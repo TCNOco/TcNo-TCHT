@@ -1,4 +1,6 @@
-![TBAG Banner](https://tcno.co/tbag-banner.png)
+![TBAG Banner](https://tcno.co/tbag-banner-short.png)
+
+# TB.AG Scripts (TroubleChute Scripts)
 
 Everything hosted on tb.ag. PowerShell scripts and more.
 
