@@ -22,8 +22,8 @@
 # This script downloads and places aria2 in C:\Tools, and adds it to PATH assuming it's not already there.
 # ----------------------------------------
 
-iex (irm https://tcno.co/scripts/Import-RemoteFunction.ps1) # Get RemoteFunction importer
-Import-RemoteFunction -ScriptUri "https://tcno.co/scripts/Invoke-Elevated.psm1" # Import function to raise code to Admin
+iex (irm Import-RemoteFunction.tb.ag) # Get RemoteFunction importer
+Import-RemoteFunction -ScriptUri "Invoke-Elevated.tb.ag" # Import function to raise code to Admin
 
 function Install-Aria2() {
     Invoke-Elevated {

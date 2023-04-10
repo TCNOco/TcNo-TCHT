@@ -20,42 +20,52 @@
 #
 # ----------------------------------------
 # This script:
-# 1. Installs git to clone the nomic-ai/gpt4all project. In the future you can run 'git pull' in the project's folder to update it.
-# 2. Downloads nomic-ai/gpt4all.
-# 3. Installs aria2c for a much faster model download.
-# 4. Installs required Microsoft VC Runtimes, which the project will not run without.
-# 5. Launches gpt4all.
-# 6. (Optional) Create a desktop shortcut
+# 1. Installs Chocolatey (for installing VCRuntimes and aria2) - https://chocolatey.org/install.
+# 2. Installs git to clone the nomic-ai/gpt4all project. In the future you can run 'git pull' in the project's folder to update it.
+# 3. Downloads nomic-ai/gpt4all
+# 4. Installs aria2c for a much faster model download using Choco.
+# 5. Installs required Microsoft VC Runtimes, which the project will not run without, using Choco.
+# 6. Launches gpt4all.
+# 7. (Optional) Create a desktop shortcut
 # ----------------------------------------
 
 Write-Host "Welcome to TroubleChute's GPT4All installer!" -ForegroundColor Cyan
 Write-Host "GPT4All as well as all of its other dependencies should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-06]`n`n" -ForegroundColor Cyan
+Write-Host "[Version 2023-04-06 (version 2)]`n`n" -ForegroundColor Cyan
 
-# Install or update Git if not already installed
-iex (irm https://tcno.co/scripts/install-git.ps1)
+# 1. Install Chocolatey
+Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-# Clone the nomic-ai GPT4All repo
+# 2. Install or update Git if not already installed
+Write-Host "`nInstalling Git..." -ForegroundColor Cyan
+iex (irm install-git.tb.ag)
+
+# 3. Clone the nomic-ai GPT4All repo
+Write-Host "`nCloning the nomic-ai GPT4All repo..." -ForegroundColor Cyan
 git clone https://github.com/nomic-ai/gpt4all.git
 
 # Import function to reload without needing to re-open Powershell
-iex (irm https://tcno.co/scripts/refreshenv.ps1)
+iex (irm refreshenv.tb.ag)
 
-# Before downloading the model, we'll install aria2c to make the download MUCH faster
-if (Get-Command aria2c -ErrorAction SilentlyContinue) { Write-Host "Aria2 is already installed." } else { iex (irm https://tcno.co/scripts/install-aria2.ps1) }
+# 4. Before downloading the model, we'll install aria2c to make the download MUCH faster
+Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
+choco install aria2 -y
 Update-SessionEnvironment
 
-# Download the GPT4All Lora model
-Write-Host "Downloading the GPT4All model. This will take a while" -ForegroundColor Yellow
+# 5. Download the GPT4All Lora model
+Write-Host "`nDownloading the GPT4All model. This will take a while" -ForegroundColor Cyan
 aria2c -x 8 -s 8 --continue --out="./gpt4all/chat/gpt4all-lora-quantized.bin" https://the-eye.eu/public/AI/models/nomic-ai/gpt4all/gpt4all-lora-quantized.bin
 
-# Install VCRedist (if missing any)
-iex (irm https://tcno.co/scripts/install-vcredist.ps1)
+# 6. Install VCRedist (if missing any)
+Write-Host "`nInstalling required VCRuntimes..." -ForegroundColor Cyan
+choco install vcredist2015 -y
 
-iex (irm https://tcno.co/scripts/Import-RemoteFunction.ps1) # Get RemoteFunction importer
-Import-RemoteFunction -ScriptUri "https://tcno.co/scripts/New-Shortcut.psm1" # Import function to create a shortcut
+iex (irm Import-RemoteFunction.tb.ag) # Get RemoteFunction importer
+Import-RemoteFunction -ScriptUri "New-Shortcut.tb.ag" # Import function to create a shortcut
 
-# Create a desktop shortcut
+# 7. Create a desktop shortcut
+Write-Host "`nCreating shortcut on desktop..." -ForegroundColor Cyan
 $shortcutName = "GPT4All"
 $targetPath = "gpt4all\chat\gpt4all-lora-quantized-win64.exe"
 $workingDirectory = "gpt4all\chat"
@@ -65,5 +75,6 @@ if ($createShortcut -eq "Y" -or $createShortcut -eq "y") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -WorkingDirectory $workingDirectory
 }
 
-# Run the gpt4all-lora-quantized-win64 program
+# 8. Run the gpt4all-lora-quantized-win64 program
+Write-Host "`nRunning GPT4All" -ForegroundColor Cyan
 Start-Process -FilePath 'gpt4all\chat\gpt4all-lora-quantized-win64.exe' -WorkingDirectory 'gpt4all\chat'

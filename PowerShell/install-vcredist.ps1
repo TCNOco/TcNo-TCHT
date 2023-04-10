@@ -4,8 +4,8 @@
 # 
 # A huge thank you to aaronparker/vcredist for this!
 
-iex (irm https://tcno.co/scripts/Import-RemoteFunction.ps1) # Get RemoteFunction importer
-Import-RemoteFunction -ScriptUri "https://tcno.co/scripts/Invoke-Elevated.psm1" # Import function to raise code to Admin
+iex (irm Import-RemoteFunction.tb.ag) # Get RemoteFunction importer
+Import-RemoteFunction -ScriptUri "Invoke-Elevated.tb.ag" # Import function to raise code to Admin
 
 # The following does need to be run as admin, so that is done with the above to elevate it.
 Invoke-Elevated {

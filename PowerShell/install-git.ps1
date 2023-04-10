@@ -33,7 +33,7 @@ Param()
 if (!($IsLinux -or $IsOSX))
 {
     # Import function to reload without needing to re-open Powershell
-    iex (irm https://tcno.co/scripts/refreshenv.ps1)
+    iex (irm refreshenv.tb.ag)
     
     # Continue...
     $gitExePath = "C:\Program Files\Git\bin\git.exe"
