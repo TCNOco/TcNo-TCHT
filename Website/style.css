@@ -1,0 +1,90 @@
+body {
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  
+  .teabag-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 0 auto;
+    transform: translateX(-50%)
+  }
+  
+  .teabag {
+    z-index: 2;
+    position: absolute;
+    bottom: 0;
+    animation: dip 3s ease-in-out infinite;
+    width: 400px;
+    height: 400px;
+  }
+  
+  .cup {
+    z-index: 1;
+    position: absolute;
+    bottom: 0;
+    width: 400px;
+    height: 400px;
+  }
+
+  .cup-front {
+    z-index: 3;
+    position: absolute;
+    bottom: 0;
+    width: 400px;
+    height: 400px;
+  }
+  
+  @keyframes dip {
+    0% {transform: translatey(0);}
+    50% {transform: translatey(-50px);}
+    100% {transform: translatey(0);}
+  }
+  
+  .text-container {
+    margin-top: 50px;
+  }
+  
+  h1 {
+    font-size: 48px;
+    margin: 0;
+  }
+  
+  a {
+    color: #fff;
+    text-decoration: none;
+    animation: rainbow 5s ease-in-out infinite;
+  }
+  
+@keyframes rainbow {
+    0% {
+      color: #ff0000;
+    }
+    16.67% {
+      color: #ff7f00;
+    }
+    33.33% {
+      color: #ffff00;
+    }
+    50% {
+      color: #00ff00;
+    }
+    66.67% {
+      color: #0000ff;
+    }
+    83.33% {
+      color: #4b0082;
+    }
+    100% {
+      color: #9400d3;
+    }
+  }
