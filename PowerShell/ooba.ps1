@@ -41,7 +41,32 @@ Remove-Item "./oobabooga-windows.zip"
 
 # 2. Run install.bat
 Set-Location "./oobabooga-windows"
-./install.bat
+if ($gpu -eq "Yes") {
+    # Replace GPU question with YES
+    (Get-Content -Path "install.bat") | ForEach-Object {
+        $_ -replace
+            'set /p "gpuchoice=Input> "',
+            '' -replace
+            'set gpuchoice=%gpuchoice:~0,1%',
+            'set gpuchoice=A'
+    } | Set-Content -Path "install-gpu.bat"
+
+    ./install-gpu.bat
+} elseif ($gpu -eq "No") {
+    # Replace GPU question with NO
+    (Get-Content -Path "install.bat") | ForEach-Object {
+        $_ -replace
+            'set /p "gpuchoice=Input> "',
+            '' -replace
+            'set gpuchoice=%gpuchoice:~0,1%',
+            'set gpuchoice=B'
+    } | Set-Content -Path "install-cpu.bat"
+
+    ./install-cpu.bat
+} else {
+    # Install normally
+    ./install.bat
+}
 
 if (-not ($skip_model -eq 1)) {
     # 3. Run the model downloader 

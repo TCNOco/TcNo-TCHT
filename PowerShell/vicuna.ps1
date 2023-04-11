@@ -23,7 +23,7 @@
 # 1. Check if current directory is oobabooga-windows, or oobabooga-windows is in directory
 # 2. Run my install script for obabooga/text-generation-webui
 # 3. Tells you how to download the vicuna model, and opens the model downloader.
-# 4. Run the model downloader
+# 4. Run the model downloader (Unless CPU-Only mode was selected in install, in which case the CPU model is downloaded)
 # 5. Replace commands in the start-webui.bat file
 # 6. Create desktop shortcuts
 # 7. Run the webui
@@ -54,41 +54,100 @@ if ($containsFolder) {
 if (-not $containsFolder) {
     Write-Host "I'll start by installing Oobabooga first, then we'll get to the model...`n`n"
     
+    #2. Choose CPU or GPU installation
+    Write-Host "Do you have an NVIDIA GPU?" -ForegroundColor Cyan
+    Write-Host "Enter anything but y or n to skip." -ForegroundColor Yellow
+
+    $choice = Read-Host "Answer (y/n)"
+
     $skip_model = 1
     $skip_start = 1
-    # 2. Run my install script for obabooga/text-generation-webui
-    iex (irm ooba.tb.ag)
+
+    if ($choice -eq "Y" -or $choice -eq "y") {
+        Write-Host "Installing GPU & CPU compatible version" -ForegroundColor Cyan
+        Write-Host "If this fails, please delete the folder and choose 'N'" -ForegroundColor Cyan
+        $gpu = "Yes"
+        # 2. Run my install script for obabooga/text-generation-webui
+        iex (irm ooba.tb.ag)
+    }
+    elseif ($choice -eq "N" -or $choice -eq "n") {
+        Write-Host "Installing CPU-Only version" -ForegroundColor Cyan
+        $gpu = "No"
+        # 2. Run my install script for obabooga/text-generation-webui
+        iex (irm ooba.tb.ag)
+    }
+
 } else {
     # CD into folder anyway
     Set-Location "./oobabooga-windows"
 }
 
-# 3. Tells you how to download the vicuna model, and opens the model downloader.
+function Download-VicunaCPU() {
+    # Download CPU model (only the updated one)
+    # If downloaded using model downloader, another 8.14 GB download will be run...
+    $url = "https://huggingface.co/eachadea/ggml-vicuna-13b-4bit/resolve/main/ggml-vicuna-13b-4bit-rev1.bin"
+    $outputPath = "text-generation-webui\models\eachadea_ggml-vicuna-13b-4bit\ggml-vicuna-13b-4bit-rev1.bin"
 
-Write-Host "`n`nATTENTION:`nCopy the following line by dragging around it and right-clicking." -ForegroundColor Cyan
-Write-Host -NoNewline "CPU: " -ForegroundColor Red
-Write-Host "eachadea/ggml-vicuna-13b-4bit" -ForegroundColor Green
-Write-Host -NoNewline "GPU (eg. Nvidia): " -ForegroundColor Red
-Write-Host "anon8231489123/vicuna-13b-GPTQ-4bit-128g" -ForegroundColor Green
-Write-Host "When asked what model, select L (none of the above). Then Right-Click when asked for the Hugging Face model, or hit Ctrl+V and Enter." -ForegroundColor Cyan
+    # Download the file from the URL
+    Write-Host "Downloading: eachadea/ggml-vicuna-13b-4bit (CPU model)" -ForegroundColor Cyan
+    aria2c -x 8 -s 8 --continue --out="$outputPath" $url --console-log-level=error --download-result=hide
+    Write-Host "`nDone!`n"
+}
+function Download-VicunaGPU() {
+    # Download GPU/CUDA model
+    $blob = "https://huggingface.co/anon8231489123/vicuna-13b-GPTQ-4bit-128g/resolve/main"
+    $outputPath = "text-generation-webui\models\anon8231489123_vicuna-13b-GPTQ-4bit-128g"
 
-$downloadAgain = Read-Host "Press any key to continue (or enter "n" to skip downloading a model)..."
-if (-not ($downloadAgain -eq "N" -or $downloadAgain -eq "n")) {
-    Write-Host "`n`n"
+    # Download the file from the URL
+    Write-Host "Downloading: anon8231489123/vicuna-13b-GPTQ-4bit-128g (GPU/CUDA model)" -ForegroundColor Cyan
+    aria2c -x 8 -s 8 --continue --out="$outputPath\vicuna-13b-4bit-128g.safetensors" "$blob/vicuna-13b-4bit-128g.safetensors" --console-log-level=error --download-result=hide
+    aria2c -x 8 -s 8 --continue --out="$outputPath\tokenizer_config.json" "$blob/tokenizer_config.json" --console-log-level=error --download-result=hide
+    aria2c -x 8 -s 8 --continue --out="$outputPath\tokenizer.model" "$blob/tokenizer.model" --console-log-level=error --download-result=hide
+    aria2c -x 8 -s 8 --continue --out="$outputPath\special_tokens_map.json" "$blob/special_tokens_map.json" --console-log-level=error --download-result=hide
+    aria2c -x 8 -s 8 --continue --out="$outputPath\pytorch_model.bin.index.json" "$blob/pytorch_model.bin.index.json" --console-log-level=error --download-result=hide
+    aria2c -x 8 -s 8 --continue --out="$outputPath\generation_config.json" "$blob/generation_config.json" --console-log-level=error --download-result=hide
+    aria2c -x 8 -s 8 --continue --out="$outputPath\config.json" "$blob/config.json" --console-log-level=error --download-result=hide
+    Write-Host "`nDone!`n"
+}
+
+# Download aria2 binary for faster downloads, if not already installed.
+iex (irm download-aria2.tb.ag)
+# Create the output folder if it does not exist
+New-Item -ItemType Directory -Force -Path (Split-Path -Parent "text-generation-webui\models\eachadea_ggml-vicuna-13b-4bit")
+
+if ($gpu -eq "No") {
+    Download-VicunaCPU
+} else {
+    Write-Host "`n`nPick which models to download:" -ForegroundColor Cyan
+    Write-Host -NoNewline "CPU (7.5GB): " -ForegroundColor Red
+    Write-Host "1" -ForegroundColor Green
+    Write-Host -NoNewline "GPU [Nvidia] (6.9GB): " -ForegroundColor Red
+    Write-Host "2" -ForegroundColor Green
+    Write-Host -NoNewline "CPU + GPU [Nvidia] (14.4GB): " -ForegroundColor Red
+    Write-Host "3" -ForegroundColor Green
     
-    # 4. Run the model downloader
-    ./download-model.bat
+    $num = Read-Host "Enter a number"
+    if ($num -eq "1") {
+        Download-VicunaCPU
+    } elseif ($num -eq "2") {
+        Download-VicunaGPU
+    } elseif ($num -eq "3") {
+        Download-VicunaCPU
+        Download-VicunaGPU
+    }
 }
 
 # 5. Replace commands in the start-webui.bat file
 # Create CPU and GPU versions
 Copy-Item "start-webui.bat" "start-webui-vicuna.bat"
 
-(Get-Content -Path "start-webui-vicuna.bat") | ForEach-Object {
-    $_ -replace
-        'call python server\.py --auto-devices --cai-chat',
-        'call python server.py --auto-devices --cai-chat --model anon8231489123_vicuna-13b-GPTQ-4bit-128g --wbits 4 --groupsize 128'
-} | Set-Content -Path "start-webui-vicuna-gpu.bat"
+if (-not ($gpu -eq "No")) {
+    (Get-Content -Path "start-webui-vicuna.bat") | ForEach-Object {
+        $_ -replace
+            'call python server\.py --auto-devices --cai-chat',
+            'call python server.py --auto-devices --cai-chat --model anon8231489123_vicuna-13b-GPTQ-4bit-128g --wbits 4 --groupsize 128'
+    } | Set-Content -Path "start-webui-vicuna-gpu.bat"
+}
 
 (Get-Content -Path "start-webui-vicuna.bat") | ForEach-Object {
     $_ -replace
@@ -97,7 +156,11 @@ Copy-Item "start-webui.bat" "start-webui-vicuna.bat"
 } | Set-Content -Path "start-webui-vicuna.bat"
 
 # 6. Create desktop shortcuts
-Write-Host "`n`nCreate desktop shortcuts for 'Vicuna' and 'Vicuna (CPU)'" -ForegroundColor Cyan
+if ($gpu -eq "No") {
+    Write-Host "`n`nCreate desktop shortcuts for 'Vicuna (CPU)'" -ForegroundColor Cyan
+} else {
+    Write-Host "`n`nCreate desktop shortcuts for 'Vicuna' and 'Vicuna (CPU)'" -ForegroundColor Cyan
+}
 $shortcuts = Read-Host "Do you want desktop shortcuts? (Y/N)"
 
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
@@ -106,13 +169,14 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     
     Write-Host "Downloading Vicuna icon..."
     Invoke-WebRequest -Uri 'https://tb.ag/vicuna.ico' -OutFile 'vicuna.ico'
+    if (-not ($gpu -eq "No")) {
+        Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
+        $shortcutName = "Vicuna oobabooga"
+        $targetPath = "start-webui-vicuna-gpu.bat"
+        $IconLocation = 'vicuna.ico'
+        New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
+    }
 
-    Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
-    $shortcutName = "Vicuna oobabooga"
-    $targetPath = "start-webui-vicuna-gpu.bat"
-    $IconLocation = 'vicuna.ico'
-    New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
-    
     $shortcutName = "Vicuna (CPU) oobabooga"
     $targetPath = "start-webui-vicuna.bat"
     $IconLocation = 'vicuna.ico'
@@ -120,19 +184,22 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     
 }
 
-
 # 7. Run the webui
-# Ask user if they want to launch the CPU or GPU version
-Write-Host "`n`nEnter 1 to launch CPU version, or 2 to launch GPU version" -ForegroundColor Cyan
-
-$choice = Read-Host "1 (CPU) or 2 (GPU)"
-
-if ($choice -eq "1") {
+if ($gpu -eq "No") {
     Start-Process ".\start-webui-vicuna.bat"
-}
-elseif ($choice -eq "2") {
-    Start-Process ".\start-webui-vicuna-gpu.bat"
-}
-else {
-    Write-Host "Invalid choice. Please enter 1 or 2."
+} else {
+    # Ask user if they want to launch the CPU or GPU version
+    Write-Host "`n`nEnter 1 to launch CPU version, or 2 to launch GPU version" -ForegroundColor Cyan
+    
+    $choice = Read-Host "1 (CPU) or 2 (GPU)"
+    
+    if ($choice -eq "1") {
+        Start-Process ".\start-webui-vicuna.bat"
+    }
+    elseif ($choice -eq "2") {
+        Start-Process ".\start-webui-vicuna-gpu.bat"
+    }
+    else {
+        Write-Host "Invalid choice. Please enter 1 or 2."
+    }
 }
