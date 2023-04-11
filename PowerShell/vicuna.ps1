@@ -90,7 +90,12 @@ function Download-VicunaCPU() {
 
     # Download the file from the URL
     Write-Host "Downloading: eachadea/ggml-vicuna-13b-4bit (CPU model)" -ForegroundColor Cyan
-    aria2c -x 8 -s 8 --continue --out="$outputPath" $url --console-log-level=error --download-result=hide
+    if (Test-Path $(Get-Command aria2c -ErrorAction SilentlyContinue).Source) {
+        aria2c -x 8 -s 8 --continue --out="$outputPath" $url --console-log-level=error --download-result=hide
+    } else {
+        Invoke-WebRequest -Uri $url -OutFile $outputPath
+    }
+    
     Write-Host "`nDone!`n"
 }
 function Download-VicunaGPU() {
@@ -100,13 +105,23 @@ function Download-VicunaGPU() {
 
     # Download the file from the URL
     Write-Host "Downloading: anon8231489123/vicuna-13b-GPTQ-4bit-128g (GPU/CUDA model)" -ForegroundColor Cyan
-    aria2c -x 8 -s 8 --continue --out="$outputPath\vicuna-13b-4bit-128g.safetensors" "$blob/vicuna-13b-4bit-128g.safetensors" --console-log-level=error --download-result=hide
-    aria2c -x 8 -s 8 --continue --out="$outputPath\tokenizer_config.json" "$blob/tokenizer_config.json" --console-log-level=error --download-result=hide
-    aria2c -x 8 -s 8 --continue --out="$outputPath\tokenizer.model" "$blob/tokenizer.model" --console-log-level=error --download-result=hide
-    aria2c -x 8 -s 8 --continue --out="$outputPath\special_tokens_map.json" "$blob/special_tokens_map.json" --console-log-level=error --download-result=hide
-    aria2c -x 8 -s 8 --continue --out="$outputPath\pytorch_model.bin.index.json" "$blob/pytorch_model.bin.index.json" --console-log-level=error --download-result=hide
-    aria2c -x 8 -s 8 --continue --out="$outputPath\generation_config.json" "$blob/generation_config.json" --console-log-level=error --download-result=hide
-    aria2c -x 8 -s 8 --continue --out="$outputPath\config.json" "$blob/config.json" --console-log-level=error --download-result=hide
+    if (Test-Path $(Get-Command aria2c -ErrorAction SilentlyContinue).Source) {
+        aria2c -x 8 -s 8 --continue --out="$outputPath\vicuna-13b-4bit-128g.safetensors" "$blob/vicuna-13b-4bit-128g.safetensors" --console-log-level=error --download-result=hide
+        aria2c -x 8 -s 8 --continue --out="$outputPath\tokenizer_config.json" "$blob/tokenizer_config.json" --console-log-level=error --download-result=hide
+        aria2c -x 8 -s 8 --continue --out="$outputPath\tokenizer.model" "$blob/tokenizer.model" --console-log-level=error --download-result=hide
+        aria2c -x 8 -s 8 --continue --out="$outputPath\special_tokens_map.json" "$blob/special_tokens_map.json" --console-log-level=error --download-result=hide
+        aria2c -x 8 -s 8 --continue --out="$outputPath\pytorch_model.bin.index.json" "$blob/pytorch_model.bin.index.json" --console-log-level=error --download-result=hide
+        aria2c -x 8 -s 8 --continue --out="$outputPath\generation_config.json" "$blob/generation_config.json" --console-log-level=error --download-result=hide
+        aria2c -x 8 -s 8 --continue --out="$outputPath\config.json" "$blob/config.json" --console-log-level=error --download-result=hide
+    } else {
+        Invoke-WebRequest -Uri "$blob\vicuna-13b-4bit-128g.safetensors" -OutFile "$outputPath\vicuna-13b-4bit-128g.safetensors"
+        Invoke-WebRequest -Uri "$blob\tokenizer_config.json" -OutFile "$outputPath\tokenizer_config.json"
+        Invoke-WebRequest -Uri "$blob\tokenizer.model" -OutFile "$outputPath\tokenizer.model"
+        Invoke-WebRequest -Uri "$blob\special_tokens_map.json" -OutFile "$outputPath\special_tokens_map.json"
+        Invoke-WebRequest -Uri "$blob\pytorch_model.bin.index.json" -OutFile "$outputPath\pytorch_model.bin.index.json"
+        Invoke-WebRequest -Uri "$blob\generation_config.json" -OutFile "$outputPath\generation_config.json"
+        Invoke-WebRequest -Uri "$blob\config.json" -OutFile "$outputPath\config.json"
+    }
     Write-Host "`nDone!`n"
 }
 
