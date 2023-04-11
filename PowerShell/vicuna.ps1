@@ -82,68 +82,7 @@ if (-not $containsFolder) {
     Set-Location "./oobabooga-windows"
 }
 
-# Allow importing remote functions
-iex (irm Import-RemoteFunction.tb.ag)
-
-function Download-Aria2File {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$Url,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$OutputPath
-    )
-
-    # Check if aria2c is available
-    if (-not ($null -eq (Get-Command aria2c -ErrorAction SilentlyContinue))) {
-        # Use aria2c to download the files
-        aria2c -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
-    } elseif (-not ($null -eq (Get-Command ./aria2c -ErrorAction SilentlyContinue))) {
-        # Use aria2c to download the files
-        ./aria2c -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
-    } else {
-        # Import download command if not already available
-        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1"
-       
-        # Use Get-FileFromWeb to download the files
-        Get-FileFromWeb -URL $url -File $outputPath
-    }
-}
-function Download-Aria2Files {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$Url,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$OutputPath,
-        
-        [Parameter(Mandatory=$true)]
-        [string[]]$Files
-    )
-
-    # Check if aria2c is available
-    if (-not ($null -eq (Get-Command aria2c -ErrorAction SilentlyContinue))) {
-        # Use aria2c to download the files
-        $files | ForEach-Object {
-            aria2c -x 8 -s 8 --continue --out="$outputPath\$_" "$Url/$_" --console-log-level=error --download-result=hide
-        }
-    } elseif (-not ($null -eq (Get-Command ./aria2c -ErrorAction SilentlyContinue))) {
-        # Use aria2c to download the files
-        $files | ForEach-Object {
-            ./aria2c -x 8 -s 8 --continue --out="$outputPath\$_" "$Url/$_" --console-log-level=error --download-result=hide
-        }
-    } else {
-        # Import download command if not already available
-        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1"
-
-        # Use Get-FileFromWeb to download the files
-        $files | ForEach-Object {
-            Get-FileFromWeb -URL "$Url\$_" -File "$outputPath\$_"
-        }
-    }
-}
-
-function Download-VicunaCPU() {
+function Get-VicunaCPU() {
     # Download CPU model (only the updated one)
     # If downloaded using model downloader, another 8.14 GB download will be run...
     $url = "https://huggingface.co/eachadea/ggml-vicuna-13b-4bit/resolve/main/ggml-vicuna-13b-4bit-rev1.bin"
@@ -151,10 +90,10 @@ function Download-VicunaCPU() {
 
     # Download the file from the URL
     Write-Host "Downloading: eachadea/ggml-vicuna-13b-4bit (CPU model)" -ForegroundColor Cyan
-    Download-Aria2Files -Url $url -OutputPath $outputPath
+    Get-Aria2File -Url $url -OutputPath $outputPath
     Write-Host "`nDone!`n"
 }
-function Download-VicunaGPU() {
+function Get-VicunaGPU() {
     # Download GPU/CUDA model
     $blob = "https://huggingface.co/anon8231489123/vicuna-13b-GPTQ-4bit-128g/resolve/main"
     $outputPath = "text-generation-webui\models\anon8231489123_vicuna-13b-GPTQ-4bit-128g"
@@ -171,12 +110,14 @@ function Download-VicunaGPU() {
         "config.json"
     )
 
-    Download-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
+    Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
     Write-Host "`nDone!`n"
 }
 
-# Download aria2 binary for faster downloads, if not already installed.
-iex (irm download-aria2.tb.ag)
+# Allow importing remote functions
+iex (irm Import-RemoteFunction.tb.ag)
+Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tb.ag"
+
 # Create the output folder if it does not exist
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent "text-generation-webui\models\eachadea_ggml-vicuna-13b-4bit") | Out-Null
 if (-not $?) {
@@ -184,7 +125,7 @@ if (-not $?) {
 }
 
 if ($gpu -eq "No") {
-    Download-VicunaCPU
+    Get-VicunaCPU
 } else {
     Write-Host "`n`nPick which models to download:" -ForegroundColor Cyan
     Write-Host -NoNewline "CPU (7.5GB): " -ForegroundColor Red
@@ -196,12 +137,12 @@ if ($gpu -eq "No") {
     
     $num = Read-Host "Enter a number"
     if ($num -eq "1") {
-        Download-VicunaCPU
+        Get-VicunaCPU
     } elseif ($num -eq "2") {
-        Download-VicunaGPU
+        Get-VicunaGPU
     } elseif ($num -eq "3") {
-        Download-VicunaCPU
-        Download-VicunaGPU
+        Get-VicunaCPU
+        Get-VicunaGPU
     }
 }
 
