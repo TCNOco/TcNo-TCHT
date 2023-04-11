@@ -31,7 +31,7 @@
 
 Write-Host "Welcome to TroubleChute's Vicuna installer!" -ForegroundColor Cyan
 Write-Host "Vicuna as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-07]`n`n" -ForegroundColor Cyan
+Write-Host "[Version 2023-04-11]`n`n" -ForegroundColor Cyan
 
 # 1. Check if current directory is oobabooga-windows, or oobabooga-windows is in directory
 # If it is, CD back a folder.

@@ -63,7 +63,7 @@ $python = "python"
 Try {
     $pythonVersion = &$python --version 2>&1
     if ($pythonVersion -match 'Python ([3].[9].[9-9]\d*|3.10.(0|10))') {
-        Write-Host "Python version $($matches[1]) is installed." - -ForegroundColor Green
+        Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
     }
     else {
         Write-Host "Python version is not between 3.9.9 and 3.10.10." -ForegroundColor Yellow
