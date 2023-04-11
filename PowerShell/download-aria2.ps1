@@ -26,7 +26,7 @@ function Install-Aria2() {
     Write-Host "Downloading Aria2 (For faster downloads - Only needs to be done once)" -ForegroundColor Yellow
     # Set download URL and destination folder
     $downloadUrl = "https://github.com/aria2/aria2/releases/download/release-1.36.0/aria2-1.36.0-win-64bit-build1.zip"
-    $aria2ZipPath = "aria2.zip"
+    $aria2ZipPath = "./aria2.zip"
 
     # Download the aria2 zip file
     Invoke-WebRequest -Uri $downloadUrl -OutFile $aria2ZipPath
@@ -35,9 +35,9 @@ function Install-Aria2() {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
 
     # Extract only aria2c.exe from the zip file
-    $zip = [System.IO.Compression.ZipFile]::OpenRead($aria2ZipPath)
+    $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path -Path $aria2ZipPath).Path)
     $aria2cExe = $zip.Entries | Where-Object { $_.FullName -eq "aria2-1.36.0-win-64bit-build1/aria2c.exe" }
-    [System.IO.Compression.ZipFileExtensions]::ExtractToFile($aria2cExe, "aria2c.exe", $true)
+    [System.IO.Compression.ZipFileExtensions]::ExtractToFile($aria2cExe, (Get-Location).Path + '\aria2c.exe', $true)
     $zip.Dispose()
 
     # Remove the downloaded zip file

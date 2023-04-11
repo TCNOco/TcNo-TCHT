@@ -82,6 +82,67 @@ if (-not $containsFolder) {
     Set-Location "./oobabooga-windows"
 }
 
+# Allow importing remote functions
+iex (irm Import-RemoteFunction.tb.ag)
+
+function Download-Aria2File {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$Url,
+        
+        [Parameter(Mandatory=$true)]
+        [string]$OutputPath
+    )
+
+    # Check if aria2c is available
+    if (-not ($null -eq (Get-Command aria2c -ErrorAction SilentlyContinue))) {
+        # Use aria2c to download the files
+        aria2c -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
+    } elseif (-not ($null -eq (Get-Command ./aria2c -ErrorAction SilentlyContinue))) {
+        # Use aria2c to download the files
+        ./aria2c -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
+    } else {
+        # Import download command if not already available
+        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1"
+       
+        # Use Get-FileFromWeb to download the files
+        Get-FileFromWeb -URL $url -File $outputPath
+    }
+}
+function Download-Aria2Files {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$Url,
+        
+        [Parameter(Mandatory=$true)]
+        [string]$OutputPath,
+        
+        [Parameter(Mandatory=$true)]
+        [string[]]$Files
+    )
+
+    # Check if aria2c is available
+    if (-not ($null -eq (Get-Command aria2c -ErrorAction SilentlyContinue))) {
+        # Use aria2c to download the files
+        $files | ForEach-Object {
+            aria2c -x 8 -s 8 --continue --out="$outputPath\$_" "$Url/$_" --console-log-level=error --download-result=hide
+        }
+    } elseif (-not ($null -eq (Get-Command ./aria2c -ErrorAction SilentlyContinue))) {
+        # Use aria2c to download the files
+        $files | ForEach-Object {
+            ./aria2c -x 8 -s 8 --continue --out="$outputPath\$_" "$Url/$_" --console-log-level=error --download-result=hide
+        }
+    } else {
+        # Import download command if not already available
+        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1"
+
+        # Use Get-FileFromWeb to download the files
+        $files | ForEach-Object {
+            Get-FileFromWeb -URL "$Url\$_" -File "$outputPath\$_"
+        }
+    }
+}
+
 function Download-VicunaCPU() {
     # Download CPU model (only the updated one)
     # If downloaded using model downloader, another 8.14 GB download will be run...
@@ -90,15 +151,7 @@ function Download-VicunaCPU() {
 
     # Download the file from the URL
     Write-Host "Downloading: eachadea/ggml-vicuna-13b-4bit (CPU model)" -ForegroundColor Cyan
-    if (Test-Path $(Get-Command aria2c -ErrorAction SilentlyContinue).Source) {
-        aria2c -x 8 -s 8 --continue --out="$outputPath" $url --console-log-level=error --download-result=hide
-    } else {
-        iex (irm Import-RemoteFunction.tb.ag)
-        Import-RemoteFunction -ScriptUri https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1
-
-        Get-FileFromWeb -URL $url -File $outputPath
-    }
-    
+    Download-Aria2Files -Url $url -OutputPath $outputPath
     Write-Host "`nDone!`n"
 }
 function Download-VicunaGPU() {
@@ -108,33 +161,27 @@ function Download-VicunaGPU() {
 
     # Download the file from the URL
     Write-Host "Downloading: anon8231489123/vicuna-13b-GPTQ-4bit-128g (GPU/CUDA model)" -ForegroundColor Cyan
-    if (Test-Path $(Get-Command aria2c -ErrorAction SilentlyContinue).Source) {
-        aria2c -x 8 -s 8 --continue --out="$outputPath\vicuna-13b-4bit-128g.safetensors" "$blob/vicuna-13b-4bit-128g.safetensors" --console-log-level=error --download-result=hide
-        aria2c -x 8 -s 8 --continue --out="$outputPath\tokenizer_config.json" "$blob/tokenizer_config.json" --console-log-level=error --download-result=hide
-        aria2c -x 8 -s 8 --continue --out="$outputPath\tokenizer.model" "$blob/tokenizer.model" --console-log-level=error --download-result=hide
-        aria2c -x 8 -s 8 --continue --out="$outputPath\special_tokens_map.json" "$blob/special_tokens_map.json" --console-log-level=error --download-result=hide
-        aria2c -x 8 -s 8 --continue --out="$outputPath\pytorch_model.bin.index.json" "$blob/pytorch_model.bin.index.json" --console-log-level=error --download-result=hide
-        aria2c -x 8 -s 8 --continue --out="$outputPath\generation_config.json" "$blob/generation_config.json" --console-log-level=error --download-result=hide
-        aria2c -x 8 -s 8 --continue --out="$outputPath\config.json" "$blob/config.json" --console-log-level=error --download-result=hide
-    } else {
-        iex (irm Import-RemoteFunction.tb.ag)
-        Import-RemoteFunction -ScriptUri https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1
+    $files = @(
+        "vicuna-13b-4bit-128g.safetensors",
+        "tokenizer_config.json",
+        "tokenizer.model",
+        "special_tokens_map.json",
+        "pytorch_model.bin.index.json",
+        "generation_config.json",
+        "config.json"
+    )
 
-        Get-FileFromWeb -URL "$blob\vicuna-13b-4bit-128g.safetensors" -File "$outputPath\vicuna-13b-4bit-128g.safetensors"
-        Get-FileFromWeb -URL "$blob\tokenizer_config.json" -File "$outputPath\tokenizer_config.json"
-        Get-FileFromWeb -URL "$blob\tokenizer.model" -File "$outputPath\tokenizer.model"
-        Get-FileFromWeb -URL "$blob\special_tokens_map.json" -File "$outputPath\special_tokens_map.json"
-        Get-FileFromWeb -URL "$blob\pytorch_model.bin.index.json" -File "$outputPath\pytorch_model.bin.index.json"
-        Get-FileFromWeb -URL "$blob\generation_config.json" -File "$outputPath\generation_config.json"
-        Get-FileFromWeb -URL "$blob\config.json" -File "$outputPath\config.json"
-    }
+    Download-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
     Write-Host "`nDone!`n"
 }
 
 # Download aria2 binary for faster downloads, if not already installed.
 iex (irm download-aria2.tb.ag)
 # Create the output folder if it does not exist
-New-Item -ItemType Directory -Force -Path (Split-Path -Parent "text-generation-webui\models\eachadea_ggml-vicuna-13b-4bit")
+New-Item -ItemType Directory -Force -Path (Split-Path -Parent "text-generation-webui\models\eachadea_ggml-vicuna-13b-4bit") | Out-Null
+if (-not $?) {
+    Write-Error "Failed to create directory."
+}
 
 if ($gpu -eq "No") {
     Download-VicunaCPU
