@@ -145,14 +145,14 @@ if (-not ($gpu -eq "No")) {
     (Get-Content -Path "start-webui-vicuna.bat") | ForEach-Object {
         $_ -replace
             'call python server\.py --auto-devices --cai-chat',
-            'call python server.py --auto-devices --cai-chat --model anon8231489123_vicuna-13b-GPTQ-4bit-128g --wbits 4 --groupsize 128'
+            'call python server.py --auto-devices --chat --model anon8231489123_vicuna-13b-GPTQ-4bit-128g --wbits 4 --groupsize 128'
     } | Set-Content -Path "start-webui-vicuna-gpu.bat"
 }
 
 (Get-Content -Path "start-webui-vicuna.bat") | ForEach-Object {
     $_ -replace
         'call python server\.py --auto-devices --cai-chat',
-        'call python server.py --auto-devices --cai-chat --model eachadea_ggml-vicuna-13b-4bit'
+        'call python server.py --auto-devices --chat --model eachadea_ggml-vicuna-13b-4bit'
 } | Set-Content -Path "start-webui-vicuna.bat"
 
 # 6. Create desktop shortcuts
