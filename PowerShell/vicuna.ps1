@@ -93,7 +93,10 @@ function Download-VicunaCPU() {
     if (Test-Path $(Get-Command aria2c -ErrorAction SilentlyContinue).Source) {
         aria2c -x 8 -s 8 --continue --out="$outputPath" $url --console-log-level=error --download-result=hide
     } else {
-        Invoke-WebRequest -Uri $url -OutFile $outputPath
+        iex (irm Import-RemoteFunction.tb.ag)
+        Import-RemoteFunction -ScriptUri https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1
+
+        Get-FileFromWeb -URL $url -File $outputPath
     }
     
     Write-Host "`nDone!`n"
@@ -114,13 +117,16 @@ function Download-VicunaGPU() {
         aria2c -x 8 -s 8 --continue --out="$outputPath\generation_config.json" "$blob/generation_config.json" --console-log-level=error --download-result=hide
         aria2c -x 8 -s 8 --continue --out="$outputPath\config.json" "$blob/config.json" --console-log-level=error --download-result=hide
     } else {
-        Invoke-WebRequest -Uri "$blob\vicuna-13b-4bit-128g.safetensors" -OutFile "$outputPath\vicuna-13b-4bit-128g.safetensors"
-        Invoke-WebRequest -Uri "$blob\tokenizer_config.json" -OutFile "$outputPath\tokenizer_config.json"
-        Invoke-WebRequest -Uri "$blob\tokenizer.model" -OutFile "$outputPath\tokenizer.model"
-        Invoke-WebRequest -Uri "$blob\special_tokens_map.json" -OutFile "$outputPath\special_tokens_map.json"
-        Invoke-WebRequest -Uri "$blob\pytorch_model.bin.index.json" -OutFile "$outputPath\pytorch_model.bin.index.json"
-        Invoke-WebRequest -Uri "$blob\generation_config.json" -OutFile "$outputPath\generation_config.json"
-        Invoke-WebRequest -Uri "$blob\config.json" -OutFile "$outputPath\config.json"
+        iex (irm Import-RemoteFunction.tb.ag)
+        Import-RemoteFunction -ScriptUri https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1
+
+        Get-FileFromWeb -URL "$blob\vicuna-13b-4bit-128g.safetensors" -File "$outputPath\vicuna-13b-4bit-128g.safetensors"
+        Get-FileFromWeb -URL "$blob\tokenizer_config.json" -File "$outputPath\tokenizer_config.json"
+        Get-FileFromWeb -URL "$blob\tokenizer.model" -File "$outputPath\tokenizer.model"
+        Get-FileFromWeb -URL "$blob\special_tokens_map.json" -File "$outputPath\special_tokens_map.json"
+        Get-FileFromWeb -URL "$blob\pytorch_model.bin.index.json" -File "$outputPath\pytorch_model.bin.index.json"
+        Get-FileFromWeb -URL "$blob\generation_config.json" -File "$outputPath\generation_config.json"
+        Get-FileFromWeb -URL "$blob\config.json" -File "$outputPath\config.json"
     }
     Write-Host "`nDone!`n"
 }
