@@ -1,4 +1,4 @@
-![TCHT Banner](https://tcno.co/tbag-banner-short.png)
+![TCHT Banner](https://tcno.co/tcht-banner-short.png)
 
 # TC.HT Scripts (TroubleChute Scripts)
 
