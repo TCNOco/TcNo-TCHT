@@ -38,11 +38,11 @@ Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # Import function to reload without needing to re-open Powershell
-iex (irm refreshenv.tb.ag)
+iex (irm refreshenv.tc.ht)
 
 # 2. Install or update Git if not already installed
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
-iex (irm install-git.tb.ag)
+iex (irm install-git.tc.ht)
 
 # 3. Check if Python returns anything (is installed - also between 3.9.9 & 3.10.10)
 Try {

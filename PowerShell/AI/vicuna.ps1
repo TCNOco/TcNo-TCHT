@@ -68,13 +68,13 @@ if (-not $containsFolder) {
         Write-Host "If this fails, please delete the folder and choose 'N'" -ForegroundColor Cyan
         $gpu = "Yes"
         # 2. Run my install script for obabooga/text-generation-webui
-        iex (irm ooba.tb.ag)
+        iex (irm ooba.tc.ht)
     }
     elseif ($choice -eq "N" -or $choice -eq "n") {
         Write-Host "Installing CPU-Only version" -ForegroundColor Cyan
         $gpu = "No"
         # 2. Run my install script for obabooga/text-generation-webui
-        iex (irm ooba.tb.ag)
+        iex (irm ooba.tc.ht)
     }
 
 } else {
@@ -115,8 +115,8 @@ function Get-VicunaGPU() {
 }
 
 # Allow importing remote functions
-iex (irm Import-RemoteFunction.tb.ag)
-Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tb.ag"
+iex (irm Import-RemoteFunction.tc.ht)
+Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
 
 # Create the output folder if it does not exist
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent "text-generation-webui\models\eachadea_ggml-vicuna-13b-4bit") | Out-Null
@@ -173,11 +173,11 @@ if ($gpu -eq "No") {
 $shortcuts = Read-Host "Do you want desktop shortcuts? (Y/N)"
 
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
-    iex (irm Import-RemoteFunction.tb.ag) # Get RemoteFunction importer
-    Import-RemoteFunction -ScriptUri "https://New-Shortcut.tb.ag" # Import function to create a shortcut
+    iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
+    Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
     Write-Host "Downloading Vicuna icon..."
-    Invoke-WebRequest -Uri 'https://tb.ag/vicuna.ico' -OutFile 'vicuna.ico'
+    Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/vicuna.ico' -OutFile 'vicuna.ico'
     if (-not ($gpu -eq "No")) {
         Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
         $shortcutName = "Vicuna oobabooga"

@@ -4,8 +4,8 @@
 # 
 # A huge thank you to aaronparker/vcredist for this!
 
-iex (irm Import-RemoteFunction.tb.ag) # Get RemoteFunction importer
-Import-RemoteFunction -ScriptUri "Invoke-Elevated.tb.ag" # Import function to raise code to Admin
+iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
+Import-RemoteFunction -ScriptUri "Invoke-Elevated.tc.ht" # Import function to raise code to Admin
 
 # The following does need to be run as admin, so that is done with the above to elevate it.
 Invoke-Elevated {

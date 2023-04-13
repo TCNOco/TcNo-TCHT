@@ -44,7 +44,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 # 2. Install or update Git if not already installed
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
-iex (irm install-git.tb.ag)
+iex (irm install-git.tc.ht)
 
 # 3. Install aria2c to make the download models MUCH faster
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
@@ -162,11 +162,11 @@ Write-Host "`n`nCreate desktop shortcuts for AUTOMATIC1111?" -ForegroundColor Cy
 $shortcuts = Read-Host "Do you want desktop shortcuts? (y/n)"
 
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
-    iex (irm Import-RemoteFunction.tb.ag) # Get RemoteFunction importer
-    Import-RemoteFunction -ScriptUri "https://New-Shortcut.tb.ag" # Import function to create a shortcut
+    iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
+    Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
     Write-Host "Downloading AUTOMATIC1111 icon (not official)..."
-    Invoke-WebRequest -Uri 'https://tb.ag/automatic1111.ico' -OutFile 'automatic1111.ico'
+    Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/automatic1111.ico' -OutFile 'automatic1111.ico'
 
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
     $shortcutName = "AUTOMATIC1111 Stable Diffusion WebUI"

@@ -1,5 +1,5 @@
 # Allow importing remote functions
-iex (irm Import-RemoteFunction.tb.ag)
+iex (irm Import-RemoteFunction.tc.ht)
 
 function Initialize-Aria2 {
     # If is currently admin: Install choco and aria2
@@ -15,7 +15,7 @@ function Initialize-Aria2 {
 
         if (-not (Get-Command Update-SessionEnvironment -ErrorAction SilentlyContinue)) {
             # Import function to reload without needing to re-open Powershell
-            iex (irm refreshenv.tb.ag)
+            iex (irm refreshenv.tc.ht)
         }
         Update-SessionEnvironment
     }
@@ -25,7 +25,7 @@ function Initialize-Aria2 {
         $triedAria2Extract = $True
 
         # Download aria2 binary for faster downloads, if not already installed.
-        iex (irm download-aria2.tb.ag)
+        iex (irm download-aria2.tc.ht)
     }
 
     # If file exists, save full path for use in other folders too

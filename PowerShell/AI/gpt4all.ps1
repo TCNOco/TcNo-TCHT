@@ -39,14 +39,14 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 # 2. Install or update Git if not already installed
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
-iex (irm install-git.tb.ag)
+iex (irm install-git.tc.ht)
 
 # 3. Clone the nomic-ai GPT4All repo
 Write-Host "`nCloning the nomic-ai GPT4All repo..." -ForegroundColor Cyan
 git clone https://github.com/nomic-ai/gpt4all.git
 
 # Import function to reload without needing to re-open Powershell
-iex (irm refreshenv.tb.ag)
+iex (irm refreshenv.tc.ht)
 
 # 4. Before downloading the model, we'll install aria2c to make the download MUCH faster
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
@@ -61,8 +61,8 @@ aria2c -x 8 -s 8 --continue --out="./gpt4all/chat/gpt4all-lora-quantized.bin" ht
 Write-Host "`nInstalling required VCRuntimes..." -ForegroundColor Cyan
 choco install vcredist2015 -y
 
-iex (irm Import-RemoteFunction.tb.ag) # Get RemoteFunction importer
-Import-RemoteFunction -ScriptUri "New-Shortcut.tb.ag" # Import function to create a shortcut
+iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
+Import-RemoteFunction -ScriptUri "New-Shortcut.tc.ht" # Import function to create a shortcut
 
 # 7. Create a desktop shortcut
 Write-Host "`nCreating shortcut on desktop..." -ForegroundColor Cyan
