@@ -50,10 +50,18 @@ if (-not $condaFound) {
     Update-SessionEnvironment
 }
 
+
 # If conda found: create environment
 if ($condaFound) {
-    conda create -n whisper python=3.10 pip -y
-    conda activate whisper
+    Write-Host "`n`nDo you want to install Whisper in a python environment called `whisper`?`nYou'll need to use `conda activate whisper` before being able to use whisper?"-ForegroundColor Cyan
+    $installWhisper = Read-Host "Use Conda (y/n):"
+    if ($installWhisper -eq "y" -or $installWhisper -eq "Y") {
+        conda create -n whisper python=3.10 pip -y
+        conda activate whisper
+    } else {
+        $condaFound = $false
+        Write-Host "Checking for Python instead..."
+    }
 }
 
 $python = "python"
@@ -179,10 +187,8 @@ if ($condaFound) {
     pip install -U openai-whisper # Environment is already active
 } else {
     &$python -m pip install -U openai-whisper
+    Update-SessionEnvironment
 }
-
-
-Update-SessionEnvironment
 
 # 6. Verify that Whisper is installed. Reinstall using another method if not.
 if (Get-Command whisper -ErrorAction SilentlyContinue) {
