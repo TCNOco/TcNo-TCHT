@@ -21,17 +21,16 @@
 # ----------------------------------------
 # This script:
 # 1. Installs Chocolatey (for installing Python and FFMPEG) - https://chocolatey.org/install
-# 2. Install or update Git if not already installed
-# 3. Installs Python using Choco (if Python not already detected)
-# 4. Installs FFMPEG using Choco (if FFMPEG not already detected)
-# 5. Install CUDA using Choco (if CUDA not already detected)
-# 6. Install Pytorch if not already installed, or update. Installs either GPU version if CUDA found, or CPU-only version
-# 7. Verify that Whisper is installed.
+# 2. Check if Conda or Python is installed. If neither: install Python using Choco (if Python not already detected)
+# 3. Installs FFMPEG using Choco (if FFMPEG not already detected)
+# 4. Install CUDA using Choco (if CUDA not already detected)
+# 5. Install Pytorch if not already installed, or update. Installs either GPU version if CUDA found, or CPU-only version
+# 6. Verify that Whisper is installed. Reinstall using another method if not.
 # ----------------------------------------
 
 Write-Host "Welcome to TroubleChute's Whisper installer!" -ForegroundColor Cyan
 Write-Host "Whisper as well as all of its other dependencies should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-06]`n`n" -ForegroundColor Cyan
+Write-Host "[Version 2023-04-14]`n`n" -ForegroundColor Cyan
 
 # 1. Install Chocolatey
 Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
@@ -40,56 +39,78 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 # Import function to reload without needing to re-open Powershell
 iex (irm refreshenv.tc.ht)
 
-# 2. Install or update Git if not already installed
-Write-Host "`nInstalling Git..." -ForegroundColor Cyan
-iex (irm install-git.tc.ht)
+# 2. Check if Conda or Python is installed
+# Check if Conda is installed
+$condaFound = $false
+if (-not (Get-Command conda -ErrorAction SilentlyContinue)) {
+    $condaFound = $true
+} else {
+    # Try checking if conda is installed a little deeper... (May not always be activated for user)
+    # Allow importing remote functions
+    iex (irm Import-RemoteFunction.tc.ht)
+    Import-FunctionIfNotExists -Command Open-Conda -ScriptUri "Get-CondaPath.tc.ht"
+    Open-Conda # This checks for Conda, if it's found it opens Conda for use
 
-# 3. Check if Python returns anything (is installed - also between 3.9.9 & 3.10.10)
-Try {
-    $pythonVersion = python --version 2>&1
-    if ($pythonVersion -match 'Python ([3].[9].[9-9]\d*|3.10.(0|10))') {
-        Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
+    if (Get-Command conda -ErrorAction SilentlyContinue) {
+        $condaFound = $true
     }
 }
-Catch {
-    Write-Host "Python is not installed." -ForegroundColor Yellow
-    Write-Host "`nInstalling Python 3.10.10." -ForegroundColor Cyan
-    choco install python --version=3.10.10 -y
-    Update-SessionEnvironment
+
+# If conda found: create environment
+if ($condaFound) {
+    conda create -n whisper python=3.10 -y
+    conda activate whisper
 }
 
-# Verify Python install
 $python = "python"
-Try {
-    $pythonVersion = &$python --version 2>&1
-    if ($pythonVersion -match 'Python ([3].[9].[9-9]\d*|3.10.(0|10))') {
-        Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
-    }
-    else {
-        Write-Host "Python version is not between 3.9.9 and 3.10.10." -ForegroundColor Yellow
-        Write-Host "Assuming you've installed the correct version, please enter the comand you use to access Python 3.9/3.10." -ForegroundColor Yellow
-    
-        $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310):"
-        $pythonVersion = &$pythonProgramName --version 2>&1
-        if ($pythonVersion -match 'Python ([3].[9].[9-9]\d*|3.10.(0|10))') {
-            Write-Host "Python version $($matches[1]) is installed."
-            $python = $pythonProgramName
-        } else {
-            Write-Host "Python version is not between 3.9.9 and 3.10.10."
-            Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-            Read-Host "Process can not continue. The program will exit when you press any key to continue..."
-            Exit
+if (-not ($condaFound)) {
+    # Try Python instead
+    # Check if Python returns anything (is installed - also between 3.9.9 & 3.10.10)
+    Try {
+        $pythonVersion = python --version 2>&1
+        if ($pythonVersion -match 'Python (3.(8|9|10).\d*)') {
+            Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
         }
     }
-}
-Catch {
-    Write-Host "Python version is not between 3.9.9 and 3.10.10."
-    Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-    Read-Host "Process can not continue. The program will exit when you press any key to continue..."
-    Exit
+    Catch {
+        Write-Host "Python is not installed." -ForegroundColor Yellow
+        Write-Host "`nInstalling Python 3.10.10." -ForegroundColor Cyan
+        choco install python --version=3.10.10 -y
+        Update-SessionEnvironment
+    }
+
+    # Verify Python install
+    Try {
+        $pythonVersion = &$python --version 2>&1
+        if ($pythonVersion -match 'Python (3.(8|9|10).\d*)') {
+            Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
+        }
+        else {
+            Write-Host "Python version is not between 3.8 and 3.10." -ForegroundColor Yellow
+            Write-Host "Assuming you've installed the correct version, please enter the comand you use to access Python 3.9/3.10." -ForegroundColor Yellow
+        
+            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310):"
+            $pythonVersion = &$pythonProgramName --version 2>&1
+            if ($pythonVersion -match 'Python (3\.(8|9|10)\.\d*)') {
+                Write-Host "Python version $($matches[1]) is installed."
+                $python = $pythonProgramName
+            } else {
+                Write-Host "Python version is not between 3.8 and 3.10."
+                Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
+                Read-Host "Process can not continue. The program will exit when you press any key to continue..."
+                Exit
+            }
+        }
+    }
+    Catch {
+        Write-Host "Python version is not between 3.8 and 3.10."
+        Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
+        Read-Host "Process can not continue. The program will exit when you press any key to continue..."
+        Exit
+    }
 }
 
-# 4. Install FFMPEG with Choco if not already installed.
+# 3. Install FFMPEG with Choco if not already installed.
 if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
     Write-Host "`nFFMPEG is not installed. Installing..." -ForegroundColor Cyan
 
@@ -107,7 +128,7 @@ else {
     Exit
 }
 
-# 5. Install CUDA using Choco if not already installed.
+# 4. Install CUDA using Choco if not already installed.
 try {
     $nvidiaSmiOutput = & nvidia-smi
     if ($LASTEXITCODE -eq 0) {
@@ -128,39 +149,63 @@ catch {
     Write-Host "An error occurred while checking for NVIDIA graphics card." -ForegroundColor Red
 }
 
-
 if (Get-Command nvcc -ErrorAction SilentlyContinue) {
     Write-Host "Nvidia CUDA installed." -ForegroundColor Green
 
-    # 6. Install Pytorch if not already installed, or update.
+    # 5. Install Pytorch if not already installed, or update.
     Write-Host "`nInstalling or updating PyTorch (With GPU support)..." -ForegroundColor Cyan
-    &$python -m pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    &$python -m pip install --upgrade setuptools-rust
+    if ($condaFound){
+        conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y
+    } else {
+        &$python -m pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    }
 }
 else {
     Write-Host "Nvidia CUDA is not installed. Please install the latest Nvidia CUDA Toolkit and run this script again." -ForegroundColor Red
     Write-Host "For now the script will proceed with installing CPU-only PyTorch. Whisper will still run when it's done." -ForegroundColor Red
     
-    # 6. Install Pytorch if not already installed, or update.
+    # 5. Install Pytorch if not already installed, or update.
     Write-Host "`nInstalling or updating PyTorch (CPU-only)..." -ForegroundColor Cyan
-    &$python -m pip3 install torch torchvision torchaudio
-    &$python -m pip install --upgrade setuptools-rust
+    if ($condaFound) {
+        conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
+    } else {
+        &$python -m pip3 install torch torchvision torchaudio
+    }
 }
 
 
 Write-Host "`nInstalling or updating Whisper..." -ForegroundColor Cyan
-&$python -m pip install git+https://github.com/openai/whisper.git
+if ($condaFound) {
+    pip install -U openai-whisper # Environment is already active
+} else {
+    &$python -m pip install -U openai-whisper
+}
+
 
 Update-SessionEnvironment
 
-# 7. Verify that Whisper is installed.
+# 6. Verify that Whisper is installed. Reinstall using another method if not.
 
 if (Get-Command whisper -ErrorAction SilentlyContinue) {
     Write-Host "`n`nWhisper is installed!" -ForegroundColor Green
     Write-Host "You can now use whisper --help for more information in this PowerShell window, CMD or another program!" -ForegroundColor Green
 }
 else {
-    Write-Host "`n`nWhisper is not installed. Please follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-    Read-Host "Process can not continue. The program will exit when you press any key to continue..."
-    Exit
+    Write-Host "Whisper is not installed, trying again but this time installing from the openai/whisper GitHub repo" -ForegroundColor Green
+
+    if ($condaFound){
+        pip install -U setuptools-rust
+        pip install git+https://github.com/openai/whisper.git
+    } else {
+        &$python -m pip install -U setuptools-rust
+        &$python -m pip install -U --no-deps --force-reinstall git+https://github.com/openai/whisper.git
+    }
+
+    if (Get-Command whisper -ErrorAction SilentlyContinue) {
+        Write-Host "`n`nWhisper is installed!" -ForegroundColor Green
+        Write-Host "You can now use whisper --help for more information in this PowerShell window, CMD or another program!" -ForegroundColor Green
+    } else {
+        Write-Host "`n`nWhisper is not installed. Please follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
+        Read-Host "Process can not continue. The program will exit when you press any key to continue..."
+    }
 }

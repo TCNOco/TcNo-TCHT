@@ -37,9 +37,6 @@ PS C:\> Import-RemoteFunction -ScriptUri https://example.com/MyFunction.ps1
 This command imports the function defined in the MyFunction.ps1 script from the example.com website.
 
 .NOTES
-Author: Your Name
-Date:   Current Date
-
 This function requires an active internet connection and sufficient permissions to download and execute scripts from remote sources.
 #>
 function Import-RemoteFunction ($ScriptUri) {
