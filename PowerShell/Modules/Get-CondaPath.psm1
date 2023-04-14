@@ -87,9 +87,9 @@ function Open-Conda {
     $condaPath = Get-CondaPath
     if ($condaPath) {
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; &$condaPath
-        Write-Host "Conda found!"
+        Write-Host "Conda found! Hooked."
     }
-    Catch {
-        Write-Host "Failed to check if Conda is installed."
+    Else {
+        Write-Host "Conda is not installed."
     }
 }

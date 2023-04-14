@@ -41,19 +41,15 @@ iex (irm refreshenv.tc.ht)
 
 # 2. Check if Conda or Python is installed
 # Check if Conda is installed
-$condaFound = $false
-if (-not (Get-Command conda -ErrorAction SilentlyContinue)) {
-    $condaFound = $true
-} else {
+$condaFound = Get-Command conda -ErrorAction SilentlyContinue
+if (-not $condaFound) {
     # Try checking if conda is installed a little deeper... (May not always be activated for user)
     # Allow importing remote functions
     iex (irm Import-RemoteFunction.tc.ht)
     Import-FunctionIfNotExists -Command Open-Conda -ScriptUri "Get-CondaPath.tc.ht"
     Open-Conda # This checks for Conda, if it's found it opens Conda for use
 
-    if (Get-Command conda -ErrorAction SilentlyContinue) {
-        $condaFound = $true
-    }
+    $condaFound = Get-Command conda -ErrorAction SilentlyContinue
 }
 
 # If conda found: create environment
@@ -171,7 +167,7 @@ else {
     if ($condaFound) {
         conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
     } else {
-        &$python -m pip3 install torch torchvision torchaudio
+        &$python -m pip install torch torchvision torchaudio
     }
 }
 
@@ -187,10 +183,9 @@ if ($condaFound) {
 Update-SessionEnvironment
 
 # 6. Verify that Whisper is installed. Reinstall using another method if not.
-
 if (Get-Command whisper -ErrorAction SilentlyContinue) {
     Write-Host "`n`nWhisper is installed!" -ForegroundColor Green
-    Write-Host "You can now use whisper --help for more information in this PowerShell window, CMD or another program!" -ForegroundColor Green
+    Write-Host "You can now use `whisper --help` for more information in this PowerShell window, CMD or another program!" -ForegroundColor Green
 }
 else {
     Write-Host "Whisper is not installed, trying again but this time installing from the openai/whisper GitHub repo" -ForegroundColor Green
