@@ -53,27 +53,27 @@ Update-SessionEnvironment
 
 # 4. Check if Conda or Python is installed
 # Check if Conda is installed
-$condaFound = $false
-if (-not (Get-Command conda -ErrorAction SilentlyContinue)) {
-    $condaFound = $true
-} else {
+$condaFound = Get-Command conda -ErrorAction SilentlyContinue
+if (-not $condaFound) {
     # Try checking if conda is installed a little deeper... (May not always be activated for user)
     # Allow importing remote functions
-    iex (irm Import-RemoteFunction.tc.ht)
-    Import-FunctionIfNotExists -Command Open-Conda -ScriptUri "Get-CondaPath.tc.ht"
-    Open-Conda # This checks for Conda, if it's found it opens Conda for use
-
-    if (Get-Command conda -ErrorAction SilentlyContinue) {
-        $condaFound = $true
-    }
+    iex (irm Get-CondaPath.tc.ht)
+    $condaFound = Open-Conda # This checks for Conda, returns true if conda is hoooked
+    Update-SessionEnvironment
 }
 
 # If conda found: create environment
 if ($condaFound) {
-    conda create -n automatic1111 python=3.10.6
-    conda activate automatic1111
+    Write-Host "`n`nDo you want to install AUTOMATIC1111 Stable Diffusion WebUI in a Conda environment called 'a11'?`nYou'll need to use 'conda activate a11' before being able to use it?"-ForegroundColor Cyan
+    $installWhisper = Read-Host "Use Conda (y/n):"
+    if ($installWhisper -eq "y" -or $installWhisper -eq "Y") {
+        conda create -n a11 python=3.10.6
+        conda activate a11
+    } else {
+        $condaFound = $false
+        Write-Host "Checking for Python instead..."
+    }
 }
-
 
 $python = "python"
 if (-not ($condaFound)) {
