@@ -103,6 +103,7 @@ This function requires the Get-CondaPath function.
 #>
 function Open-Conda {
     $condaPath = Get-CondaPath
+    Write-Host $condaPath
     if ($condaPath) {
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; &$condaPath
         Write-Host "Conda found! Hooked."

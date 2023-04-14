@@ -45,9 +45,9 @@ $condaFound = Get-Command conda -ErrorAction SilentlyContinue
 if (-not $condaFound) {
     # Try checking if conda is installed a little deeper... (May not always be activated for user)
     # Allow importing remote functions
-    iex (irm Import-RemoteFunction.tc.ht)
-    Import-FunctionIfNotExists -Command Open-Conda -ScriptUri "Get-CondaPath.tc.ht"
+    iex (irm Get-CondaPath.tc.ht)
     $condaFound = Open-Conda # This checks for Conda, returns true if conda is hoooked
+    Update-SessionEnvironment
 }
 
 # If conda found: create environment
