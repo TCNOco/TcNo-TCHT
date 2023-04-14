@@ -23,7 +23,7 @@
 # 1. Install Chocolatey
 # 2. Install or update Git if not already installed
 # 3. Install aria2c to make the download models MUCH faster
-# 4. Check if Python returns anything (is installed - also is 3.10.6)
+# 4. Check if Conda or Python is installed (is installed - also is 3.10.6 - 3.10.11)
 # 5. Download AUTOMATIC1111 repo
 # 6. Enable xformers?
 # 7. Fix for AMD GPUs (untested)
@@ -51,48 +51,79 @@ Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cya
 choco install aria2 -y
 Update-SessionEnvironment
 
-# 4. Check if Python returns anything (is installed - also is 3.10.6 - 3.10.11)
-Try {
-    $pythonVersion = python --version 2>&1
-    if ($pythonVersion -match "Python ([3].[1][0-1].[6-9]|3.10.1[0-1])") {
-        Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
+# 4. Check if Conda or Python is installed
+# Check if Conda is installed
+$condaFound = $false
+if (-not (Get-Command conda -ErrorAction SilentlyContinue)) {
+    $condaFound = $true
+} else {
+    # Try checking if conda is installed a little deeper... (May not always be activated for user)
+    # Allow importing remote functions
+    iex (irm Import-RemoteFunction.tc.ht)
+    Import-FunctionIfNotExists -Command Open-Conda -ScriptUri "Get-CondaPath.tc.ht"
+    Open-Conda # This checks for Conda, if it's found it opens Conda for use
+
+    if (Get-Command conda -ErrorAction SilentlyContinue) {
+        $condaFound = $true
     }
-}
-Catch {
-    Write-Host "Python is not installed." -ForegroundColor Yellow
-    Write-Host "`nInstalling Python 3.10.11." -ForegroundColor Cyan
-    choco install python --version=3.10.11 -y
-    Update-SessionEnvironment
 }
 
-# Verify Python install
+# If conda found: create environment
+if ($condaFound) {
+    conda create -n automatic1111 python=3.10.6
+    conda activate automatic1111
+}
+
+
 $python = "python"
-Try {
-    $pythonVersion = &$python --version 2>&1
-    if ($pythonVersion -match 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])') {
-        Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
-    }
-    else {
-        Write-Host "Python version is not between 3.10.6 and 3.10.11." -ForegroundColor Yellow
-        Write-Host "Assuming you've installed the correct version, please enter the comand you use to access Python 3.10.6/3.10.11." -ForegroundColor Yellow
-    
-        $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310):"
-        $pythonVersion = &$pythonProgramName --version 2>&1
+if (-not ($condaFound)) {
+    # Try Python instead
+    # Check if Python returns anything (is installed - also is 3.10.6 - 3.10.11)
+    Try {
+        $pythonVersion = python --version 2>&1
         if ($pythonVersion -match 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])') {
-            Write-Host "Python version $($matches[1]) is installed."
-            $python = $pythonProgramName
-        } else {
-            Write-Host "Python version is not between 3.10.6 - 3.10.11."
-            Read-Host "I will try set up AUTOMATIC1111 anyway... Press any key to continue, or close this window..."
-            $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+            Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
         }
     }
+    Catch {
+        Write-Host "Python is not installed." -ForegroundColor Yellow
+        Write-Host "`nInstalling Python 3.10.11." -ForegroundColor Cyan
+        choco install python --version=3.10.11 -y
+        Update-SessionEnvironment
+    }
+
+    # Verify Python install
+    Try {
+        $pythonVersion = &$python --version 2>&1
+        if ($pythonVersion -match 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])') {
+            Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
+        }
+        else {
+            Write-Host "Python version is not between 3.10.6 and 3.10.11." -ForegroundColor Yellow
+            Write-Host "Assuming you've installed the correct version, please enter the comand you use to access Python 3.9/3.10." -ForegroundColor Yellow
+        
+            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310):"
+            $pythonVersion = &$pythonProgramName --version 2>&1
+            if ($pythonVersion -match 'Python([3].[1][0-1].[6-9]|3.10.1[0-1])') {
+                Write-Host "Python version $($matches[1]) is installed."
+                $python = $pythonProgramName
+            } else {
+                Write-Host "Python version is not between 3.10.6 and 3.10.11."
+                Write-Host "Alternatively, follow this guide for manual installation: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs" -ForegroundColor Red
+                Read-Host "Process can not continue. The program will exit when you press any key to continue..."
+                Exit
+            }
+        }
+    }
+    Catch {
+        Write-Host "Python version is not between 3.10.6 - 3.10.11."
+        Read-Host "Alternatively, follow this guide for manual installation: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs...`nPress any key to continue, or close this window..."
+        $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+        Exit
+    }
 }
-Catch {
-    Write-Host "Python version is not between 3.10.6 - 3.10.11."
-    Read-Host "I will try set up AUTOMATIC1111 anyway... Press any key to continue, or close this window..."
-    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
-}
+
+
 
 # 5. Download AUTOMATIC1111 repo (but also find out where it is, incase we're in the folder already)
 $currentDir = (Get-Item -Path ".\" -Verbose).FullName

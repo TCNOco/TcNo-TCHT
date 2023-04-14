@@ -98,6 +98,7 @@ if (-not ($condaFound)) {
                 Write-Host "Python version is not between 3.8 and 3.10."
                 Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
                 Read-Host "Process can not continue. The program will exit when you press any key to continue..."
+                $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
                 Exit
             }
         }
@@ -106,6 +107,7 @@ if (-not ($condaFound)) {
         Write-Host "Python version is not between 3.8 and 3.10."
         Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
         Read-Host "Process can not continue. The program will exit when you press any key to continue..."
+        $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
         Exit
     }
 }
