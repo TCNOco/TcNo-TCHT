@@ -24,12 +24,12 @@
 # Usually you'll see (Conda) before the path in the command line, assuming it's already active.
 # ----------------------------------------
 
-<# 
+<#
 .SYNOPSIS
 Get the Conda PowerShell hook script path.
 
 .DESCRIPTION
-The Get-CondaPath function searches for the Conda PowerShell hook script in the specified paths and returns the path if found.
+The Get-CondaPath function searches for the Conda PowerShell hook script in the specified paths, considering both Anaconda and Miniconda installations, and returns the path if found.
 
 .EXAMPLE
 $condaPath = Get-CondaPath
@@ -38,35 +38,53 @@ $condaPath = Get-CondaPath
 This function currently checks the following locations for the Conda PowerShell hook script:
 
 1. C:\ProgramData\anaconda3\shell\condabin\conda-hook.ps1
-2. C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt.lnk
+2. C:\ProgramData\miniconda3\shell\condabin\conda-hook.ps1
+3. C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt.lnk
+4. C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3\Anaconda Powershell Prompt.lnk
+5. C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Miniconda3 (64-bit)\Anaconda Powershell Prompt (miniconda3).lnk
+6. C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Miniconda3\Anaconda Powershell Prompt (miniconda3).lnk
 #>
 function Get-CondaPath {
-    # Check if the first file exists
-    $filePath1 = "C:\ProgramData\anaconda3\shell\condabin\conda-hook.ps1"
-    if (Test-Path $filePath1) {
-        return $filePath1
-    }
+    # Define the file paths to check
+    $filePaths1 = @(
+        "C:\ProgramData\anaconda3\shell\condabin\conda-hook.ps1",
+        "C:\ProgramData\miniconda3\shell\condabin\conda-hook.ps1"
+    )
 
-    # Check if the shortcut file exists in the start menu
-    $filePath2 = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt.lnk"
+    $filePaths2 = @(
+        "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt.lnk",
+        "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3\Anaconda Powershell Prompt.lnk",
+        "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Miniconda3 (64-bit)\Anaconda Powershell Prompt (miniconda3).lnk",
+        "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Miniconda3\Anaconda Powershell Prompt (miniconda3).lnk"
+    )
 
-    # TODO: Check user path as well for user only installs
-
-    if (Test-Path $filePath2) {
-        # Read the target of the .lnk file
-        $shell = New-Object -ComObject WScript.Shell
-        $shortcut = $shell.CreateShortcut($filePath2)
-        $targetPath = $shortcut.Arguments
-
-        # Extract the ps1 script path
-        $regex = "'.+\.ps1'"
-        if ($targetPath -match $regex) {
-            $ps1ScriptPath = $Matches[0].Trim("'")
-
-            # Return script path
-            return $ps1ScriptPath
+    # Check if any of the first set of file paths exist
+    foreach ($filePath1 in $filePaths1) {
+        if (Test-Path $filePath1) {
+            return $filePath1
         }
     }
+
+    # Check if any of the shortcut files exist in the start menu
+    foreach ($filePath2 in $filePaths2) {
+        if (Test-Path $filePath2) {
+            # Read the target of the .lnk file
+            $shell = New-Object -ComObject WScript.Shell
+            $shortcut = $shell.CreateShortcut($filePath2)
+            $targetPath = $shortcut.Arguments
+
+            # Extract the ps1 script path
+            $regex = "'.+\.ps1'"
+            if ($targetPath -match $regex) {
+                $ps1ScriptPath = $Matches[0].Trim("'")
+
+                # Return script path
+                return $ps1ScriptPath
+            }
+        }
+    }
+
+    # If none of the file paths were found, return an empty string
     return ""
 }
 
