@@ -47,9 +47,7 @@ if (-not $condaFound) {
     # Allow importing remote functions
     iex (irm Import-RemoteFunction.tc.ht)
     Import-FunctionIfNotExists -Command Open-Conda -ScriptUri "Get-CondaPath.tc.ht"
-    Open-Conda # This checks for Conda, if it's found it opens Conda for use
-
-    $condaFound = Get-Command conda -ErrorAction SilentlyContinue
+    $condaFound = Open-Conda # This checks for Conda, returns true if conda is hoooked
 }
 
 # If conda found: create environment

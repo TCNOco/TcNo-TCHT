@@ -72,13 +72,13 @@ function Get-CondaPath {
 
 <#
 .SYNOPSIS
-Opens the Conda environment if found.
+Opens the Conda environment if found. Then returns true or false whether it was successfully hooked or not.
 
 .DESCRIPTION
 The Open-Conda function calls the Get-CondaPath function to retrieve the Conda PowerShell hook script path and executes the script if found.
 
 .EXAMPLE
-Open-Conda
+$condaReady = Open-Conda
 
 .NOTES
 This function requires the Get-CondaPath function.
@@ -88,8 +88,10 @@ function Open-Conda {
     if ($condaPath) {
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; &$condaPath
         Write-Host "Conda found! Hooked."
+        return $true
     }
     Else {
         Write-Host "Conda is not installed."
+        return $false
     }
 }
