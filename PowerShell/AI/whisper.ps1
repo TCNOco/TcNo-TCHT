@@ -52,7 +52,7 @@ if (-not $condaFound) {
 
 # If conda found: create environment
 if ($condaFound) {
-    conda create -n whisper pip python=3.10 -y
+    conda create -n whisper python=3.10 pip -y
     conda activate whisper
 }
 
