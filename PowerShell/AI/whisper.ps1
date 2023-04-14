@@ -172,6 +172,10 @@ else {
 
 Write-Host "`nInstalling or updating Whisper..." -ForegroundColor Cyan
 if ($condaFound) {
+    # For some reason conda NEEDS to be deactivated and reactivated to use pip reliably... Otherwise python and pip are not found.
+    conda deactivate
+    #Open-Conda
+    conda activate whisper
     pip install -U openai-whisper # Environment is already active
 } else {
     &$python -m pip install -U openai-whisper
