@@ -53,7 +53,7 @@ if (-not $condaFound) {
 
 # If conda found: create environment
 if ($condaFound) {
-    Write-Host "`n`nDo you want to install Whisper in a python environment called `whisper`?`nYou'll need to use `conda activate whisper` before being able to use whisper?"-ForegroundColor Cyan
+    Write-Host "`n`nDo you want to install Whisper in a Conda environment called `whisper`?`nYou'll need to use 'conda activate whisper' before being able to use it?"-ForegroundColor Cyan
     $installWhisper = Read-Host "Use Conda (y/n):"
     if ($installWhisper -eq "y" -or $installWhisper -eq "Y") {
         conda create -n whisper python=3.10 pip -y
