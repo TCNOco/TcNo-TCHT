@@ -43,7 +43,9 @@ if ($currentDir -like "*\oobabooga-windows") {
 $containsFolder = Get-ChildItem -Path ".\" -Directory -Name | Select-String -Pattern "oobabooga-windows"
 if ($containsFolder) {
     Write-Host "The 'oobabooga-windows' folder already exists." -ForegroundColor Cyan
-    $downloadAgain = Read-Host "Do you want to download it again? (Y/N)"
+    do {
+        $downloadAgain = Read-Host "Do you want to download it again? (Y/N)"
+    } while ($downloadAgain -notin "Y", "y", "N", "n")
 
     if ($downloadAgain -eq "Y" -or $downloadAgain -eq "y") {
         # Perform the download again
@@ -58,7 +60,9 @@ if (-not $containsFolder) {
     Write-Host "Do you have an NVIDIA GPU?" -ForegroundColor Cyan
     Write-Host "Enter anything but y or n to skip." -ForegroundColor Yellow
 
-    $choice = Read-Host "Answer (y/n)"
+    do {
+        $choice = Read-Host "Answer (y/n)"
+    } while ($choice -notin "Y", "y", "N", "n")
 
     $skip_model = 1
     $skip_start = 1
@@ -82,19 +86,54 @@ if (-not $containsFolder) {
     Set-Location "./oobabooga-windows"
 }
 
-function Get-VicunaCPU() {
-    # Download CPU model (only the updated one)
-    # If downloaded using model downloader, another 8.14 GB download will be run...
-    $url = "https://huggingface.co/eachadea/ggml-vicuna-13b-4bit/resolve/main/ggml-vicuna-13b-4bit-rev1.bin"
-    $outputPath = "text-generation-webui\models\eachadea_ggml-vicuna-13b-4bit\ggml-vicuna-13b-4bit-rev1.bin"
 
-    # Download the file from the URL
-    Write-Host "Downloading: eachadea/ggml-vicuna-13b-4bit (CPU model)" -ForegroundColor Cyan
-    Get-Aria2File -Url $url -OutputPath $outputPath
-    Write-Host "`nDone!`n"
+function Get-VincunaCPU13B {
+    # Download CPU model 13B
+    Write-Host "Downloading CPU model 13B" -ForegroundColor Yellow
+    $blob = "https://huggingface.co/eachadea/ggml-vicuna-13b-1.1/resolve/main"
+    $outputPath = "text-generation-webui\models\eachadea_ggml-vicuna-13b-1-1"
+    Write-Host "Downloading: eachadea/ggml-vicuna-13b-1.1 (CPU model)" -ForegroundColor Cyan
+    $files = @(
+        "ggml-vicuna-13b-1.1-q4_0.bin",
+        "ggml-vicuna-13b-1.1-q4_1.bin"
+    )
+
+    Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
+    Write-Host "Done" -ForegroundColor Yellow
 }
-function Get-VicunaGPU() {
-    # Download GPU/CUDA model
+
+function Get-VicunaCPU7B {
+    # Download CPU model 7B
+    Write-Host "Downloading CPU model 7B" -ForegroundColor Yellow
+    $blob = "https://huggingface.co/eachadea/ggml-vicuna-7b-1.1/resolve/main"
+    $outputPath = "text-generation-webui\models\eachadea_ggml-vicuna-7b-1-1"
+    Write-Host "Downloading: eachadea/ggml-vicuna-7b-1.1 (CPU model)" -ForegroundColor Cyan
+    $files = @(
+        "ggml-vicuna-7b-1.1-q4_0.bin",
+        "ggml-vicuna-7b-1.1-q4_1.bin"
+    )
+
+    Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
+    Write-Host "Done" -ForegroundColor Yellow
+}
+
+$global:cpuModel = ""
+function Get-VicunaCPU() {
+    if ($global:cpuModel -eq "1") {
+        Get-VincunaCPU13B
+    } elseif ($global:cpuModel -eq "2") {
+        Get-VicunaCPU7B
+    } elseif ($global:cpuModel -eq "3"){
+        Get-VincunaCPU13B
+        Get-VicunaCPU7B
+    }
+
+    Write-Host "`nDone!`n" -ForegroundColor Cyan
+}
+
+function Get-VicunaGPU13B {
+    # Download GPU model 13B
+    Write-Host "Downloading GPU model 13B" -ForegroundColor Yellow
     $blob = "https://huggingface.co/anon8231489123/vicuna-13b-GPTQ-4bit-128g/resolve/main"
     $outputPath = "text-generation-webui\models\anon8231489123_vicuna-13b-GPTQ-4bit-128g"
 
@@ -111,7 +150,43 @@ function Get-VicunaGPU() {
     )
 
     Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
-    Write-Host "`nDone!`n"
+    Write-Host "Done" -ForegroundColor Yellow
+}
+function Get-VicunaGPU7B {
+    # Download GPU model 7B
+    Write-Host "Downloading GPU model 7B" -ForegroundColor Yellow
+    $blob = "https://huggingface.co/TheBloke/vicuna-AlekseyKorshuk-7B-GPTQ-4bit-128g/resolve/main"
+    $outputPath = "text-generation-webui\models\TheBloke_vicuna-AlekseyKorshuk-7B-GPTQ-4bit-128g"
+
+    # Download the file from the URL
+    Write-Host "Downloading: TheBloke/vicuna-AlekseyKorshuk-7B-GPTQ-4bit-128g (GPU/CUDA model)" -ForegroundColor Cyan
+    $files = @(
+        "vicuna-AlekseyKorshuk-7B-GPTQ-4bit-128g.safetensors",
+        "tokenizer_config.json",
+        "tokenizer.model",
+        "special_tokens_map.json",
+        "pytorch_model.bin.index.json",
+        "generation_config.json",
+        "added_tokens.json",
+        "config.json"
+    )
+
+    Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
+    Write-Host "Done" -ForegroundColor Yellow
+}
+
+$global:gpuModel = ""
+function Get-VicunaGPU() {
+    if ($global:gpuModel -eq "1") {
+        Get-VicunaGPU13B
+    } elseif ($global:gpuModel -eq "2") {
+        Get-VicunaGPU7B
+    } elseif ($global:gpuModel -eq "3"){
+        Get-VicunaGPU13B
+        Get-VicunaGPU7B
+    }
+
+    Write-Host "`nDone!`n" -ForegroundColor Cyan
 }
 
 # Allow importing remote functions
@@ -124,45 +199,115 @@ if (-not $?) {
     Write-Error "Failed to create directory."
 }
 
+Write-Host "`n`nNOTE: If you see ""AttributeError: 'Llama' object has no attribute 'ctx' "" then you don't have enough RAM/VRAM." -ForegroundColor Red
+Write-Host "Should you need less memory usage, see: https://github.com/oobabooga/text-generation-webui/wiki/Low-VRAM-guide" -ForegroundColor Green
+Write-Host "(These will be added to the .bat you're trying to run in the oobabooga-windows folder)" -ForegroundColor Green
+
 if ($gpu -eq "No") {
+    # Ask user what CPU model they want
+    Write-Host "`nPick a CPU model and enter a number below?" -ForegroundColor Cyan
+    Write-Host -NoNewline "- 13B (~9.8GB+ RAM): " -ForegroundColor Red
+    Write-Host "1" -ForegroundColor Green
+    Write-Host -NoNewline "-  7B (~5.8GB+ RAM): " -ForegroundColor Red
+    Write-Host "2" -ForegroundColor Green
+    Write-Host -NoNewline "- Both: " -ForegroundColor Red
+    Write-Host "3" -ForegroundColor Green
+    
+    do {
+        $global:cpuModel = Read-Host "Enter choice"
+    } while ($global:cpuModel -notin "1", "2", "3")
+
     Get-VicunaCPU
 } else {
     Write-Host "`n`nPick which models to download:" -ForegroundColor Cyan
-    Write-Host -NoNewline "CPU (7.5GB): " -ForegroundColor Red
+    Write-Host -NoNewline "CPU: " -ForegroundColor Red
     Write-Host "1" -ForegroundColor Green
-    Write-Host -NoNewline "GPU [Nvidia] (6.9GB): " -ForegroundColor Red
+    Write-Host -NoNewline "GPU [Nvidia]: " -ForegroundColor Red
     Write-Host "2" -ForegroundColor Green
-    Write-Host -NoNewline "CPU + GPU [Nvidia] (14.4GB): " -ForegroundColor Red
+    Write-Host -NoNewline "CPU + GPU [Nvidia]: " -ForegroundColor Red
     Write-Host "3" -ForegroundColor Green
     
-    $num = Read-Host "Enter a number"
-    if ($num -eq "1") {
+    do {
+        $num = Read-Host "Enter a number"
+    } while ($num -notin "1", "2", "3")
+
+    # Get choices
+    if ($num -in "1", "3") {
+        # Ask user what CPU model they want
+        Write-Host "`n`nPick a CPU model and enter a number below?" -ForegroundColor Cyan
+        Write-Host -NoNewline "- 13B (~9.8GB+ RAM): " -ForegroundColor Red
+        Write-Host "1" -ForegroundColor Green
+        Write-Host -NoNewline "-  7B (~5.8GB+ RAM): " -ForegroundColor Red
+        Write-Host "2" -ForegroundColor Green
+        Write-Host -NoNewline "- Both: " -ForegroundColor Red
+        Write-Host "3" -ForegroundColor Green
+        
+        do {
+            $global:cpuModel = Read-Host "Enter choice"
+        } while ($global:cpuModel -notin "1", "2", "3")
+    }
+    if ($num -in "2", "3") {
+        # Ask user what GPU model they want
+        Write-Host "`n`nPick a GPU model and enter a number below?" -ForegroundColor Cyan
+        Write-Host -NoNewline "- 13B (~7GB+ VRAM): " -ForegroundColor Red
+        Write-Host "1" -ForegroundColor Green
+        Write-Host -NoNewline "-  7B (~4.3GB+ VRAM): " -ForegroundColor Red
+        Write-Host "2" -ForegroundColor Green
+        Write-Host -NoNewline "- Both: " -ForegroundColor Red
+        Write-Host "3" -ForegroundColor Green
+    
+        do {
+            $global:gpuModel = Read-Host "Enter choice"
+        } while ($global:gpuModel -notin "1", "2", "3")
+    }
+    
+    # Download all requested models
+    if ($num -in "1", "3") {
         Get-VicunaCPU
-    } elseif ($num -eq "2") {
-        Get-VicunaGPU
-    } elseif ($num -eq "3") {
-        Get-VicunaCPU
+    }
+    if ($num -in "2", "3") {
         Get-VicunaGPU
     }
+}
+
+
+function New-WebUIBat {
+    param(
+        [string]$model,
+        [string]$newBatchFile,
+        [string]$otherArgs
+    )
+
+    (Get-Content -Path "start-webui-vicuna.bat") | ForEach-Object {
+        ($_ -replace
+            'call python server\.py --auto-devices',
+            "call python server.py --auto-devices --model $model $otherArgs") -replace '--cai-chat', '--chat'
+    } | Set-Content -Path $newBatchFile
 }
 
 # 5. Replace commands in the start-webui.bat file
 # Create CPU and GPU versions
 Copy-Item "start-webui.bat" "start-webui-vicuna.bat"
 
-if (-not ($gpu -eq "No")) {
-    (Get-Content -Path "start-webui-vicuna.bat") | ForEach-Object {
-        $_ -replace
-            'call python server\.py --auto-devices --cai-chat',
-            'call python server.py --auto-devices --chat --model anon8231489123_vicuna-13b-GPTQ-4bit-128g --wbits 4 --groupsize 128'
-    } | Set-Content -Path "start-webui-vicuna-gpu.bat"
+if (-not ($gpu -eq "No")) {    
+    if ($global:gpuModel -eq "1") {
+        New-WebUIBat -model "anon8231489123_vicuna-13b-GPTQ-4bit-128g" -newBatchFile "start-webui-vicuna-gpu-13B.bat" -otherArgs "--wbits 4 --groupsize 128"
+    } elseif ($global:gpuModel -eq "2") {
+        New-WebUIBat -model "TheBloke_vicuna-AlekseyKorshuk-7B-GPTQ-4bit-128g" -newBatchFile "start-webui-vicuna-gpu-7B.bat" -otherArgs "--wbits 4 --groupsize 128"
+    } elseif ($global:gpuModel -eq "3") {
+        New-WebUIBat -model "anon8231489123_vicuna-13b-GPTQ-4bit-128g" -newBatchFile "start-webui-vicuna-gpu-13B.bat" -otherArgs "--wbits 4 --groupsize 128"
+        New-WebUIBat -model "TheBloke_vicuna-AlekseyKorshuk-7B-GPTQ-4bit-128g" -newBatchFile "start-webui-vicuna-gpu-7B.bat" -otherArgs "--wbits 4 --groupsize 128"
+    }
 }
 
-(Get-Content -Path "start-webui-vicuna.bat") | ForEach-Object {
-    $_ -replace
-        'call python server\.py --auto-devices --cai-chat',
-        'call python server.py --auto-devices --chat --model eachadea_ggml-vicuna-13b-4bit'
-} | Set-Content -Path "start-webui-vicuna.bat"
+if ($global:cpuModel -eq "1") {
+    New-WebUIBat -model "eachadea_ggml-vicuna-13b-1-1" -newBatchFile "start-webui-vicuna-cpu-13B.bat" -otherArgs ""
+} elseif ($global:cpuModel -eq "2") {
+    New-WebUIBat -model "eachadea_ggml-vicuna-7b-1-1" -newBatchFile "start-webui-vicuna-cpu-7B.bat" -otherArgs ""
+} elseif ($global:cpuModel -eq "3") {
+    New-WebUIBat -model "eachadea_ggml-vicuna-13b-1-1" -newBatchFile "start-webui-vicuna-cpu-13B.bat" -otherArgs ""
+    New-WebUIBat -model "eachadea_ggml-vicuna-7b-1-1" -newBatchFile "start-webui-vicuna-cpu-7B.bat" -otherArgs ""
+}
 
 # 6. Create desktop shortcuts
 if ($gpu -eq "No") {
@@ -170,7 +315,19 @@ if ($gpu -eq "No") {
 } else {
     Write-Host "`n`nCreate desktop shortcuts for 'Vicuna' and 'Vicuna (CPU)'" -ForegroundColor Cyan
 }
-$shortcuts = Read-Host "Do you want desktop shortcuts? (Y/N)"
+
+function Deploy-Shortcut {
+    param(
+        [string]$name,
+        [string]$batFile
+    )
+    New-Shortcut -ShortcutName $name -TargetPath $batFile -IconLocation 'vicuna.ico'
+}
+
+do {
+    $shortcuts = Read-Host "Do you want desktop shortcuts? (Y/N)"
+} while ($shortcuts -notin "Y", "y", "N", "n")
+
 
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
@@ -178,19 +335,26 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     
     Write-Host "Downloading Vicuna icon..."
     Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/vicuna.ico' -OutFile 'vicuna.ico'
+    Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
     if (-not ($gpu -eq "No")) {
-        Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
-        $shortcutName = "Vicuna oobabooga"
-        $targetPath = "start-webui-vicuna-gpu.bat"
-        $IconLocation = 'vicuna.ico'
-        New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
+        if ($global:gpuModel -eq "1") {
+            Deploy-Shortcut -name "Vicuna GPU [13B] oobabooga" -batFile "start-webui-vicuna-gpu-13B.bat"
+        } elseif ($global:gpuModel -eq "2") {
+            Deploy-Shortcut -name "Vicuna GPU [7B] oobabooga" -batFile "start-webui-vicuna-gpu-7B.bat"
+        } elseif ($global:gpuModel -eq "3") {
+            Deploy-Shortcut -name "Vicuna GPU [13B] oobabooga" -batFile "start-webui-vicuna-gpu-13B.bat"
+            Deploy-Shortcut -name "Vicuna GPU [7B] oobabooga" -batFile "start-webui-vicuna-gpu-7B.bat"
+        }
     }
 
-    $shortcutName = "Vicuna (CPU) oobabooga"
-    $targetPath = "start-webui-vicuna.bat"
-    $IconLocation = 'vicuna.ico'
-    New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
-    
+    if ($global:cpuModel -eq "1") {
+        Deploy-Shortcut -name "Vicuna CPU [13B] oobabooga" -batFile "start-webui-vicuna-cpu-13B.bat"
+    } elseif ($global:cpuModel -eq "2") {
+        Deploy-Shortcut -name "Vicuna CPU [7B] oobabooga" -batFile "start-webui-vicuna-cpu-7B.bat"
+    } elseif ($global:cpuModel -eq "3") {
+        Deploy-Shortcut -name "Vicuna CPU [13B] oobabooga" -batFile "start-webui-vicuna-cpu-13B.bat"
+        Deploy-Shortcut -name "Vicuna CPU [7B] oobabooga" -batFile "start-webui-vicuna-cpu-7B.bat"
+    }
 }
 
 # 7. Run the webui
@@ -198,15 +362,55 @@ if ($gpu -eq "No") {
     Start-Process ".\start-webui-vicuna.bat"
 } else {
     # Ask user if they want to launch the CPU or GPU version
-    Write-Host "`n`nEnter 1 to launch CPU version, or 2 to launch GPU version" -ForegroundColor Cyan
+    Write-Host "`n`nAll set up. Which model should I launch?" -ForegroundColor Cyan
+    Write-Host -NoNewline "- CPU version: " -ForegroundColor Red
+    Write-Host "1" -ForegroundColor Green
+    Write-Host -NoNewline "- GPU version: " -ForegroundColor Red
+    Write-Host "2" -ForegroundColor Green
+    Write-Host -NoNewline "- Exit: " -ForegroundColor Red
+    Write-Host "3" -ForegroundColor Green
     
-    $choice = Read-Host "1 (CPU) or 2 (GPU)"
+    do {
+        $choice = Read-Host "Enter a number"
+    } while ($choice -notin "1", "2", "3")
     
     if ($choice -eq "1") {
-        Start-Process ".\start-webui-vicuna.bat"
+        if ($global:gpuModel -eq "1") {
+            Start-Process ".\start-webui-vicuna-cpu-13B.bat"
+        } elseif ($global:gpuModel -eq "2") {
+            Start-Process ".\start-webui-vicuna-cpu-7B.bat"
+        } elseif ($global:gpuModel -eq "3") {
+            Write-Host "`n`nWhich model version?" -ForegroundColor Cyan
+                
+            do {
+                $choice2 = Read-Host "1 (13B-CPU) or 2 (7B-CPU)"
+            } while ($choice2 -notin "1", "2")
+
+            if ($choice2 -eq "1") {
+                Start-Process ".\start-webui-vicuna-cpu-13B.bat"
+            } else {
+                Start-Process ".\start-webui-vicuna-cpu-7B.bat"
+            }
+        }
     }
     elseif ($choice -eq "2") {
-        Start-Process ".\start-webui-vicuna-gpu.bat"
+        if ($global:gpuModel -eq "1") {
+            Start-Process ".\start-webui-vicuna-gpu-13B.bat"
+        } elseif ($global:gpuModel -eq "2") {
+            Start-Process ".\start-webui-vicuna-gpu-7B.bat"
+        } elseif ($global:gpuModel -eq "3") {
+            Write-Host "`n`nWhich model version?" -ForegroundColor Cyan
+
+            do {
+                $choice2 = Read-Host "1 (13B-GPU) or 2 (7B-GPU)"
+            } while ($choice2 -notin "1", "2")
+            
+            if ($choice2 -eq "1") {
+                Start-Process ".\start-webui-vicuna-gpu-13B.bat"
+            } else {
+                Start-Process ".\start-webui-vicuna-gpu-7B.bat"
+            }
+        }
     }
     else {
         Write-Host "Invalid choice. Please enter 1 or 2."
