@@ -30,7 +30,8 @@
 # 8. Low VRAM
 # 9. Share with Gradio?
 # 10. Create desktop shortcuts?
-# 11. Launch AUTOMATIC1111 Stable Diffusion WebUI
+# 11. Download Stable Diffusion 1.5 model
+# 12. Launch AUTOMATIC1111 Stable Diffusion WebUI
 # ----------------------------------------
 
 
@@ -155,7 +156,7 @@ if ($answer -eq "y" -or $answer -eq "Y") {
 }
 
 # 7. Fix for AMD GPUs (untested)
-if ((Get-CimInstance -ClassName Win32_PnPEntity -Filter "Manufacturer like 'Advanced Micro Devices%'").DeviceID) {
+if ((Get-WmiObject Win32_VideoController).Name -like "AMD") {
     Write-Host "`n`nAMD GPU is installed. Applying fix (https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-AMD-GPUs#automatic-installation)" -ForegroundColor Cyan
     (Get-Content webui-user.bat) | Foreach-Object {
         $_ -replace 'set COMMANDLINE_ARGS=', 'set COMMANDLINE_ARGS=--precision full --no-half '
@@ -235,8 +236,8 @@ do {
     $shortcuts = Read-Host
 } while ($shortcuts -notin "Y", "y", "N", "n")
 
+iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
-    iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
     Write-Host "Downloading AUTOMATIC1111 icon (not official)..."
@@ -255,7 +256,10 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     
 }
 
-# 11. Launch AUTOMATIC1111 Stable Diffusion WebUI
+# 11. Download Stable Diffusion 1.5 model
+Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
+Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
 
+# 12. Launch AUTOMATIC1111 Stable Diffusion WebUI
 Write-Host "`n`nLaunching AUTOMATIC1111 Stable Diffusion WebUI!" -ForegroundColor Cyan
 ./webui-user.bat
