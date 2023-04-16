@@ -251,11 +251,11 @@ $condaPath = Get-CondaPath
 if ($condaFound) {
     # As the Windows Target path can only have 260 chars, we easily hit that limit...
     $OutputFilePath = "Start.ps1"
-    $OutputText = "$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`n& '$condaPath'`nconda activate autogpt`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
+    $OutputText = "`$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`n& '$condaPath'`nconda activate autogpt`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
     Set-Content -Path $OutputFilePath -Value $OutputText
 } else {
     $OutputFilePath = "Start.ps1"
-    $OutputText = "$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
+    $OutputText = "`$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
     Set-Content -Path $OutputFilePath -Value $OutputText
 }
 
@@ -265,6 +265,7 @@ Set-Content -Path $OutputFilePath -Value $OutputText
 
 # Create shortcut
 do {
+    Write-Host "`n`n"
     $createShortcut = Read-Host "Do you want a desktop shortcut? (Y/N)"
 } while ($createShortcut -notin "Y", "y", "N", "n" -and (-not [String]::IsNullOrEmpty($createShortcut)))
 if ($createShortcut -in "Y", "y") {
@@ -282,6 +283,7 @@ if ($createShortcut -in "Y", "y") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
+Write-Host "`n`n`nStarting Auto-GPT...`n" -ForegroundColor Cyan
 
 # 7. Run Auto-GPT
 python -m autogpt
