@@ -270,7 +270,7 @@ if ($condaFound) {
 }
 
 $OutputFilePath = "start.bat"
-$OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$(Get-Location)\start.ps1`""
+$OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"start.ps1`""
 Set-Content -Path $OutputFilePath -Value $OutputText
 
 # Create shortcut

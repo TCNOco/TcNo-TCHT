@@ -72,7 +72,7 @@ if ($condaFound) {
     } while ($installWhisper -notin "Y", "y", "N", "n")
     
     if ($installWhisper -eq "y" -or $installWhisper -eq "Y") {
-        conda create -n a11 python=3.10.6
+        conda create -n a11 python=3.10.6 -y
         conda activate a11
     } else {
         $condaFound = $false
@@ -219,21 +219,22 @@ Write-Host "`n`nCreate desktop shortcuts for AUTOMATIC1111?" -ForegroundColor Cy
 # Create start bat and ps1 files
 if ($condaFound) {
     # As the Windows Target path can only have 260 chars, we easily hit that limit...
+    $condaPath = Get-CondaPath
+    $OutputFilePath = "start-conda.ps1"
+    $OutputText = "& '$condaPath'`nconda activate a11`nSet-Location `"$(Get-Location)`"`nwebui-user.bat"
+    Set-Content -Path $OutputFilePath -Value $OutputText
+    
     $OutputFilePath = "start-conda.bat"
-    $condaPathBat = $condaPath -replace '.ps1', '.bat'
-    $OutputText = "$condaPathBat`nconda activate a11`ncd `"$(Get-Location)`"`nwebui-user.bat"
+    $OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"start-conda.ps1`""
     Set-Content -Path $OutputFilePath -Value $OutputText
 }
+
 
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
 } while ($shortcuts -notin "Y", "y", "N", "n")
 
-
-$OutputFilePath = "Start.bat"
-$OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$(Get-Location)\Start.ps1`""
-Set-Content -Path $OutputFilePath -Value $OutputText
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
