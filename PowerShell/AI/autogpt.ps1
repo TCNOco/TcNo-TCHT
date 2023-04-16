@@ -64,7 +64,8 @@ if ($condaFound) {
     Write-Host "`n`nDo you want to install Auto-GPT in a Conda environment called 'autogpt'?`nYou'll need to use 'conda activate autogpt' before being able to use it?"-ForegroundColor Cyan
 
     do {
-        $installAutoGPT = Read-Host "Use Conda (y/n)"
+        Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda (y/n): "
+        $installAutoGPT = Read-Host
     } while ($installAutoGPT -notin "Y", "y", "N", "n")
 
     if ($installAutoGPT -eq "y" -or $installAutoGPT -eq "Y") {

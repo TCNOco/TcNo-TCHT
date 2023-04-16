@@ -54,7 +54,8 @@ if (-not $condaFound) {
 # If conda found: create environment
 if ($condaFound) {
     Write-Host "`n`nDo you want to install Whisper in a Conda environment called 'whisper'?`nYou'll need to use 'conda activate whisper' before being able to use it?"-ForegroundColor Cyan
-    $installWhisper = Read-Host "Use Conda (y/n):"
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda? (y/n): "
+    $installWhisper = Read-Host
     if ($installWhisper -eq "y" -or $installWhisper -eq "Y") {
         conda create -n whisper python=3.10 pip -y
         conda activate whisper
@@ -91,7 +92,7 @@ if (-not ($condaFound)) {
             Write-Host "Python version is not between 3.8 and 3.10." -ForegroundColor Yellow
             Write-Host "Assuming you've installed the correct version, please enter the comand you use to access Python 3.8/3.10." -ForegroundColor Yellow
         
-            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310):"
+            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310)"
             $pythonVersion = &$pythonProgramName --version 2>&1
             if ($pythonVersion -match 'Python (3\.(8|9|10)\.\d*)') {
                 Write-Host "Python version $($matches[1]) is installed."

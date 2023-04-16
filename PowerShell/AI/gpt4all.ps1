@@ -71,7 +71,8 @@ $targetPath = "gpt4all\chat\gpt4all-lora-quantized-win64.exe"
 $workingDirectory = "gpt4all\chat"
 
 do {
-    $createShortcut = Read-Host "Do you want a desktop shortcut? (Y/N)"
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want a desktop shortcut? (y/n): "
+    $createShortcut = Read-Host
 } while ($createShortcut -notin "Y", "y", "N", "n")
 
 if ($createShortcut -eq "Y" -or $createShortcut -eq "y") {

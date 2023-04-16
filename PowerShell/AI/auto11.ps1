@@ -67,7 +67,8 @@ if ($condaFound) {
     Write-Host "`n`nDo you want to install AUTOMATIC1111 Stable Diffusion WebUI in a Conda environment called 'a11'?`nYou'll need to use 'conda activate a11' before being able to use it?"-ForegroundColor Cyan
 
     do {
-        $installWhisper = Read-Host "Use Conda (y/n):"
+        Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda (y/n): "
+        $installWhisper = Read-Host
     } while ($installWhisper -notin "Y", "y", "N", "n")
     
     if ($installWhisper -eq "y" -or $installWhisper -eq "Y") {
@@ -142,7 +143,8 @@ git pull # Update A1 SDUI
 # 6. Enable xformers?
 
 do {
-    $answer = Read-Host "`n`nDo you want to enable xformers for extra speed? (Recommended) (y/n)"
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to enable xformers for extra speed? (Recommended) (y/n): "
+    $answer = Read-Host
 } while ($answer -notin "Y", "y", "N", "n")
 
 if ($answer -eq "y" -or $answer -eq "Y") {
@@ -165,7 +167,8 @@ if ((Get-CimInstance -ClassName Win32_PnPEntity -Filter "Manufacturer like 'Adva
 Write-Host "`n`nImage generation uses a lot of VRAM. There are tons of optimizations to do." -ForegroundColor Cyan
 
 do {
-    $answer = Read-Host "Do you have 8GB or more VRAM? (y/n)"
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you have 8GB or more VRAM? (y/n): "
+    $answer = Read-Host
 } while ($answer -notin "Y", "y", "N", "n")
 
 if ($answer -eq "y" -or $answer -eq "Y") {
@@ -175,7 +178,8 @@ if ($answer -eq "y" -or $answer -eq "Y") {
 } else {
     
     do {
-        $answer = Read-Host "Do you have more than 4GB VRAM (Answer no if 4GB and want >512px images)? (y/n)"
+        Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you have more than 4GB VRAM (Answer no if 4GB and want >512px images)? (y/n): "
+        $answer = Read-Host
     } while ($answer -notin "Y", "y", "N", "n")
 
     if ($answer -eq "y" -or $answer -eq "Y") {
@@ -196,7 +200,8 @@ Write-Host "`n`nDo you want to share your WebUI over the internet? (--share)" -F
 Write-Host "NOTE: If yes, you will likely need to create an antivirus exception (More info provided if yes)." -ForegroundColor Cyan
 
 do {
-    $answer = Read-Host "Enter an answer (y/n)"
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n): "
+    $answer = Read-Host
 } while ($answer -notin "Y", "y", "N", "n")
 
 if ($answer -eq "y" -or $answer -eq "Y") {
@@ -221,7 +226,8 @@ if ($condaFound) {
 }
 
 do {
-    $shortcuts = Read-Host "Do you want desktop shortcuts? (y/n)"
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
+    $shortcuts = Read-Host
 } while ($shortcuts -notin "Y", "y", "N", "n")
 
 

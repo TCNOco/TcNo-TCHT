@@ -44,7 +44,8 @@ $containsFolder = Get-ChildItem -Path ".\" -Directory -Name | Select-String -Pat
 if ($containsFolder) {
     Write-Host "The 'oobabooga-windows' folder already exists." -ForegroundColor Cyan
     do {
-        $downloadAgain = Read-Host "Do you want to download it again? (Y/N)"
+        Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again? (y/n): "
+        $downloadAgain = Read-Host
     } while ($downloadAgain -notin "Y", "y", "N", "n")
 
     if ($downloadAgain -eq "Y" -or $downloadAgain -eq "y") {
@@ -323,7 +324,8 @@ function Deploy-Shortcut {
 }
 
 do {
-    $shortcuts = Read-Host "Do you want desktop shortcuts? (Y/N)"
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
+    $shortcuts = Read-Host
 } while ($shortcuts -notin "Y", "y", "N", "n")
 
 
