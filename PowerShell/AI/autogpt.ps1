@@ -178,7 +178,7 @@ if (-not [String]::IsNullOrEmpty($elevenLabsKey)) {
     Write-Host "`nWould you like to use the Brian TTS instead? No key required." -ForegroundColor Cyan
     do {
         $brianTTS = Read-Host "Use Brian TTS? (y/n)"
-    } while ($brianTTS -notin "Y", "y", "N", "n")
+    } while ($brianTTS -notin "Y", "y", "N", "n" -and (-not [String]::IsNullOrEmpty($createShortcut)))
     if ($brianTTS -in "Y", "y") {
         (Get-Content -Path ".env") | ForEach-Object {
             $_ -replace
@@ -251,11 +251,11 @@ $condaPath = Get-CondaPath
 if ($condaFound) {
     # As the Windows Target path can only have 260 chars, we easily hit that limit...
     $OutputFilePath = "Start.ps1"
-    $OutputText = "& '$condaPath'`nconda activate autogpt`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
+    $OutputText = "$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`n& '$condaPath'`nconda activate autogpt`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
     Set-Content -Path $OutputFilePath -Value $OutputText
 } else {
     $OutputFilePath = "Start.ps1"
-    $OutputText = "Set-Location `"$(Get-Location)`"`npython -m autogpt"
+    $OutputText = "$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
     Set-Content -Path $OutputFilePath -Value $OutputText
 }
 
@@ -264,8 +264,10 @@ $OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$(G
 Set-Content -Path $OutputFilePath -Value $OutputText
 
 # Create shortcut
-$createShortcut = Read-Host "Do you want a desktop shortcut? (Y/N)"
-if ($createShortcut -eq "Y" -or $createShortcut -eq "y") {
+do {
+    $createShortcut = Read-Host "Do you want a desktop shortcut? (Y/N)"
+} while ($createShortcut -notin "Y", "y", "N", "n" -and (-not [String]::IsNullOrEmpty($createShortcut)))
+if ($createShortcut -in "Y", "y") {
     # Create desktop shortcut
     iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
     Import-RemoteFunction -ScriptUri "New-Shortcut.tc.ht" # Import function to create a shortcut
