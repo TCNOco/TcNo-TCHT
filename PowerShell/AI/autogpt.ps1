@@ -260,7 +260,7 @@ if ($condaFound) {
 }
 
 $OutputFilePath = "Start.bat"
-$OutputText = "powershell -ExecutionPolicy ByPass -NoExit -File `"$(Get-Location)\Start.ps1`""
+$OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$(Get-Location)\Start.ps1`""
 Set-Content -Path $OutputFilePath -Value $OutputText
 
 # Create shortcut
@@ -270,11 +270,14 @@ if ($createShortcut -eq "Y" -or $createShortcut -eq "y") {
     iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
     Import-RemoteFunction -ScriptUri "New-Shortcut.tc.ht" # Import function to create a shortcut
     
+    Write-Host "Downloading Auto-GPT icon (not official)..."
+    Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/autogpt.ico' -OutFile 'autogpt.ico'
+
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
     $shortcutName = "Auto-GPT"
     $targetPath = "$(Get-Location)\Start.bat"
-    #$IconLocation = 'automatic1111.ico'
-    New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath # -IconLocation $IconLocation
+    $IconLocation = 'autogpt.ico'
+    New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
 
