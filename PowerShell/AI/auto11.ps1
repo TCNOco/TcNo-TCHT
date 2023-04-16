@@ -65,7 +65,11 @@ if (-not $condaFound) {
 # If conda found: create environment
 if ($condaFound) {
     Write-Host "`n`nDo you want to install AUTOMATIC1111 Stable Diffusion WebUI in a Conda environment called 'a11'?`nYou'll need to use 'conda activate a11' before being able to use it?"-ForegroundColor Cyan
-    $installWhisper = Read-Host "Use Conda (y/n):"
+
+    do {
+        $installWhisper = Read-Host "Use Conda (y/n):"
+    } while ($installWhisper -notin "Y", "y", "N", "n")
+    
     if ($installWhisper -eq "y" -or $installWhisper -eq "Y") {
         conda create -n a11 python=3.10.6
         conda activate a11
@@ -136,7 +140,11 @@ Set-Location stable-diffusion-webui
 git pull # Update A1 SDUI
 
 # 6. Enable xformers?
-$answer = Read-Host "`n`nDo you want to enable xformers for extra speed? (Recommended) (y/n)"
+
+do {
+    $answer = Read-Host "`n`nDo you want to enable xformers for extra speed? (Recommended) (y/n)"
+} while ($answer -notin "Y", "y", "N", "n")
+
 if ($answer -eq "y" -or $answer -eq "Y") {
     (Get-Content webui-user.bat) | Foreach-Object {
         $_ -replace 'set COMMANDLINE_ARGS=', 'set COMMANDLINE_ARGS=--xformers --reinstall-xformers '
@@ -155,13 +163,21 @@ if ((Get-CimInstance -ClassName Win32_PnPEntity -Filter "Manufacturer like 'Adva
 
 # 8. Low VRAM
 Write-Host "`n`nImage generation uses a lot of VRAM. There are tons of optimizations to do." -ForegroundColor Cyan
-$answer = Read-Host "Do you have 8GB or more VRAM? (y/n)"
+
+do {
+    $answer = Read-Host "Do you have 8GB or more VRAM? (y/n)"
+} while ($answer -notin "Y", "y", "N", "n")
+
 if ($answer -eq "y" -or $answer -eq "Y") {
     Write-Host "Great! You should have enough VRAM. You should check the following pages anyway for more:" -ForegroundColor Cyan
     Write-Host "Optimizations: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Optimizations" -ForegroundColor Yellow
     Write-Host "Troubleshooting: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Troubleshooting" -ForegroundColor Yellow
 } else {
-    $answer = Read-Host "Do you have more than 4GB VRAM (Answer no if 4GB and want >512px images)? (y/n)"
+    
+    do {
+        $answer = Read-Host "Do you have more than 4GB VRAM (Answer no if 4GB and want >512px images)? (y/n)"
+    } while ($answer -notin "Y", "y", "N", "n")
+
     if ($answer -eq "y" -or $answer -eq "Y") {
         Write-Host "Applying --medvram optimization" -ForegroundColor Cyan
         (Get-Content webui-user.bat) | Foreach-Object {
@@ -178,7 +194,11 @@ if ($answer -eq "y" -or $answer -eq "Y") {
 # 9. Share with Gradio?
 Write-Host "`n`nDo you want to share your WebUI over the internet? (--share)" -ForegroundColor Cyan
 Write-Host "NOTE: If yes, you will likely need to create an antivirus exception (More info provided if yes)." -ForegroundColor Cyan
-$answer = Read-Host "Enter an answer (y/n)"
+
+do {
+    $answer = Read-Host "Enter an answer (y/n)"
+} while ($answer -notin "Y", "y", "N", "n")
+
 if ($answer -eq "y" -or $answer -eq "Y") {
     Write-Host "To fix the AntiVirus warning see: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Troubleshooting#--share-non-functional-after-gradio-322-update" -ForegroundColor Cyan
     Write-Host "You may need to restore the file, and run the WebUI again for it to work" -ForegroundColor Yellow
@@ -190,8 +210,24 @@ if ($answer -eq "y" -or $answer -eq "Y") {
 
 # 10. Create desktop shortcuts?
 Write-Host "`n`nCreate desktop shortcuts for AUTOMATIC1111?" -ForegroundColor Cyan
-$shortcuts = Read-Host "Do you want desktop shortcuts? (y/n)"
 
+# Create start bat and ps1 files
+if ($condaFound) {
+    # As the Windows Target path can only have 260 chars, we easily hit that limit...
+    $OutputFilePath = "start-conda.bat"
+    $condaPathBat = $condaPath -replace '.ps1', '.bat'
+    $OutputText = "$condaPathBat`nconda activate a11`ncd `"$(Get-Location)`"`nwebui-user.bat"
+    Set-Content -Path $OutputFilePath -Value $OutputText
+}
+
+do {
+    $shortcuts = Read-Host "Do you want desktop shortcuts? (y/n)"
+} while ($shortcuts -notin "Y", "y", "N", "n")
+
+
+$OutputFilePath = "Start.bat"
+$OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$(Get-Location)\Start.ps1`""
+Set-Content -Path $OutputFilePath -Value $OutputText
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
@@ -201,7 +237,12 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
     $shortcutName = "AUTOMATIC1111 Stable Diffusion WebUI"
-    $targetPath = "webui-user.bat"
+    if ($condaFound) {
+        $targetPath = "start-conda.bat"
+    }
+    else {
+        $targetPath = "webui-user.bat"
+    }
     $IconLocation = 'automatic1111.ico'
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
     

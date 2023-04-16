@@ -70,7 +70,10 @@ $shortcutName = "GPT4All"
 $targetPath = "gpt4all\chat\gpt4all-lora-quantized-win64.exe"
 $workingDirectory = "gpt4all\chat"
 
-$createShortcut = Read-Host "Do you want a desktop shortcut? (Y/N)"
+do {
+    $createShortcut = Read-Host "Do you want a desktop shortcut? (Y/N)"
+} while ($createShortcut -notin "Y", "y", "N", "n")
+
 if ($createShortcut -eq "Y" -or $createShortcut -eq "y") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -WorkingDirectory $workingDirectory
 }

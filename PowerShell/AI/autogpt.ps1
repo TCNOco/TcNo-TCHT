@@ -62,7 +62,11 @@ if (-not $condaFound) {
 # If conda found: create environment
 if ($condaFound) {
     Write-Host "`n`nDo you want to install Auto-GPT in a Conda environment called 'autogpt'?`nYou'll need to use 'conda activate autogpt' before being able to use it?"-ForegroundColor Cyan
-    $installAutoGPT = Read-Host "Use Conda (y/n)"
+
+    do {
+        $installAutoGPT = Read-Host "Use Conda (y/n)"
+    } while ($installAutoGPT -notin "Y", "y", "N", "n")
+
     if ($installAutoGPT -eq "y" -or $installAutoGPT -eq "Y") {
         conda create -n autogpt python=3.10 pip -y
         conda activate autogpt
@@ -250,24 +254,25 @@ $condaPath = Get-CondaPath
 # Create start bat and ps1 files
 if ($condaFound) {
     # As the Windows Target path can only have 260 chars, we easily hit that limit...
-    $OutputFilePath = "Start.ps1"
+    $OutputFilePath = "start.ps1"
     $OutputText = "`$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`n& '$condaPath'`nconda activate autogpt`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
     Set-Content -Path $OutputFilePath -Value $OutputText
 } else {
-    $OutputFilePath = "Start.ps1"
+    $OutputFilePath = "start.ps1"
     $OutputText = "`$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
     Set-Content -Path $OutputFilePath -Value $OutputText
 }
 
-$OutputFilePath = "Start.bat"
-$OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$(Get-Location)\Start.ps1`""
+$OutputFilePath = "start.bat"
+$OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$(Get-Location)\start.ps1`""
 Set-Content -Path $OutputFilePath -Value $OutputText
 
 # Create shortcut
 do {
     Write-Host "`n`n"
     $createShortcut = Read-Host "Do you want a desktop shortcut? (Y/N)"
-} while ($createShortcut -notin "Y", "y", "N", "n" -and (-not [String]::IsNullOrEmpty($createShortcut)))
+} while ($createShortcut -notin "Y", "y", "N", "n")
+
 if ($createShortcut -in "Y", "y") {
     # Create desktop shortcut
     iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
@@ -278,7 +283,7 @@ if ($createShortcut -in "Y", "y") {
 
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
     $shortcutName = "Auto-GPT"
-    $targetPath = "$(Get-Location)\Start.bat"
+    $targetPath = "$(Get-Location)\start.bat"
     $IconLocation = 'autogpt.ico'
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
@@ -286,4 +291,5 @@ if ($createShortcut -in "Y", "y") {
 Write-Host "`n`n`nStarting Auto-GPT...`n" -ForegroundColor Cyan
 
 # 7. Run Auto-GPT
+$Host.UI.RawUI.WindowTitle = 'Auto-GPT'
 python -m autogpt
