@@ -91,18 +91,23 @@ if (-not ($condaFound)) {
         else {
             Write-Host "Python version is not between 3.8 and 3.10." -ForegroundColor Yellow
             Write-Host "Assuming you've installed the correct version, please enter the comand you use to access Python 3.8/3.10." -ForegroundColor Yellow
+            Write-Host "Otherwise enter python to continue anyway." -ForegroundColor Yellow
         
-            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310)"
+            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python, python3, python310)"
             $pythonVersion = &$pythonProgramName --version 2>&1
             if ($pythonVersion -match 'Python (3\.(8|9|10)\.\d*)') {
                 Write-Host "Python version $($matches[1]) is installed."
                 $python = $pythonProgramName
             } else {
-                Write-Host "Python version is not between 3.8 and 3.10."
-                Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-                Read-Host "Process can not continue. The program will exit when you press any key to continue..."
-                $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
-                Exit
+                if ($pythonProgramName -eq "python") {
+                    Write-Host "`n`"python`" entered. Ignoring version and attempting to continue anyway." -ForegroundColor Yellow
+                } else {
+                    Write-Host "Python version is not between 3.8 and 3.10."
+                    Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
+                    Read-Host "Process can not continue. The program will exit when you press any key to continue..."
+                    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+                    Exit
+                }
             }
         }
     }
