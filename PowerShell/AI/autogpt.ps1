@@ -220,7 +220,7 @@ if (-not [String]::IsNullOrEmpty($pineconeApi)) {
 # Create empty auto-gpt.json file for memory should pinecone be removed later, or not entered in the first place.
 # Otherwise users will see error.
 $FilePath = "auto-gpt.json"
-New-Item -Path $FilePath -ItemType File
+New-Item -Path $FilePath -ItemType File -Value "{}"
 
 # Enter Google Search key
 Write-Host "`nToo many Google Searches could end up with error 429. You can get and enter a Google API key to get around this." -ForegroundColor Cyan
