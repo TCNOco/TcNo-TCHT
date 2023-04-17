@@ -244,6 +244,7 @@ if ($condaFound) {
         & .\Whisper\Scripts\Activate.ps1
         python -m pip install -U openai-whisper
         deactivate
+        Copy-Item ".\Whisper\Scripts\whisper.exe" -Destination ".\_Programs\whisper.exe" -Force
     } else {
         &$python -m pip install -U openai-whisper
     }
@@ -252,10 +253,6 @@ if ($condaFound) {
 
 # 6. Verify that Whisper is installed. Reinstall using another method if not.
 if (Get-Command whisper -ErrorAction SilentlyContinue) {
-    if ($useVenv) {
-        # Copy Whisper to Programs folder if using venv
-        Copy-Item ".\Whisper\Scripts\whisper.exe" -Destination ".\_Programs\whisper.exe" -Force
-    }
     Write-Host "`n`nWhisper is installed!" -ForegroundColor Green
     Write-Host "You can now use `whisper --help` for more information in this PowerShell window, CMD or another program!" -ForegroundColor Green
 }
@@ -271,6 +268,7 @@ else {
             python -m pip install -U setuptools-rust
             python -m pip install -U --no-deps --force-reinstall git+https://github.com/openai/whisper.git
             deactivate
+            Copy-Item ".\Whisper\Scripts\whisper.exe" -Destination ".\_Programs\whisper.exe" -Force
         } else {
             &$python -m pip install -U setuptools-rust
             &$python -m pip install -U --no-deps --force-reinstall git+https://github.com/openai/whisper.git

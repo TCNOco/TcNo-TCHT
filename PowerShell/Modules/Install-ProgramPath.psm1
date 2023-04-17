@@ -102,14 +102,14 @@ function Install-ProgramPath {
         Write-Host "The installation path is already in the $pathType PATH."
     }
 
-    $filePath = "./_Programs/_README.txt"
+    $filePath = Join-Path $env:USERPROFILE "TCHT/_Programs/_README.txt"
     $content = "This folder contains .exes from Python venvs (virtual environments) in the parent folder.`r`n`r`nPlease do not delete anything here, or in the parent folder. Instead use the following to uninstall properly:`r`niex (irm uninstall.tc.ht)"
 
     New-Item -ItemType File -Path $filePath -Force | Out-Null
     Set-Content -Path $filePath -Value $content
 
 
-    $filePath = "./_README.txt"
+    $filePath = Join-Path $env:USERPROFILE "TCHT/_README.txt"
     $content = "This folder containsPython venvs (virtual environments) and programs 'installed' with TroubleChute's scripts in the _Programs folder.`r`n`r`nPlease do not delete anything here. Instead use the following to uninstall properly:`r`niex (irm uninstall.tc.ht)`n`n`nThe script will let you choose a program, then delete the linked exe, the actual venv files as well as unregister the venv from Python."
 
     New-Item -ItemType File -Path $filePath -Force | Out-Null
