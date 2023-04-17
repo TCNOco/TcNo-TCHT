@@ -259,6 +259,9 @@ if (Get-Command whisper -ErrorAction SilentlyContinue) {
 else {
     Write-Host "Whisper is not installed, trying again but this time installing from the openai/whisper GitHub repo" -ForegroundColor Green
 
+    Write-Host "`nInstalling Git..." -ForegroundColor Cyan
+    iex (irm install-git.tc.ht)
+
     if ($condaFound){
         pip install -U setuptools-rust
         pip install git+https://github.com/openai/whisper.git
