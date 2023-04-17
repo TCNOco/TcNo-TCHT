@@ -152,6 +152,7 @@ if (-not ($condaFound) -and (Get-Command $python -ErrorAction SilentlyContinue))
 
 # Update pip
 if (-not $condaFound -and ($useVenv)) {
+    & .\Whisper\Scripts\Activate.ps1
     python -m pip install --upgrade pip
 } else {
     &$python -m pip install --upgrade pip
@@ -205,6 +206,7 @@ if (Get-Command nvcc -ErrorAction SilentlyContinue) {
         conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y
     } else {
         if ($useVenv) {
+            & .\Whisper\Scripts\Activate.ps1
             python -m pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
         } else {
             &$python -m pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
@@ -221,6 +223,7 @@ else {
         conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
     } else {
         if ($useVenv) {
+            & .\Whisper\Scripts\Activate.ps1
             python -m pip install torch torchvision torchaudio
         } else {
             &$python -m pip install torch torchvision torchaudio
@@ -238,6 +241,7 @@ if ($condaFound) {
     pip install -U openai-whisper # Environment is already active
 } else {
     if ($useVenv) {
+        & .\Whisper\Scripts\Activate.ps1
         python -m pip install -U openai-whisper
         deactivate
     } else {
@@ -250,7 +254,7 @@ if ($condaFound) {
 if (Get-Command whisper -ErrorAction SilentlyContinue) {
     if ($useVenv) {
         # Copy Whisper to Programs folder if using venv
-        Copy-Item ".\Whisper\Scripts\whisper.exe" -Destination ".\Programs\whisper.exe" -Force
+        Copy-Item ".\Whisper\Scripts\whisper.exe" -Destination ".\_Programs\whisper.exe" -Force
     }
     Write-Host "`n`nWhisper is installed!" -ForegroundColor Green
     Write-Host "You can now use `whisper --help` for more information in this PowerShell window, CMD or another program!" -ForegroundColor Green
