@@ -47,8 +47,8 @@ function Install-ProgramPath {
 
     # Ask user where to install
     do {
-        Write-Host -ForegroundColor Cyan "`n`nWhere do you want $ProgramName installed?`n1. Install for me only ($($env:USERPROFILE)\whisper)`n2. Install for all users (C:\TCHT\Whisper)"
-        $choice = Read-Host "Answer (1/2): "
+        Write-Host -ForegroundColor Cyan "`n`nWhere do you want $ProgramName installed?`n1. Install for me only ($($env:USERPROFILE)\$ProgramName)`n2. Install for all users (C:\TCHT\$ProgramName)"
+        $choice = Read-Host "Answer (1/2)"
         switch ($choice) {
             "1" {
                 $envPath = Join-Path $env:USERPROFILE "TCHT"
@@ -66,9 +66,9 @@ function Install-ProgramPath {
                 Write-Host "Invalid choice. Please choose 1 or 2."
             }
         }
-    } while ($choice -ne "1" -and $choice -ne "2")
+    } while ($choice -notin "1", "2")
 
-    $envPathPrograms = Join-Path $envPath "programs"
+    $envPathPrograms = Join-Path $envPath "Programs"
 
     # Create folder
     if (-not (Test-Path $savePath)) {
@@ -76,6 +76,9 @@ function Install-ProgramPath {
         Write-Host "Created directory $savePath."
     } else {
         Write-Host "Directory $savePath already exists."
+    }
+    if (-not (Test-Path $envPathPrograms)) {
+        New-Item -ItemType Directory -Path $envPathPrograms | Out-Null
     }
 
     # Check if the installation path is already in the PATH
