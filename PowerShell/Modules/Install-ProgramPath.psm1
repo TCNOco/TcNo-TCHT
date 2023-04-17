@@ -47,7 +47,7 @@ function Install-ProgramPath {
 
     # Ask user where to install
     do {
-        Write-Host -ForegroundColor Cyan "`n`nWhere do you want $ProgramName installed?`n1. Install for me only ($($env:USERPROFILE)\$ProgramName)`n2. Install for all users (C:\TCHT\$ProgramName)"
+        Write-Host -ForegroundColor Cyan "`nWhere do you want $ProgramName installed?`n1. Install for me only ($($env:USERPROFILE)\TCHT\$ProgramName)`n2. Install for all users (C:\TCHT\$ProgramName)"
         $choice = Read-Host "Answer (1/2)"
         switch ($choice) {
             "1" {
