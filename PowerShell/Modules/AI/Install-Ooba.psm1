@@ -32,6 +32,13 @@ function Install-Ooba {
         [int]$skip_start,
         [int]$skip_model
     )
+
+    if ($skip_start -eq 1) {
+        Write-Host "Not starting Ooba after installation"
+    }
+    if ($skip_model -eq 1) {
+        Write-Host "Skipping model download"
+    }
         
     # Since the latest update, this program is unhappy with paths with a space in them.
     # The program will be installed to C:\TCHT\Ooba
