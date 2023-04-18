@@ -31,16 +31,16 @@ Write-Host "[Version 2023-04-07]`n`n" -ForegroundColor Cyan
 
 # 1. Downloads and extracts the latest oobabooga/text-generation-webui release
 # Download file
-Invoke-WebRequest -Uri "https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga_windows.zip" -OutFile "./oobabooga-windows.zip"
+Invoke-WebRequest -Uri "https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga_windows.zip" -OutFile "./oobabooga_windows.zip"
 
 # Extract file
-Expand-Archive "./oobabooga-windows.zip" -DestinationPath "./" -Force
+Expand-Archive "./oobabooga_windows.zip" -DestinationPath "./" -Force
 
 # Delete zip file
-Remove-Item "./oobabooga-windows.zip"
+Remove-Item "./oobabooga_windows.zip"
 
 # 2. Run install.bat
-Set-Location "./oobabooga-windows"
+Set-Location "./oobabooga_windows"
 if ($gpu -eq "Yes") {
     # Replace GPU question with YES
     (Get-Content -Path "install.bat") | ForEach-Object {

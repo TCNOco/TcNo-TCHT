@@ -36,13 +36,13 @@ Write-Host "[Version 2023-04-11]`n`n" -ForegroundColor Cyan
 # 1. Check if current directory is oobabooga-windows, or oobabooga-windows is in directory
 # If it is, CD back a folder.
 $currentDir = (Get-Item -Path ".\" -Verbose).FullName
-if ($currentDir -like "*\oobabooga-windows") {
+if ($currentDir -like "*\oobabooga_windows") {
     Set-Location ../
 }
 
-$containsFolder = Get-ChildItem -Path ".\" -Directory -Name | Select-String -Pattern "oobabooga-windows"
+$containsFolder = Get-ChildItem -Path ".\" -Directory -Name | Select-String -Pattern "oobabooga_windows"
 if ($containsFolder) {
-    Write-Host "The 'oobabooga-windows' folder already exists." -ForegroundColor Cyan
+    Write-Host "The 'oobabooga_windows' folder already exists." -ForegroundColor Cyan
     do {
         Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again? (y/n): "
         $downloadAgain = Read-Host
@@ -84,7 +84,7 @@ if (-not $containsFolder) {
 
 } else {
     # CD into folder anyway
-    Set-Location "./oobabooga-windows"
+    Set-Location "./oobabooga_windows"
 }
 
 
@@ -200,7 +200,7 @@ if (-not $?) {
 
 Write-Host "`n`nNOTE: If you see ""AttributeError: 'Llama' object has no attribute 'ctx' "" then you don't have enough RAM/VRAM." -ForegroundColor Red
 Write-Host "Should you need less memory usage, see: https://github.com/oobabooga/text-generation-webui/wiki/Low-VRAM-guide" -ForegroundColor Green
-Write-Host "(These will be added to the .bat you're trying to run in the oobabooga-windows folder)" -ForegroundColor Green
+Write-Host "(These will be added to the .bat you're trying to run in the oobabooga_windows folder)" -ForegroundColor Green
 
 if ($gpu -eq "No") {
     # Ask user what CPU model they want
