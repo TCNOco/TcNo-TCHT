@@ -87,18 +87,16 @@ function Install-Ooba {
         ForEach-Object { $_ -replace 'gpuchoice = input\("Input> "\)\.lower\(\)', "gpuchoice = `"$choice`".lower()" } | 
     Set-Content -Path webui-modified.py
 
-    if ($skip_model -eq 1) {
-        # Skip model download prompt if selected
-        (Get-Content -Path webui-modified.py) | 
-            ForEach-Object { $_ -replace "def download_model():", "def download_model():`nreturn" } | 
-        Set-Content -Path webui-modified.py
-    }
+    $filePath = "webui-modified.py"
+    
     if ($skip_start -eq 1) {
-        # Skip model download prompt if selected
-        (Get-Content -Path webui-modified.py) | 
-            ForEach-Object { $_ -replace "def run_model():", "def run_model():`nreturn" } | 
-        Set-Content -Path webui-modified.py
+        (Get-Content $filePath) -replace "def run_model\(\):", "def run_model():`n    return" | Set-Content $filePath
     }
+    
+    if ($skip_model -eq 1) {
+        (Get-Content $filePath) -replace "def download_model\(\):", "def download_model():`n    return" | Set-Content $filePath
+    }
+
     (Get-Content -Path start_windows.bat) | 
         ForEach-Object { $_ -replace "call python webui.py", "call python webui-modified.py" } | 
     Set-Content -Path start_windows-modified.bat
