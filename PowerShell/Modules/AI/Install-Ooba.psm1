@@ -82,6 +82,11 @@ function Install-Ooba {
         $choice = Read-Host "Answer (A/B/C/D)"
     } while ($choice -notin "A", "a", "B", "b", "C", "c", "D", "d")
 
+
+    (Get-Content -Path start_windows.bat) | 
+        ForEach-Object { $_ -replace "call python webui.py", "call python webui-modified.py" } | 
+    Set-Content -Path start_windows-modified.bat
+
     $filePath = "webui-modified.py"
     
     # Replace `gpuchoice = input("Input> ").lower()`1 in webui.py with `gpuchoice = $choice`, but choice is lower case
@@ -92,16 +97,12 @@ function Install-Ooba {
     
     if ($skip_start -eq 1) {
         (Get-Content $filePath) -replace "def run_model\(\):", "def run_model():`n    return" | Set-Content $filePath
-        (Get-Content $filePath) -replace "pause", "" | Set-Content $filePath
+        (Get-Content start_windows-modified.bat) -replace "pause", "" | Set-Content start_windows-modified.bat
     }
     
     if ($skip_model -eq 1) {
         (Get-Content $filePath) -replace "def download_model\(\):", "def download_model():`n    return" | Set-Content $filePath
     }
-
-    (Get-Content -Path start_windows.bat) | 
-        ForEach-Object { $_ -replace "call python webui.py", "call python webui-modified.py" } | 
-    Set-Content -Path start_windows-modified.bat
 
     # 3. Run the modified installer
     ./start_windows-modified.bat

@@ -240,7 +240,7 @@ function New-WebUIBat {
     (Get-Content -Path "start_windows.bat") | ForEach-Object {
         ($_ -replace
             'call python webui.py',
-            "python webui.py --auto-devices --chat --model $model $otherArgs")
+            "cd text-generation-webui`npython server.py --auto-devices --chat --model $model $otherArgs")
     } | Set-Content -Path $newBatchFile
 }
 
