@@ -26,8 +26,89 @@ Write-Host "Welcome to TroubleChute's Oobabooga installer!" -ForegroundColor Cya
 Write-Host "Oobabooga should now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-04-18]`n`n" -ForegroundColor Cyan
 
-# Allow importing remote functions
-iex (irm Import-RemoteFunction.tc.ht)
-Import-FunctionIfNotExists -Command Install-Ooba -ScriptUri "Install-Ooba.tc.ht"
+# Since the latest update, this program is unhappy with paths with a space in them.
+# The program will be installed to C:\TCHT\Ooba
+# So, we'll create C:\TCHT\Ooba if it doesn't already exist:
+if (!(Test-Path -Path "C:\TCHT")) {
+    New-Item -ItemType Directory -Path "C:\TCHT"
+}
 
-Install-Ooba
+# Then CD into C:\TCHT\
+Set-Location "C:\TCHT\"
+
+# 1. Downloads and extracts the latest oobabooga/text-generation-webui release
+# Download file
+Invoke-WebRequest -Uri "https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga_windows.zip" -OutFile "./oobabooga_windows.zip"
+
+# Extract file
+Expand-Archive "./oobabooga_windows.zip" -DestinationPath "./" -Force
+
+# Delete zip file
+Remove-Item "./oobabooga_windows.zip"
+Set-Location "./oobabooga_windows"
+
+# 2. Ask user about installation and create a modified installer
+Write-Host "What version do you want to install?" -ForegroundColor Cyan
+if ((Get-WmiObject Win32_VideoController).Name -match "NVIDIA") {
+    Write-Host "A) NVIDIA (Detected)" -ForegroundColor Cyan
+} else {
+    Write-Host "A) NVIDIA" -ForegroundColor Cyan
+}
+
+if ((Get-WmiObject Win32_VideoController).Name -match "AMD") {
+    Write-Host "B) AMD (Detected)"
+} else {
+    Write-Host "B) AMD" -ForegroundColor Cyan
+}
+
+Write-Host "C) Apple M Series" -ForegroundColor Cyan
+Write-Host "D) CPU-Only mode" -ForegroundColor Cyan
+
+do {
+    $choice = Read-Host "Answer (A/B/C/D)"
+} while ($choice -notin "A", "a", "B", "b", "C", "c", "D", "d")
+
+# Replace `gpuchoice = input("Input> ").lower()`1 in webui.py with `gpuchoice = $choice`, but choice is lower case
+(Get-Content -Path webui.py) | 
+    ForEach-Object { $_ -replace 'gpuchoice = input\("Input> "\)\.lower\(\)', "gpuchoice = `"$choice`".lower()" } | 
+Set-Content -Path webui-modified.py
+
+if ($skip_model -eq 1) {
+    # Skip model download prompt if selected
+    (Get-Content -Path webui-modified.py) | 
+        ForEach-Object { $_ -replace "def download_model():", "def download_model():`nreturn" } | 
+    Set-Content -Path webui-modified.py
+}
+if ($skip_start -eq 1) {
+    # Skip model download prompt if selected
+    (Get-Content -Path webui-modified.py) | 
+        ForEach-Object { $_ -replace "def run_model():", "def run_model():`nreturn" } | 
+    Set-Content -Path webui-modified.py
+}
+(Get-Content -Path start_windows.bat) | 
+    ForEach-Object { $_ -replace "call python webui.py", "call python webui-modified.py" } | 
+Set-Content -Path start_windows-modified.bat
+
+# 3. Run the modified installer
+./start_windows-modified.bat
+
+# 4. Delete the modified installer
+Remove-Item "./webui-modified.py"
+Remove-Item "./start_windows-modified.bat"
+
+# 5. Ask the user if they want Desktop shortcuts
+do {
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts for Oobabooga? (y/n): "
+    $shortcuts = Read-Host
+} while ($shortcuts -notin "Y", "y", "N", "n")
+
+if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
+    iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
+    Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
+    
+    Write-Host "Downloading Oobabooga icon..."
+    Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/ooba.ico' -OutFile 'ooba.ico'
+    Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
+    
+    New-Shortcut -ShortcutName "Oobabooga WebUI" -TargetPath "start_windows.bat" -IconLocation 'ooba.ico'
+}

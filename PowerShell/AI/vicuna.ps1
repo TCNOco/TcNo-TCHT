@@ -53,12 +53,10 @@ if (Test-Path -Path "C:\TCHT\oobabooga_windows") {
 if ($toDownload) {
     Write-Host "I'll start by installing Oobabooga first, then we'll get to the model...`n`n"
     
-    # Allow importing remote functions
-    iex (irm Import-RemoteFunction.tc.ht)
-    Import-FunctionIfNotExists -Command Install-Ooba -ScriptUri "Install-Ooba.tc.ht"
+    $skip_model = 1
+    $skip_start = 1
 
-    Install-Ooba -skip_model 1 -skip_start 1
-
+    iex (irm ooba.tc.ht)
 } else {
     # CD into folder anyway
     Set-Location "C:\TCHT\oobabooga_windows"
