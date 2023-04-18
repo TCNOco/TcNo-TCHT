@@ -23,6 +23,9 @@
 # Creates folder, and adds to PATH if not already.
 # ----------------------------------------
 
+#TODO: Add a Current Folder option, that just prints CD. Installs there. Return both the install folder as well as the C:\TCHT or whichever folder was picked for reference in the program
+#TODO: Also save the path to the install folder in a text file so that the future uninstall script can refer to it...
+
 <#
 .Synopsis
 Creates folders to later install a program to a specified path and adds the installation path to the user or system PATH environment variable.

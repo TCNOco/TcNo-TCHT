@@ -116,16 +116,14 @@ if (-not ($condaFound)) {
             } else {
                 Write-Host "Python version is not between 3.10.6 and 3.10.11."
                 Write-Host "Alternatively, follow this guide for manual installation: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs" -ForegroundColor Red
-                Read-Host "Process can not continue. The program will exit when you press any key to continue..."
-                Exit
+                Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
             }
         }
     }
     Catch {
         Write-Host "Python version is not between 3.10.6 - 3.10.11."
-        Read-Host "Alternatively, follow this guide for manual installation: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs...`nPress any key to continue, or close this window..."
-        $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
-        Exit
+        Write-Host "Alternatively, follow this guide for manual installation: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs..." -ForegroundColor Red
+        Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
     }
 }
 
