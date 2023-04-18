@@ -31,17 +31,11 @@
 
 Write-Host "Welcome to TroubleChute's Vicuna installer!" -ForegroundColor Cyan
 Write-Host "Vicuna as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-11]`n`n" -ForegroundColor Cyan
+Write-Host "[Version 2023-04-18]`n`n" -ForegroundColor Cyan
 
-# 1. Check if current directory is oobabooga-windows, or oobabooga-windows is in directory
-# If it is, CD back a folder.
-$currentDir = (Get-Item -Path ".\" -Verbose).FullName
-if ($currentDir -like "*\oobabooga_windows") {
-    Set-Location ../
-}
-
-$containsFolder = Get-ChildItem -Path ".\" -Directory -Name | Select-String -Pattern "oobabooga_windows"
-if ($containsFolder) {
+# 1. Check if has oobabooga_windows directory (C:\TCHT\oobabooga_windows)
+$toDownload = $True
+if (Test-Path -Path "C:\TCHT\oobabooga_windows") {
     Write-Host "The 'oobabooga_windows' folder already exists." -ForegroundColor Cyan
     do {
         Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again? (y/n): "
@@ -50,43 +44,23 @@ if ($containsFolder) {
 
     if ($downloadAgain -eq "Y" -or $downloadAgain -eq "y") {
         # Perform the download again
-        $containsFolder = $False
+        $toDownload = $True
+    } else {
+        $toDownload = $False
     }
 }
 
-if (-not $containsFolder) {
+if ($toDownload) {
     Write-Host "I'll start by installing Oobabooga first, then we'll get to the model...`n`n"
     
-    #2. Choose CPU or GPU installation
-    Write-Host "Do you have an NVIDIA GPU?" -ForegroundColor Cyan
-    Write-Host "Enter anything but y or n to skip." -ForegroundColor Yellow
-
-    do {
-        $choice = Read-Host "Answer (y/n)"
-    } while ($choice -notin "Y", "y", "N", "n")
-
     $skip_model = 1
     $skip_start = 1
 
-    if ($choice -eq "Y" -or $choice -eq "y") {
-        Write-Host "Installing GPU & CPU compatible version" -ForegroundColor Cyan
-        Write-Host "If this fails, please delete the folder and choose 'N'" -ForegroundColor Cyan
-        $gpu = "Yes"
-        # 2. Run my install script for obabooga/text-generation-webui
-        iex (irm ooba.tc.ht)
-    }
-    elseif ($choice -eq "N" -or $choice -eq "n") {
-        Write-Host "Installing CPU-Only version" -ForegroundColor Cyan
-        $gpu = "No"
-        # 2. Run my install script for obabooga/text-generation-webui
-        iex (irm ooba.tc.ht)
-    }
-
+    iex (irm ooba.tc.ht)
 } else {
     # CD into folder anyway
-    Set-Location "./oobabooga_windows"
+    Set-Location "C:\TCHT\oobabooga_windows"
 }
-
 
 function Get-VincunaCPU13B {
     # Download CPU model 13B
