@@ -82,12 +82,13 @@ function Install-Ooba {
         $choice = Read-Host "Answer (A/B/C/D)"
     } while ($choice -notin "A", "a", "B", "b", "C", "c", "D", "d")
 
+    $filePath = "webui-modified.py"
+    
     # Replace `gpuchoice = input("Input> ").lower()`1 in webui.py with `gpuchoice = $choice`, but choice is lower case
     (Get-Content -Path webui.py) | 
         ForEach-Object { $_ -replace 'gpuchoice = input\("Input> "\)\.lower\(\)', "gpuchoice = `"$choice`".lower()" } | 
-    Set-Content -Path webui-modified.py
+    Set-Content -Path $filePath
 
-    $filePath = "webui-modified.py"
     
     if ($skip_start -eq 1) {
         (Get-Content $filePath) -replace "def run_model\(\):", "def run_model():`n    return" | Set-Content $filePath
