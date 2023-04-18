@@ -53,8 +53,8 @@ if (Test-Path -Path "C:\TCHT\oobabooga_windows") {
 if ($toDownload) {
     Write-Host "I'll start by installing Oobabooga first, then we'll get to the model...`n`n"
     
-    $skip_model = 1
-    $skip_start = 1
+    $global:skip_model = 1
+    $global:skip_start = 1
 
     iex (irm ooba.tc.ht)
 } else {

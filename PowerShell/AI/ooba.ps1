@@ -79,13 +79,13 @@ do {
     ForEach-Object { $_ -replace 'gpuchoice = input\("Input> "\)\.lower\(\)', "gpuchoice = `"$choice`".lower()" } | 
 Set-Content -Path webui-modified.py
 
-if (-not ($skip_model -eq 1)) {
+if (-not ($global:skip_model -eq 1)) {
     # Skip model download prompt if selected
     (Get-Content -Path webui-modified.py) | 
         ForEach-Object { $_ -replace "def download_model():", "def download_model():`nreturn" } | 
     Set-Content -Path webui-modified.py
 }
-if (-not ($skip_start -eq 1)) {
+if (-not ($global:skip_start -eq 1)) {
     # Skip model download prompt if selected
     (Get-Content -Path webui-modified.py) | 
         ForEach-Object { $_ -replace "def run_model():", "def run_model():`nreturn" } | 
@@ -116,5 +116,5 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/ooba.ico' -OutFile 'ooba.ico'
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
     
-    New-Shortcut -ShortcutName "Oobabooga WebUI" -TargetPath $batFile -IconLocation 'ooba.ico'
+    New-Shortcut -ShortcutName "Oobabooga WebUI" -TargetPath "start_windows.bat" -IconLocation 'ooba.ico'
 }
