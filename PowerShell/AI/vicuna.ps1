@@ -36,7 +36,7 @@ Write-Host "[Version 2023-04-18]`n`n" -ForegroundColor Cyan
 # 1. Check if has oobabooga_windows directory (C:\TCHT\oobabooga_windows)
 $toDownload = $True
 if (Test-Path -Path "C:\TCHT\oobabooga_windows") {
-    Write-Host "The 'oobabooga_windows' folder already exists." -ForegroundColor Cyan
+    Write-Host "The 'oobabooga_windows' folder already exists." -ForegroundColor Green
     do {
         Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again? (y/n): "
         $downloadAgain = Read-Host
@@ -240,7 +240,7 @@ function New-WebUIBat {
     (Get-Content -Path "start_windows.bat") | ForEach-Object {
         ($_ -replace
             'call python webui.py',
-            "python server.py --auto-devices --chat --model $model $otherArgs")
+            "python webui.py --auto-devices --chat --model $model $otherArgs")
     } | Set-Content -Path $newBatchFile
 }
 

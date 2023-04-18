@@ -92,6 +92,7 @@ function Install-Ooba {
     
     if ($skip_start -eq 1) {
         (Get-Content $filePath) -replace "def run_model\(\):", "def run_model():`n    return" | Set-Content $filePath
+        (Get-Content $filePath) -replace "pause", "" | Set-Content $filePath
     }
     
     if ($skip_model -eq 1) {
