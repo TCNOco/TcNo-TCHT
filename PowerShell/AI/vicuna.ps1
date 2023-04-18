@@ -21,12 +21,10 @@
 # ----------------------------------------
 # This script:
 # 1. Check if current directory is oobabooga-windows, or oobabooga-windows is in directory
-# 2. Run my install script for obabooga/text-generation-webui
-# 3. Tells you how to download the vicuna model, and opens the model downloader.
-# 4. Run the model downloader (Unless CPU-Only mode was selected in install, in which case the CPU model is downloaded)
-# 5. Replace commands in the start-webui.bat file
-# 6. Create desktop shortcuts
-# 7. Run the webui
+# 2. Ask the user what models they want to download
+# 3. Replace commands in the start-webui.bat file
+# 4. Create desktop shortcuts
+# 5. Run the webui
 # ----------------------------------------
 
 Write-Host "Welcome to TroubleChute's Vicuna installer!" -ForegroundColor Cyan
@@ -136,7 +134,7 @@ function Get-VicunaGPU7B {
     # Download the file from the URL
     Write-Host "Downloading: TheBloke/vicuna-AlekseyKorshuk-7B-GPTQ-4bit-128g (GPU/CUDA model)" -ForegroundColor Cyan
     $files = @(
-        "vicuna-AlekseyKorshuk-7B-GPTQ-4bit-128g.safetensors",
+        "vicuna-AlekseyKorshuk-7B-GPTQ-4bit-128g.no-act-order.pt",
         "tokenizer_config.json",
         "tokenizer.model",
         "special_tokens_map.json",
@@ -164,6 +162,7 @@ function Get-VicunaGPU() {
     Write-Host "`nDone!`n" -ForegroundColor Cyan
 }
 
+# 2. Ask the user what models they want to download
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
@@ -244,7 +243,7 @@ function New-WebUIBat {
     } | Set-Content -Path $newBatchFile
 }
 
-# 5. Replace commands in the start-webui.bat file
+# 3. Replace commands in the start-webui.bat file
 # Create CPU and GPU versions
 if (-not ($gpu -eq "No")) {    
     if ($global:gpuModel -eq "1") {
@@ -266,7 +265,7 @@ if ($global:cpuModel -eq "1") {
     New-WebUIBat -model "eachadea_ggml-vicuna-7b-1-1" -newBatchFile "start_vicuna-cpu-7B.bat" -otherArgs ""
 }
 
-# 6. Create desktop shortcuts
+# 4. Create desktop shortcuts
 if ($gpu -eq "No") {
     Write-Host "`n`nCreate desktop shortcuts for 'Vicuna (CPU)'" -ForegroundColor Cyan
 } else {
@@ -315,7 +314,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     }
 }
 
-# 7. Run the webui
+# 5. Run the webui
 if ($gpu -eq "No") {
     Start-Process ".\start_vicuna.bat"
 } else {
