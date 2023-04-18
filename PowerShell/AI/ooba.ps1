@@ -31,7 +31,7 @@ Write-Host "[Version 2023-04-07]`n`n" -ForegroundColor Cyan
 
 # 1. Downloads and extracts the latest oobabooga/text-generation-webui release
 # Download file
-Invoke-WebRequest -Uri "https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga-windows.zip" -OutFile "./oobabooga-windows.zip"
+Invoke-WebRequest -Uri "https://github.com/oobabooga/text-generation-webui/releases/download/installers/oobabooga_windows.zip" -OutFile "./oobabooga-windows.zip"
 
 # Extract file
 Expand-Archive "./oobabooga-windows.zip" -DestinationPath "./" -Force
