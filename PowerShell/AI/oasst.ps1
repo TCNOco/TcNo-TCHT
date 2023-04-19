@@ -31,6 +31,8 @@ Write-Host "Welcome to TroubleChute's OpenAssist (Pythia) installer!" -Foregroun
 Write-Host "OpenAssist (Pythia) as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-04-19]`n`n" -ForegroundColor Cyan
 
+Write-Host "This installs to C:\TCHT by default. You can change this by setting 'TC.HT' to a path like 'D:\TCHT' in the System Variables (Start Menu -> Environment Variables)`n`n" -ForegroundColor Yellow
+
 $TCHT = [Environment]::GetEnvironmentVariable("TC.HT", "Machine")
 
 if ($TCHT -eq $null) {
