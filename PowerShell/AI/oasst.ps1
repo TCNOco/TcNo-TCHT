@@ -98,9 +98,12 @@ do {
     }
 
     $selectedNumbers += $num
-    Write-Host "Done downloading model`n`n" -ForegroundColor Yellow
-
-    $again = Read-Host "Do you want to download another model? (y/n)"
+    if ($selectedNumbers.Count -lt 2) {
+        Write-Host "Done downloading model`n`n" -ForegroundColor Yellow
+        $again = Read-Host "Do you want to download another model? (y/n)"
+    } else {
+        $again = "N"
+    }
 } while ($again -notin "N", "n")
 
 
