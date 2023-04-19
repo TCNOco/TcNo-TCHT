@@ -33,6 +33,11 @@ Write-Host "[Version 2023-04-18]`n`n" -ForegroundColor Cyan
 
 Write-Host "This installs to C:\TCHT by default. You can change this by setting 'TC.HT' to a path like 'D:\TCHT' in the System Variables (Start Menu -> Environment Variables)`n`n" -ForegroundColor Yellow
 
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "This script needs to be run as an administrator." -ForegroundColor Red
+    Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
+}
+
 $TCHT = [Environment]::GetEnvironmentVariable("TC.HT", "Machine")
 
 if ($TCHT -eq $null) {
