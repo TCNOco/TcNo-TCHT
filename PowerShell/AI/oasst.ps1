@@ -63,36 +63,65 @@ if ($toDownload) {
     Set-Location "C:\TCHT\oobabooga_windows"
 }
 
-function Get-Oasst-12B-3-5 {
-    # Download 12B model
-    Write-Host "Downloading 12B OpenAssist SFT Pythia 12B epoch 3.5" -ForegroundColor Yellow
-    $blob = "https://huggingface.co/OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5/resolve/main"
-    $outputPath = "text-generation-webui\models\openassistant_oasst-sft-4-pythia-12b-epoch-3.5"
-    Write-Host "Downloading: OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5" -ForegroundColor Cyan
-    $files = @(
-        "config.json"
-        "generation_config.json"
-        "pytorch_model-00001-of-00003.bin"
-        "pytorch_model-00002-of-00003.bin"
-        "pytorch_model-00003-of-00003.bin"
-        "pytorch_model.bin.index.json"
-        "special_tokens_map.json"
-        "tokenizer.json"
-        "tokenizer_config.json"
-    )
-
-    Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
-    Write-Host "Done" -ForegroundColor Yellow
-}
-
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
-Get-Oasst-12B-3-5
+Import-FunctionIfNotExists -Command Get-HuggingFaceRepo -ScriptUri "Get-HuggingFace.tc.ht"
+
+Write-Host "`nNOTE: (SFT: Supervised Fine-Tuning, RM: Reward Model)`n"  -ForegroundColor Cyan
+$selectedNumbers = @()
+$num = ""
+do {
+    # Ask user what model they want
+    Write-Host "`n`nWhat model do you wan to download?" -ForegroundColor Cyan
+    if ("1" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
+    Write-Host -NoNewline "- [11 Apr '23] Pythia SFT-4 12B epoch 3.5 (~24GB): " -ForegroundColor Red
+    Write-Host "1" -ForegroundColor Green
+
+    if ("2" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
+    Write-Host -NoNewline "- [11 Apr '23] Pythia RM-2.1 1.4B epoch 2.5 (~5.6GB): " -ForegroundColor Red
+    Write-Host "2" -ForegroundColor Green
+
+    if ("3" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
+    Write-Host -NoNewline "- [11 Apr '23] Pythia RM-2 6.9B epoch 1 (~14GB): " -ForegroundColor Red
+    Write-Host "3" -ForegroundColor Green
+
+    if ("4" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
+    Write-Host -NoNewline "- [11 Mar '23] Pythia SFT-1 12B 7B (~24GB): " -ForegroundColor Red
+    Write-Host "4" -ForegroundColor Green
+    
+    do {
+        $num = Read-Host "Enter a number"
+    } while ($num -notin "1", "2", "3", "4")
+    
+    switch ($num) {
+        "1" {
+            Write-Host "Downloading Open-Assistant SFT-4 12B Model Epoch 3.5" -ForegroundColor Yellow
+            Get-HuggingFaceRepo -Model "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5" -OutputPath "text-generation-webui\models\openassistant_oasst-sft-4-pythia-12b-epoch-3.5"
+        }
+        "2" {
+            Write-Host "Downloading Open-Assistant Pythia 1.4B Based Reward Model" -ForegroundColor Yellow
+            Get-HuggingFaceRepo -Model "OpenAssistant/oasst-rm-2.1-pythia-1.4b-epoch-2.5" -OutputPath "text-generation-webui\models\openassistant_oasst-rm-2.1-pythia-1.4b-epoch-2.5"
+        }
+        "3" {
+            Write-Host "Downloading Open-Assistant Pythia 6.9B Based Reward Model" -ForegroundColor Yellow
+            Get-HuggingFaceRepo -Model "OpenAssistant/oasst-rm-2-pythia-6.9b-epoch-1" -OutputPath "text-generation-webui\models\openassistant_oasst-rm-2-pythia-6.9b-epoch-1"
+        }
+        "4" {
+            Write-Host "Downloading Open-Assistant SFT-1 12B Model" -ForegroundColor Yellow
+            Get-HuggingFaceRepo -Model "OpenAssistant/oasst-sft-1-pythia-12b" -OutputPath "text-generation-webui\models\openassistant_oasst-sft-1-pythia-12b"
+        }
+    }
+
+    $selectedNumbers += $num
+    Write-Host "Done downloading model`n`n" -ForegroundColor Yellow
+
+    $again = Read-Host "Do you want to download another model? (y/n)"
+} while ($again -notin "N", "n")
+
 
 Write-Host "NOTE: Should you need less memory usage, see: https://github.com/oobabooga/text-generation-webui/wiki/Low-VRAM-guide" -ForegroundColor Green
 Write-Host "(These will be added to the .bat you're trying to run in the oobabooga_windows folder)" -ForegroundColor Green
-
 
 function New-WebUIBat {
     param(
@@ -109,10 +138,25 @@ function New-WebUIBat {
 }
 
 # 3. Replace commands in the start-webui.bat file
-New-WebUIBat -model "openassistant_oasst-sft-4-pythia-12b-epoch-3.5" -newBatchFile "start_oasst-12B.bat" -otherArgs ""
+foreach ($number in $selectedNumbers) {
+    Write-Host "Creating launcher: $number"
+    switch ($number) {
+        "1" {
+            New-WebUIBat -model "openassistant_oasst-sft-4-pythia-12b-epoch-3.5" -newBatchFile "start_oasst-sft-4-12b.bat" -otherArgs ""
+        }
+        "2" {
+            New-WebUIBat -model "openassistant_oasst-rm-2.1-pythia-1.4b-epoch-2.5" -newBatchFile "start_oasst-rm-2.1-1.4b.bat" -otherArgs ""
+        }
+        "3" {
+            New-WebUIBat -model "openassistant_oasst-rm-2-pythia-6.9b-epoch-1" -newBatchFile "start_oasst-rm-2-6.9b.bat" -otherArgs ""
+        }
+        "4" {
+            New-WebUIBat -model "openassistant_oasst-sft-1-pythia-12b" -newBatchFile "start_oasst-sft-1-12b.bat" -otherArgs ""
+        }
+    }
+}
 
 # 4. Create desktop shortcuts
-
 function Deploy-Shortcut {
     param(
         [string]$name,
@@ -135,8 +179,24 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/oasst.ico' -OutFile 'oasst.ico'
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
 
-    Deploy-Shortcut -name "OpenAssist 12B 3.5 Oobabooga" -batFile "start_oasst-12B.bat"
+    foreach ($number in $selectedNumbers) {
+        Write-Host "Creating shortcut: $number"
+        switch ($number) {
+            "1" {
+                Deploy-Shortcut -name "Open-Assistant SFT-4 12B - Oobabooga" -batFile "start_oasst-sft-4-12b.bat"
+            }
+            "2" {
+                Deploy-Shortcut -name "Open-Assistant RM-2.1 1.4B - Oobabooga" -batFile "start_oasst-rm-2.1-1.4b.bat"
+            }
+            "3" {
+                Deploy-Shortcut -name "Open-Assistant RM-2 6.9B - Oobabooga" -batFile "start_oasst-rm-2-6.9b.bat"
+            }
+            "4" {
+                Deploy-Shortcut -name "Open-Assistant SFT-1 12B - Oobabooga" -batFile "start_oasst-sft-1-12b.bat"
+            }
+        }
+    }
 }
 
 # 5. Run the webui
-    Start-Process ".\start_oasst-12B.bat"
+Start-Process ".\start_oasst-12B.bat"
