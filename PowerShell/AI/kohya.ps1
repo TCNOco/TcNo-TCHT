@@ -116,14 +116,14 @@ if (-not ($condaFound)) {
             } else {
                 Write-Host "Python version is not between 3.10.6 and 3.10.11."
                 Write-Host "Alternatively, follow this guide for manual installation: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs" -ForegroundColor Red
-                Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
+                Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
             }
         }
     }
     Catch {
         Write-Host "Python version is not between 3.10.6 - 3.10.11."
         Write-Host "Alternatively, follow this guide for manual installation: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs..." -ForegroundColor Red
-        Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
+        Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
     }
 }
 
@@ -136,8 +136,8 @@ do {
 if ($cudnn -in "Y","y") {
     Write-Host "Please:`n1. Open: https://developer.nvidia.com/rdp/cudnn-download`n2. Log in.`n3. Expand the latest cuDNN (matching your CUDA version)`n4. Click 'Local Installer for Windows (Zip)'`n5. Rename the zip to 'cudnn.zip'`n6. Move to C:\TCHT\kohya_ss (This folder should auto-open in Explorer)`nYou can do nothing and continue to cancel this operation." -ForegroundColor Cyan
     explorer C:\TCHT\kohya_ss
-    Write-Host "Press any key to continue..."
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    Read-Host "Press Enter to continue..."
+
 
     $zipFilePath = "cudnn.zip"
     if (Test-Path $zipFilePath) {
@@ -163,7 +163,7 @@ if ($cudnn -in "Y","y") {
 
         Write-Host "Done!`n`nYou can now delete cudnn.zip (You may want to use it elsewhere so I won't auto-delete)`n`n"
 
-        .\venv\Scripts\activate
+        ./activate.ps1
         python .\tools\cudann_1.8_install.py
     } else {
         Write-Host "CUDNN download cancelled."
@@ -171,10 +171,10 @@ if ($cudnn -in "Y","y") {
 }
 
 # Continue with installation
-./setup-modified.bat
+./setup.bat
 
-# Delete setup-modified.bat
-Remove-Item setup-modified.bat
+# Delete setup.bat
+Remove-Item setup.bat
 
 # 6. Create desktop shortcuts?
 do {
