@@ -56,6 +56,7 @@ if ($toDownload) {
     Import-FunctionIfNotExists -Command Install-Ooba -ScriptUri "Install-Ooba.tc.ht"
 
     Install-Ooba -skip_model 1 -skip_start 1
+    Set-Location "C:\TCHT\oobabooga_windows"
 
 } else {
     # CD into folder anyway

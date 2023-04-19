@@ -108,7 +108,7 @@ if (-not ($condaFound)) {
             Write-Host "Python version is not between 3.10.6 and 3.10.11." -ForegroundColor Yellow
             Write-Host "Assuming you've installed the correct version, please enter the comand you use to access Python 3.9/3.10." -ForegroundColor Yellow
         
-            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310):"
+            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310)"
             $pythonVersion = &$pythonProgramName --version 2>&1
             if ($pythonVersion -match 'Python([3].[1][0-1].[6-9]|3.10.1[0-1])') {
                 Write-Host "Python version $($matches[1]) is installed."
