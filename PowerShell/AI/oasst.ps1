@@ -79,20 +79,12 @@ do {
     Write-Host "1" -ForegroundColor Green
 
     if ("2" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
-    Write-Host -NoNewline "- [11 Apr '23] Pythia RM-2.1 1.4B epoch 2.5 (~5.6GB): " -ForegroundColor Red
-    Write-Host "2" -ForegroundColor Green
-
-    if ("3" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
-    Write-Host -NoNewline "- [11 Apr '23] Pythia RM-2 6.9B epoch 1 (~14GB): " -ForegroundColor Red
-    Write-Host "3" -ForegroundColor Green
-
-    if ("4" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
     Write-Host -NoNewline "- [11 Mar '23] Pythia SFT-1 12B 7B (~24GB): " -ForegroundColor Red
-    Write-Host "4" -ForegroundColor Green
+    Write-Host "2" -ForegroundColor Green
     
     do {
         $num = Read-Host "Enter a number"
-    } while ($num -notin "1", "2", "3", "4")
+    } while ($num -notin "1", "2")
     
     switch ($num) {
         "1" {
@@ -100,14 +92,6 @@ do {
             Get-HuggingFaceRepo -Model "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5" -OutputPath "text-generation-webui\models\openassistant_oasst-sft-4-pythia-12b-epoch-3.5"
         }
         "2" {
-            Write-Host "Downloading Open-Assistant Pythia 1.4B Based Reward Model" -ForegroundColor Yellow
-            Get-HuggingFaceRepo -Model "OpenAssistant/oasst-rm-2.1-pythia-1.4b-epoch-2.5" -OutputPath "text-generation-webui\models\openassistant_oasst-rm-2.1-pythia-1.4b-epoch-2.5"
-        }
-        "3" {
-            Write-Host "Downloading Open-Assistant Pythia 6.9B Based Reward Model" -ForegroundColor Yellow
-            Get-HuggingFaceRepo -Model "OpenAssistant/oasst-rm-2-pythia-6.9b-epoch-1" -OutputPath "text-generation-webui\models\openassistant_oasst-rm-2-pythia-6.9b-epoch-1"
-        }
-        "4" {
             Write-Host "Downloading Open-Assistant SFT-1 12B Model" -ForegroundColor Yellow
             Get-HuggingFaceRepo -Model "OpenAssistant/oasst-sft-1-pythia-12b" -OutputPath "text-generation-webui\models\openassistant_oasst-sft-1-pythia-12b"
         }
@@ -145,12 +129,6 @@ foreach ($number in $selectedNumbers) {
             New-WebUIBat -model "openassistant_oasst-sft-4-pythia-12b-epoch-3.5" -newBatchFile "start_oasst-sft-4-12b.bat" -otherArgs ""
         }
         "2" {
-            New-WebUIBat -model "openassistant_oasst-rm-2.1-pythia-1.4b-epoch-2.5" -newBatchFile "start_oasst-rm-2.1-1.4b.bat" -otherArgs ""
-        }
-        "3" {
-            New-WebUIBat -model "openassistant_oasst-rm-2-pythia-6.9b-epoch-1" -newBatchFile "start_oasst-rm-2-6.9b.bat" -otherArgs ""
-        }
-        "4" {
             New-WebUIBat -model "openassistant_oasst-sft-1-pythia-12b" -newBatchFile "start_oasst-sft-1-12b.bat" -otherArgs ""
         }
     }
@@ -186,12 +164,6 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
                 Deploy-Shortcut -name "Open-Assistant SFT-4 12B - Oobabooga" -batFile "start_oasst-sft-4-12b.bat"
             }
             "2" {
-                Deploy-Shortcut -name "Open-Assistant RM-2.1 1.4B - Oobabooga" -batFile "start_oasst-rm-2.1-1.4b.bat"
-            }
-            "3" {
-                Deploy-Shortcut -name "Open-Assistant RM-2 6.9B - Oobabooga" -batFile "start_oasst-rm-2-6.9b.bat"
-            }
-            "4" {
                 Deploy-Shortcut -name "Open-Assistant SFT-1 12B - Oobabooga" -batFile "start_oasst-sft-1-12b.bat"
             }
         }
@@ -199,4 +171,34 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 }
 
 # 5. Run the webui
-Start-Process ".\start_oasst-12B.bat"
+if ($selectedNumbers.Count -eq 1) {
+    if ("1" -in $selectedNumbers) {
+        Start-Process ".\start_oasst-sft-4-12b.bat"
+    } elseif ("2" -in $selectedNumbers) {
+        Start-Process ".\start_oasst-sft-1-12b.bat"
+    }
+} else {
+    Write-Host "`nWhich model would you like to launch?" -ForegroundColor Cyan
+    foreach ($number in $selectedNumbers) {
+        switch ($number) {
+            "1" {
+                Write-Host -NoNewline "- [11 Apr '23] Pythia SFT-4 12B epoch 3.5 (~24GB): " -ForegroundColor Red
+                Write-Host "1" -ForegroundColor Green
+            }
+            "2" {
+                Write-Host -NoNewline "- [11 Mar '23] Pythia SFT-1 12B 7B (~24GB): " -ForegroundColor Red
+                Write-Host "2" -ForegroundColor Green
+            }
+        }
+    }
+    
+    do {
+        $num = Read-Host "Enter a number"
+    } while ($num -notin "1", "2")
+
+    if ("1" -in $selectedNumbers) {
+        Start-Process ".\start_oasst-sft-4-12b.bat"
+    } elseif ("2" -in $selectedNumbers) {
+        Start-Process ".\start_oasst-sft-1-12b.bat"
+    }
+}
