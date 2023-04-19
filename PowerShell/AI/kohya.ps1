@@ -21,12 +21,11 @@
 # ----------------------------------------
 # 1. Install Chocolatey
 # 2. Install or update Git if not already installed
-# 3. Install vcredist
-# 4. Download kohya_ss
-# 5. Check if Conda or Python is installed
-# 6. Optional: CUDNN
-# 7. Create desktop shortcuts?
-# 8. Launch!
+# 3. Download kohya_ss
+# 4. Check if Conda or Python is installed
+# 5. Optional: CUDNN
+# 6. Create desktop shortcuts?
+# 7. Launch!
 # ----------------------------------------
 
 Write-Host "Welcome to TroubleChute's kohya_ss installer!" -ForegroundColor Cyan
@@ -49,14 +48,11 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
-# 3. Install vcredist
-choco install vcredist-all -y
-
-# 4. Download kohya_ss
+# 3. Download kohya_ss
 git clone https://github.com/bmaltais/kohya_ss.git
 cd kohya_ss
 
-# 5. Check if Conda or Python is installed
+# 4. Check if Conda or Python is installed
 # Check if Conda is installed
 $condaFound = Get-Command conda -ErrorAction SilentlyContinue
 if (-not $condaFound) {
@@ -131,9 +127,9 @@ if (-not ($condaFound)) {
     }
 }
 
-# 6. Optional: CUDNN
+# 5. Optional: CUDNN
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download CUDNN (~700MB)? You will need an Nvidia account. (y/n)"
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download CUDNN (~700MB)? You will need an Nvidia account. (y/n): "
     $cudnn = Read-Host
 } while ($cudnn -notin "Y", "y", "N", "n")
 
@@ -143,7 +139,7 @@ if ($cudnn -in "Y","y") {
     Write-Host "Press any key to continue..."
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 
-    $zipFilePath = (Resolve-Path "cudnn.zip").Path
+    $zipFilePath = "cudnn.zip"
     if (Test-Path $zipFilePath) {
         Write-Host "Extracting..." -ForegroundColor Green
         # Set the path to the ZIP file and the destination folder
@@ -155,6 +151,7 @@ if ($cudnn -in "Y","y") {
         }
 
         $destinationFolder = (Resolve-Path "cudnn_windows").Path
+        $zipFilePath = (Resolve-Path "cudnn.zip").Path
 
         # Extract every .dll file from the ZIP file and copy it to the destination folder
         Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -179,7 +176,7 @@ if ($cudnn -in "Y","y") {
 # Delete setup-modified.bat
 Remove-Item setup-modified.bat
 
-# 7. Create desktop shortcuts?
+# 6. Create desktop shortcuts?
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
@@ -199,5 +196,5 @@ if ($shortcuts -in "Y","y") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
-# 8. Launch!
+# 7. Launch!
 ./gui-user.bat
