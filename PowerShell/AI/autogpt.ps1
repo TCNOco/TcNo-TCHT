@@ -116,7 +116,7 @@ if (-not ($condaFound)) {
                 } else {
                     Write-Host "Python version is not between 3.8 and 3.10."
                     Write-Host "Alternatively, follow this guide for manual installation: https://github.com/Significant-Gravitas/Auto-GPT#-installation" -ForegroundColor Red
-                    Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
+                    Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
                 }
             }
         }
@@ -124,7 +124,7 @@ if (-not ($condaFound)) {
     Catch {
         Write-Host "Python version is not between 3.8 and 3.10."
         Write-Host "Alternatively, follow this guide for manual installation: https://github.com/Significant-Gravitas/Auto-GPT#-installation" -ForegroundColor Red
-        Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
+        Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
     }
 }
 

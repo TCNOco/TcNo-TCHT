@@ -111,7 +111,7 @@ if (-not ($condaFound)) {
                 } else {
                     Write-Host "Python version is not between 3.8 and 3.10."
                     Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-                    Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
+                    Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
                 }
             }
         }
@@ -119,7 +119,7 @@ if (-not ($condaFound)) {
     Catch {
         Write-Host "Python version is not between 3.8 and 3.10."
         Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-        Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
+        Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
     }
 }
 
@@ -169,7 +169,7 @@ if (Get-Command ffmpeg -ErrorAction SilentlyContinue) {
 else {
     Write-Host "FFmpeg is not installed. Please add FFMPEG to PATH (install ffmpeg) and run this script again." -ForegroundColor Red
     Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-    Read-Host "Process can not continue. The program will exit when you press any key to continue..."
+    Read-Host "Process can not continue. The program will exit when you press Enter to continue..."
     Exit
 }
 
@@ -280,7 +280,7 @@ else {
         Write-Host "You can now use whisper --help for more information in this PowerShell window, CMD or another program!" -ForegroundColor Green
     } else {
         Write-Host "`n`nWhisper is not installed. Please follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-        Read-Host "Process can not continue. The program will exit when you press any key to continue..."
+        Read-Host "Process can not continue. The program will exit when you Enter to continue..."
     }
 }
 

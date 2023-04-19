@@ -116,14 +116,14 @@ if (-not ($condaFound)) {
             } else {
                 Write-Host "Python version is not between 3.10.6 and 3.10.11."
                 Write-Host "Alternatively, follow this guide for manual installation: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs" -ForegroundColor Red
-                Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
+                Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
             }
         }
     }
     Catch {
         Write-Host "Python version is not between 3.10.6 - 3.10.11."
         Write-Host "Alternatively, follow this guide for manual installation: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs..." -ForegroundColor Red
-        Read-Host "Process can try to continue, but will likely fail. Press any key to continue..."
+        Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
     }
 }
 
