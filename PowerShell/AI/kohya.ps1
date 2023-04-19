@@ -19,6 +19,15 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ----------------------------------------
+# 1. Install Chocolatey
+# 2. Install or update Git if not already installed
+# 3. Install vcredist
+# 4. Download kohya_ss
+# 5. Check if Conda or Python is installed
+# 6. Replace choices in setup.bat
+# 7. Optional: CUDNN
+# 8. Create desktop shortcuts?
+# ----------------------------------------
 
 Write-Host "Welcome to TroubleChute's kohya_ss installer!" -ForegroundColor Cyan
 Write-Host "kohya_ss as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
@@ -131,7 +140,7 @@ if (-not ($condaFound)) {
     }
 } | Set-Content setup-modified.bat
 
-# 8. Optional: CUDNN
+# 7. Optional: CUDNN
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download CUDNN (~700MB)? You will need an Nvidia account. (y/n)"
     $cudnn = Read-Host
@@ -176,7 +185,7 @@ if ($cudnn -in "Y","y") {
 # Delete setup-modified.bat
 Remove-Item setup-modified.bat
 
-# 7. Create desktop shortcuts?
+# 8. Create desktop shortcuts?
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
