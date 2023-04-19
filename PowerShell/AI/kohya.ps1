@@ -32,13 +32,20 @@ Write-Host "Welcome to TroubleChute's kohya_ss installer!" -ForegroundColor Cyan
 Write-Host "kohya_ss as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-04-19]`n`n" -ForegroundColor Cyan
 
-# We'll create C:\TCHT\Ooba if it doesn't already exist:
-if (!(Test-Path -Path "C:\TCHT")) {
-    New-Item -ItemType Directory -Path "C:\TCHT"
+$TCHT = [Environment]::GetEnvironmentVariable("TC.HT", "Machine")
+
+if ($TCHT -eq $null) {
+    [Environment]::SetEnvironmentVariable("TC.HT", "C:\TCHT", "Machine")
+    $TCHT = "C:\TCHT"
 }
 
-# Then CD into C:\TCHT\
-Set-Location "C:\TCHT\"
+# We'll create $TCHT\Ooba if it doesn't already exist:
+if (!(Test-Path -Path $TCHT)) {
+    New-Item -ItemType Directory -Path $TCHT
+}
+
+# Then CD into $TCHT\
+Set-Location "$TCHT\"
 
 # 1. Install Chocolatey
 Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
@@ -134,8 +141,8 @@ do {
 } while ($cudnn -notin "Y", "y", "N", "n")
 
 if ($cudnn -in "Y","y") {
-    Write-Host "Please:`n1. Open: https://developer.nvidia.com/rdp/cudnn-download`n2. Log in.`n3. Expand the latest cuDNN (matching your CUDA version)`n4. Click 'Local Installer for Windows (Zip)'`n5. Rename the zip to 'cudnn.zip'`n6. Move to C:\TCHT\kohya_ss (This folder should auto-open in Explorer)`nYou can do nothing and continue to cancel this operation." -ForegroundColor Cyan
-    explorer C:\TCHT\kohya_ss
+    Write-Host "Please:`n1. Open: https://developer.nvidia.com/rdp/cudnn-download`n2. Log in.`n3. Expand the latest cuDNN (matching your CUDA version)`n4. Click 'Local Installer for Windows (Zip)'`n5. Rename the zip to 'cudnn.zip'`n6. Move to $TCHT\kohya_ss (This folder should auto-open in Explorer)`nYou can do nothing and continue to cancel this operation." -ForegroundColor Cyan
+    explorer $TCHT\kohya_ss
     Read-Host "Press Enter to continue..."
 
 

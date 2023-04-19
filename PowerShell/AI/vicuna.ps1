@@ -31,9 +31,16 @@ Write-Host "Welcome to TroubleChute's Vicuna installer!" -ForegroundColor Cyan
 Write-Host "Vicuna as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-04-18]`n`n" -ForegroundColor Cyan
 
-# 1. Check if has oobabooga_windows directory (C:\TCHT\oobabooga_windows)
+$TCHT = [Environment]::GetEnvironmentVariable("TC.HT", "Machine")
+
+if ($TCHT -eq $null) {
+    [Environment]::SetEnvironmentVariable("TC.HT", "C:\TCHT", "Machine")
+    $TCHT = "C:\TCHT"
+}
+
+# 1. Check if has oobabooga_windows directory ($TCHT\oobabooga_windows)
 $toDownload = $True
-if (Test-Path -Path "C:\TCHT\oobabooga_windows") {
+if (Test-Path -Path "$TCHT\oobabooga_windows") {
     Write-Host "The 'oobabooga_windows' folder already exists." -ForegroundColor Green
     do {
         Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again? (y/n): "
@@ -56,11 +63,11 @@ if ($toDownload) {
     Import-FunctionIfNotExists -Command Install-Ooba -ScriptUri "Install-Ooba.tc.ht"
 
     Install-Ooba -skip_model 1 -skip_start 1
-    Set-Location "C:\TCHT\oobabooga_windows"
+    Set-Location "$TCHT\oobabooga_windows"
 
 } else {
     # CD into folder anyway
-    Set-Location "C:\TCHT\oobabooga_windows"
+    Set-Location "$TCHT\oobabooga_windows"
 }
 
 function Get-VincunaCPU13B {

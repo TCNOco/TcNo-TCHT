@@ -39,16 +39,23 @@ function Install-Ooba {
     if ($skip_model -eq 1) {
         Write-Host "Skipping model download"
     }
-        
-    # Since the latest update, this program is unhappy with paths with a space in them.
-    # The program will be installed to C:\TCHT\Ooba
-    # So, we'll create C:\TCHT\Ooba if it doesn't already exist:
-    if (!(Test-Path -Path "C:\TCHT")) {
-        New-Item -ItemType Directory -Path "C:\TCHT"
+
+    $TCHT = [Environment]::GetEnvironmentVariable("TC.HT", "Machine")
+
+    if ($TCHT -eq $null) {
+        [Environment]::SetEnvironmentVariable("TC.HT", "C:\TCHT", "Machine")
+        $TCHT = "C:\TCHT"
     }
 
-    # Then CD into C:\TCHT\
-    Set-Location "C:\TCHT\"
+    # Since the latest update, this program is unhappy with paths with a space in them.
+    # The program will be installed to $TCHT\Ooba
+    # So, we'll create $TCHT\Ooba if it doesn't already exist:
+    if (!(Test-Path -Path "$TCHT")) {
+        New-Item -ItemType Directory -Path "$TCHT"
+    }
+
+    # Then CD into $TCHT\
+    Set-Location "$TCHT\"
 
     # 1. Downloads and extracts the latest oobabooga/text-generation-webui release
     # Download file
