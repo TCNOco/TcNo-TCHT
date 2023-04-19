@@ -47,7 +47,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
-# 3. Install aria2c to make the download models MUCH faster
+# 3. Install aria2c to make the model downloads MUCH faster
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
 choco install aria2 -y
 Update-SessionEnvironment
