@@ -24,9 +24,9 @@
 # 3. Install vcredist
 # 4. Download kohya_ss
 # 5. Check if Conda or Python is installed
-# 6. Replace choices in setup.bat
-# 7. Optional: CUDNN
-# 8. Create desktop shortcuts?
+# 6. Optional: CUDNN
+# 7. Create desktop shortcuts?
+# 8. Launch!
 # ----------------------------------------
 
 Write-Host "Welcome to TroubleChute's kohya_ss installer!" -ForegroundColor Cyan
@@ -131,23 +131,15 @@ if (-not ($condaFound)) {
     }
 }
 
-# 6. Replace choices in setup.bat
-(Get-Content setup.bat) | ForEach-Object {
-    if ($_ -like 'set /p uninstall_choice="Enter your choice (1 or 2): "*') {
-        'set uninstall_choice=1'
-    } else {
-        $_
-    }
-} | Set-Content setup-modified.bat
-
-# 7. Optional: CUDNN
+# 6. Optional: CUDNN
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download CUDNN (~700MB)? You will need an Nvidia account. (y/n)"
     $cudnn = Read-Host
 } while ($cudnn -notin "Y", "y", "N", "n")
 
 if ($cudnn -in "Y","y") {
-    Write-Host "Please:`n1. Open: https://developer.nvidia.com/rdp/cudnn-download`n2. Log in.`n3. Expand the latest cuDNN (matching your CUDA version)`n4. Click 'Local Installer for Windows (Zip)'`n5. Rename the zip to 'cudnn.zip'`n6. Move to C:\TCHT\kohya_ss`nYou can do nothing and continue to cancel this operation." -ForegroundColor Cyan
+    Write-Host "Please:`n1. Open: https://developer.nvidia.com/rdp/cudnn-download`n2. Log in.`n3. Expand the latest cuDNN (matching your CUDA version)`n4. Click 'Local Installer for Windows (Zip)'`n5. Rename the zip to 'cudnn.zip'`n6. Move to C:\TCHT\kohya_ss (This folder should auto-open in Explorer)`nYou can do nothing and continue to cancel this operation." -ForegroundColor Cyan
+    explorer C:\TCHT\kohya_ss
     Write-Host "Press any key to continue..."
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 
@@ -155,12 +147,14 @@ if ($cudnn -in "Y","y") {
     if (Test-Path $zipFilePath) {
         Write-Host "Extracting..." -ForegroundColor Green
         # Set the path to the ZIP file and the destination folder
-        $destinationFolder = (Resolve-Path "cudnn_windows").Path
+        $destinationFolder = "cudnn_windows"
 
         # Create the destination folder if it does not exist
         if (-not (Test-Path -Path $destinationFolder -PathType Container)) {
             New-Item -ItemType Directory -Path $destinationFolder | Out-Null
         }
+
+        $destinationFolder = (Resolve-Path "cudnn_windows").Path
 
         # Extract every .dll file from the ZIP file and copy it to the destination folder
         Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -170,7 +164,7 @@ if ($cudnn -in "Y","y") {
                 [System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$destinationFolder\$($_.Name)", $true)
             }
 
-        Write-Host "Done!`nYou can now delete cudnn.zip (You may want to use it elsewhere so I won't auto-delete)"
+        Write-Host "Done!`n`nYou can now delete cudnn.zip (You may want to use it elsewhere so I won't auto-delete)`n`n"
 
         .\venv\Scripts\activate
         python .\tools\cudann_1.8_install.py
@@ -185,7 +179,7 @@ if ($cudnn -in "Y","y") {
 # Delete setup-modified.bat
 Remove-Item setup-modified.bat
 
-# 8. Create desktop shortcuts?
+# 7. Create desktop shortcuts?
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
@@ -203,5 +197,7 @@ if ($shortcuts -in "Y","y") {
     $targetPath = "gui-user.bat"
     $IconLocation = 'kohya.ico'
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
-    
 }
+
+# 8. Launch!
+./gui-user.bat
