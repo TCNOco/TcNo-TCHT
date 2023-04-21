@@ -6,11 +6,13 @@ echo -e "\033[36mI will try installing PowerShell now...\033[0m"
 if [[ "$(uname -s)" == "Linux" ]]; then
     # Check if Apt is available to install and use lsb-release to get OS information
     if command -v apt-get >/dev/null 2>&1; then
+        echo -e "\033[36mApt detected. Attempting to install lsb-release to check version info...\033[0m"
         apt-get update && apt-get install -y lsb-release && apt-get clean all
         
         if [[ -f "/etc/lsb-release" ]]; then
             . /etc/lsb-release
             if [[ "$DISTRIB_ID" == "Ubuntu" ]]; then
+                echo -e "\033[36mUbuntu detected.\033[0m"
                 # Install PowerShell - https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.3
                 # Install pre-requisite packages.
                 apt-get install -y wget apt-transport-https software-properties-common
@@ -27,8 +29,10 @@ if [[ "$(uname -s)" == "Linux" ]]; then
                 # Start PowerShell
                 pwsh
             elif [[ "$ID" == "debian" ]]; then
+                echo -e "\033[36mDebian detected.\033[0m"
                 # Install for Debian https://learn.microsoft.com/en-us/powershell/scripting/install/install-debian?view=powershell-7.3
                 if [[ "$VERSION_ID" == "11" ]]; then
+                    echo -e "\033[36mDebian 11 to be specific.\033[0m"
                     # Install system components
                     apt update  && apt install -y curl gnupg apt-transport-https
 
@@ -44,6 +48,7 @@ if [[ "$(uname -s)" == "Linux" ]]; then
                     # Start PowerShell
                     pwsh
                 elif [[ "$VERSION_ID" == "10" ]]; then
+                    echo -e "\033[36mDebian 10 to be specific.\033[0m"
                     # Download the Microsoft repository GPG keys
                     wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb
 
@@ -59,11 +64,14 @@ if [[ "$(uname -s)" == "Linux" ]]; then
                     # Start PowerShell
                     pwsh
                 else
+                    echo -e "\033[36mUnknown Debian version...\033[0m"
                     echo "This script is only for Debian 11 or Debian 10"
                 fi
             elif [[ "$ID" == "raspbian" || "$ID" == "debian" ]]; then
+                echo -e "\033[36mRaspbian detected.\033[0m"
                 # Install for Raspbian https://learn.microsoft.com/en-us/powershell/scripting/install/install-raspbian?view=powershell-7.3
                 if [[ "$VERSION_ID" =~ (9|10) ]]; then
+                    echo -e "\033[36mRaspbian 9 or 10 detected.\033[0m"
                     # Prerequisites
                     apt-get update
                     apt-get install '^libssl1.0.[0-9]$' libunwind8 -y
@@ -75,6 +83,9 @@ if [[ "$(uname -s)" == "Linux" ]]; then
 
                     # Start PowerShell
                     ~/powershell/pwsh
+                else
+                    echo -e "\033[36mUnsupported Raspbian version detected...\033[0m"
+                    echo "Please see: https://learn.microsoft.com/en-us/powershell/scripting/install/install-raspbian?view=powershell-7.3"
                 fi
             fi
         else
@@ -82,8 +93,10 @@ if [[ "$(uname -s)" == "Linux" ]]; then
             echo "https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3"
         fi
     elif [[ -f "/etc/redhat-release" ]]; then
+        echo -e "\033[36mRHEL detected.\033[0m"
         # Install for RHEL https://learn.microsoft.com/en-us/powershell/scripting/install/install-rhel?view=powershell-7.3
         if grep -q "release 8" /etc/redhat-release; then
+            echo -e "\033[36mRHEL version 8 to be specific.\033[0m"
             # Register the Microsoft RedHat repository
             curl https://packages.microsoft.com/config/rhel/8/prod.repo | tee /etc/yum.repos.d/microsoft.repo
 
@@ -93,6 +106,7 @@ if [[ "$(uname -s)" == "Linux" ]]; then
             # Start PowerShell
             pwsh
         elif grep -q "release 7" /etc/redhat-release; then
+            echo -e "\033[36mRHEL version 7 to be specific.\033[0m"
             # Register the Microsoft RedHat repository
             curl https://packages.microsoft.com/config/rhel/7/prod.repo | tee /etc/yum.repos.d/microsoft.repo
 
@@ -102,9 +116,12 @@ if [[ "$(uname -s)" == "Linux" ]]; then
             # Start PowerShell
             pwsh
         else
+            echo -e "\033[36mUnsupported RHEL version detected...\033[0m"
             echo "This script is only for RHEL 8 or RHEL 7"
+            echo "Please see this for more information: https://learn.microsoft.com/en-us/powershell/scripting/install/install-rhel?view=powershell-7.3"
         fi
     elif grep -q "Kali" /etc/os-release; then
+        echo -e "\033[36mKali detected.\033[0m"
         # Install for Kali https://learn.microsoft.com/en-us/powershell/scripting/install/community-support?view=powershell-7.3
         # Install PowerShell package
         apt update && apt -y install powershell
@@ -112,6 +129,7 @@ if [[ "$(uname -s)" == "Linux" ]]; then
         # Start PowerShell
         pwsh
     elif [[ -f "/etc/alpine-release" ]]; then
+        echo -e "\033[36mAlpine detected.\033[0m"
         # Install for Alpine https://learn.microsoft.com/en-us/powershell/scripting/install/install-alpine?view=powershell-7.3
         # install the requirements
         apk add --no-cache ca-certificates less ncurses-terminfo-base krb5-libs libgcc libintl libssl1.1 libstdc++ tzdata userspace-rcu zlib icu-libs curl
@@ -136,6 +154,7 @@ if [[ "$(uname -s)" == "Linux" ]]; then
         # Start PowerShell
         pwsh
     elif command -v snap >/dev/null 2>&1; then
+        echo -e "\033[36mSnap was detected. Installing using Snap instead.\033[0m"
         # Install with Snap: https://learn.microsoft.com/en-us/powershell/scripting/install/install-other-linux?view=powershell-7.3
         # Install PowerShell
         snap install powershell --classic
@@ -148,8 +167,10 @@ if [[ "$(uname -s)" == "Linux" ]]; then
     fi
 fi
 elif [[ "$(uname -s)" == "Darwin" ]]; then
+        echo -e "\033[36mMacOS detected.\033[0m"
     # ELSE FOR MAC
     if command -v brew >/dev/null 2>&1; then
+        echo -e "\033[36mHomebrew is installed. Trying installation.\033[0m"
         # Install PowerShell with Homebrew
         brew install --cask powershell
 
@@ -166,19 +187,24 @@ elif [[ "$(uname -s)" == "Darwin" ]]; then
             # Start PowerShell
             pwsh
         else
+            echo -e "\033[36mHomebrew not detected.\033[0m"
             # Check if .NET Global is installed
             if command -v dotnet >/dev/null 2>&1; then
+                echo -e "\033[36mDotnet detected. Attempting installation..\033[0m"
                 # Install PowerShell with dotnet
                 dotnet tool install --global PowerShell
 
                 # Start PowerShell
                 pwsh
             else
+                echo -e "\033[36mAttempting manual install...\033[0m"
                 # Check macOS architecture
                 if [[ "$(uname -m)" == "x86_64" ]]; then
+                    echo -e "\033[36mOn x64 hardware.\033[0m"
                     # Download PowerShell for x64 devices
                     curl -L -o /tmp/powershell.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.3.4/powershell-7.3.4-osx-x64.tar.gz
                 else
+                    echo -e "\033[36mOn M1 hardware.\033[0m"
                     # Download PowerShell for M1 devices
                     curl -L -o /tmp/powershell.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.3.4/powershell-7.3.4-osx-arm64.tar.gz
                 fi
