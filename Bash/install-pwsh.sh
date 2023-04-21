@@ -3,7 +3,7 @@
 echo -e "\033[36mI will try installing PowerShell now...\033[0m"
 
 # IF LINUX:
-if [[ "$(uname -s)" == "Linux"]]; then
+if [[ "$(uname -s)" == "Linux" ]]; then
     # Check if Apt is available to install and use lsb-release to get OS information
     if command -v apt-get >/dev/null 2>&1; then
         apt-get update && apt-get install -y lsb-release && apt-get clean all
