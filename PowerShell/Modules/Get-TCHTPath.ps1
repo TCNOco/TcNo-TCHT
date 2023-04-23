@@ -5,6 +5,50 @@ function Get-TCHTPath() {
 
     switch ($os) {
         "Win32NT" {
+            $registryPath = "HKCU:\Software\TCHT\Path"
+            if (Test-Path $registryPath) {
+                return (Get-ItemProperty $registryPath).Path
+            } else {
+                return ""
+            }
+            break
+        }
+        "Unix" {
+            # If gsettings installed:
+            $gsettingsPath = "tc.ht"
+            $gsettingsKey = "path"
+            $gsettingsValue = $(gsettings get $gsettingsPath $gsettingsKey 2> $null)
+            if ($LASTEXITCODE -eq 0) {
+                return $gsettingsValue.Trim("`"'")
+            } else {
+                # If not dconf installed:
+                if (! $(command -v dconf)) {
+                    Install-Dconf
+                }
+
+                # If dconf installed:
+                $dconfPath = "/tcht/path"
+                $dconfValue = $(dconf read $dconfPath 2> $null)
+                if ($LASTEXITCODE -eq 0) {
+                    return $dconfValue
+                }
+            }
+
+            return ""
+            break
+        }
+        default {
+            throw "Unsupported operating system."
+        }
+    }
+}
+
+
+function Get-TCHTPathFromUser() {
+    $os = [System.Environment]::OSVersion.Platform.ToString()
+
+    switch ($os) {
+        "Win32NT" {
             $path = "C:\TCHT"
             break
         }
@@ -44,7 +88,7 @@ or Enter a custom path
         if (!(Test-Path $installLocation -PathType Container)) {
             Write-Host "Folder created: $installLocation"
             New-Item -ItemType Directory -Path $installLocation | Out-Null
-        }        
+        }
     }
     # Else, a custom path entered. Check the path exists and prompt about spaces.
     do {
@@ -65,9 +109,102 @@ or Enter a custom path
         }
     } while ($installLocation.Contains(" ") -and $proceedAnyway -notin 'Y', 'y')
 
+    Write-Host "Saving path..."
+    Set-TCHTPath -Path $installationLocation
+
     Write-Host "Installing this, and future TC.HT programs to: $installationLocation"
     return $installLocation
 }
 
-$test = Get-TCHTPath
+function Install-Dconf() {
+    $os = [System.Environment]::OSVersion.Platform.ToString()
+
+    switch ($os) {
+        "Win32NT" {
+            Write-Host "You only need DConf on Mac or Linux."
+            return
+        }
+        "Unix" {
+            if (which apt-get) {
+                # Ubuntu, Debian, Raspbian, Kali, etc.
+                sudo apt-get update
+                sudo apt-get install -y dconf-cli
+            } elseif (which dnf) {
+                # Fedora, RedHat, CentOS, etc.
+                sudo dnf install -y dconf
+            } elseif (which yum) {
+                # CentOS, RedHat, etc.
+                sudo yum install -y dconf
+            } elseif (which apk) {
+                # Alpine, etc.
+                sudo apk update
+                sudo apk add dconf
+            } elseif (which snap) {
+                # Snap
+                sudo snap install dconf
+            } else {
+                Write-Error "Could not find a package manager to install DConf."
+            }
+            break
+        }
+        default {
+            throw "Unsupported operating system."
+        }
+    }
+}
+
+
+
+
+
+function Set-TCHTPath() {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$Path
+    )
+
+    $os = [System.Environment]::OSVersion.Platform.ToString()
+
+    switch ($os) {
+        "Win32NT" {
+            $registryPath = "HKCU:\Software\TCHT\Path"
+            if (Test-Path $registryPath) {
+                Set-ItemProperty $registryPath -Name Path -Value $path
+            } else {
+                New-Item -Path "HKCU:\Software\TCHT" -Force | Out-Null
+                New-ItemProperty -Path $registryPath -Name Path -Value $path -PropertyType String | Out-Null
+            }
+            break
+        }
+        "Unix" {
+            $gsettingsPath = "tc.ht"
+            $gsettingsKey = "path"
+            $gsettingsValue = $(gsettings get $gsettingsPath $gsettingsKey 2> $null)
+            if ($LASTEXITCODE -eq 0) {
+                # If gsettings is installed, use it to set the key value
+                gsettings set $gsettingsPath $gsettingsKey "$path"
+            } else {
+                # If not dconf installed:
+                if (! $(command -v dconf)) {
+                    Install-Dconf
+                }
+
+                # If dconf installed:
+                $dconfPath = "/tcht/path"
+                dconf write $dconfPath "$path"
+            }
+            break
+        }
+        default {
+            throw "Unsupported operating system."
+        }
+    }
+
+}
+
+Write-Host "Getting path from saved registry or gsettings: "
+$path = Get-TCHTPath
+Write-Host "RESULT: '$path'"
+
+$path = Get-TCHTPathFromUser
 Write-Host "$test is where I am!"
