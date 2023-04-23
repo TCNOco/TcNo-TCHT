@@ -165,7 +165,6 @@ if [[ "$(uname -s)" == "Linux" ]]; then
         echo "Did not detect OS as supported Linux OS. Snap is also missing. See the following for more info:"
         echo "https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3"
     fi
-fi
 elif [[ "$(uname -s)" == "Darwin" ]]; then
         echo -e "\033[36mMacOS detected.\033[0m"
     # ELSE FOR MAC
