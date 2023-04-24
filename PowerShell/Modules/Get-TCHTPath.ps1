@@ -1,6 +1,6 @@
 # This function gets and/or sets the TCHT install path.
 
-function Get-TCHTPath() {
+function Get-TCHTPathSaved() {
     $os = [System.Environment]::OSVersion.Platform.ToString()
 
     switch ($os) {
@@ -226,11 +226,11 @@ function Set-TCHTPath() {
 
 }
 
+function Get-TCHTPath() {
+    $path = Get-TCHTPathSaved
+    if ($path -eq "") {
+        $path = Get-TCHTPathFromUser
+    }
 
-Write-Host "Getting path from saved registry or gsettings: "
-$path = Get-TCHTPath
-Write-Host "RESULT: '$path'"
-
-$path = Get-TCHTPathFromUser
-
-Write-Host "$test is where I am!"
+    return $path
+}
