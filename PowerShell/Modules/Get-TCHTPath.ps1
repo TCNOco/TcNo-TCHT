@@ -15,11 +15,13 @@ function Get-TCHTPath() {
         }
         "Unix" {
             # If gsettings installed:
-            $gsettingsPath = "tc.ht"
-            $gsettingsKey = "path"
-            $gsettingsValue = $(gsettings get $gsettingsPath $gsettingsKey 2> $null)
-            if ($LASTEXITCODE -eq 0) {
-                return $gsettingsValue.Trim("`"'")
+            if (command -v gsettings) {
+                Write-Host "gsettings is installed"
+                
+                $gsettingsValue = $(gsettings get tc.ht path 2> $null)
+                if ($LASTEXITCODE -eq 0) {
+                    return $gsettingsValue.Trim("`"'")
+                }
             } else {
                 # If not dconf installed:
                 if (! $(command -v dconf)) {
@@ -110,9 +112,9 @@ or Enter a custom path
     } while ($installLocation.Contains(" ") -and $proceedAnyway -notin 'Y', 'y')
 
     Write-Host "Saving path..."
-    Set-TCHTPath -Path $installationLocation
+    Set-TCHTPath -Path $installLocation
 
-    Write-Host "Installing this, and future TC.HT programs to: $installationLocation"
+    Write-Host "Installing this, and future TC.HT programs to: $installLocation"
     return $installLocation
 }
 
@@ -177,18 +179,45 @@ function Set-TCHTPath() {
             break
         }
         "Unix" {
-            $gsettingsPath = "tc.ht"
-            $gsettingsKey = "path"
-            $gsettingsValue = $(gsettings get $gsettingsPath $gsettingsKey 2> $null)
-            if ($LASTEXITCODE -eq 0) {
-                # If gsettings is installed, use it to set the key value
-                gsettings set $gsettingsPath $gsettingsKey "$path"
+            if (command -v gsettings) {
+                Write-Host "gsettings installed."
+                if (!(command -v glib-compile-schemas)) {
+                    Write-Host "glib not installed. Installing..."
+                    brew install glib
+                }
+
+                # Install schema
+                @"
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="tc.ht" path="/org/gnome/tc/ht/">
+    <key name="path" type="s">
+      <default>'/Users/mish/Documents/TCHT'</default>
+      <summary>Path for TCHT</summary>
+      <description>Path where TCHT files are located.</description>
+    </key>
+  </schema>
+</schemalist>
+"@ | Set-Content -Path ./tc.ht.gschema.xml
+                
+                $SchemaDir = "$HOME/.local/share/glib-2.0/schemas"
+                if (-not (Test-Path -Path $SchemaDir)) {
+                    New-Item -ItemType Directory -Path $SchemaDir -Force
+                }
+
+                glib-compile-schemas . --strict --targetdir=$HOME/.local/share/glib-2.0/schemas
+                $Env:GSETTINGS_SCHEMA_DIR="$HOME/.local/share/glib-2.0/schemas"
+                
+                Write-Host "Saving gsettings path as /tc.ht/path, $path"
+                gsettings set tc.ht path "/Users/mish/Documents/TCHT"
             } else {
                 # If not dconf installed:
                 if (! $(command -v dconf)) {
+                    Write-Host "dconf not installed. Installing..."
                     Install-Dconf
                 }
 
+                Write-Host "Saving dconf path as /tc.ht/path, $path"
                 # If dconf installed:
                 $dconfPath = "/tcht/path"
                 dconf write $dconfPath "$path"
@@ -207,4 +236,5 @@ $path = Get-TCHTPath
 Write-Host "RESULT: '$path'"
 
 $path = Get-TCHTPathFromUser
+
 Write-Host "$test is where I am!"

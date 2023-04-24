@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="tc.ht" path="/org/gnome/tc/ht/">
+    <key name="path" type="s">
+      <default>'/Users/mish/Documents/TCHT'</default>
+      <summary>Path for TCHT</summary>
+      <description>Path where TCHT files are located.</description>
+    </key>
+  </schema>
+</schemalist>
