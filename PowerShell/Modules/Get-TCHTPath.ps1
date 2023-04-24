@@ -22,18 +22,6 @@ function Get-TCHTPath() {
                 if ($LASTEXITCODE -eq 0) {
                     return $gsettingsValue.Trim("`"'")
                 }
-            } else {
-                # If not dconf installed:
-                if (! $(command -v dconf)) {
-                    Install-Dconf
-                }
-
-                # If dconf installed:
-                $dconfPath = "/tcht/path"
-                $dconfValue = $(dconf read $dconfPath 2> $null)
-                if ($LASTEXITCODE -eq 0) {
-                    return $dconfValue
-                }
             }
 
             return ""
@@ -119,35 +107,45 @@ or Enter a custom path
 }
 
 
-function Install-Dconf() {
+function Install-GSettings {
     $os = [System.Environment]::OSVersion.Platform.ToString()
 
     switch ($os) {
         "Win32NT" {
-            Write-Host "You only need DConf on Mac or Linux."
+            Write-Host "You only need GSettings on Mac or Linux."
             return
         }
         "Unix" {
             if (which apt-get) {
                 # Ubuntu, Debian, Raspbian, Kali, etc.
                 apt-get update
-                apt-get install -y dconf-cli
-            } elseif (which dnf) {
+                apt-get install -y gsettings-ubuntu-schemas
+                if (command -v gsettings) { return }
+            }
+            if (which dnf) {
                 # Fedora, RedHat, CentOS, etc.
-                dnf install -y dconf
-            } elseif (which yum) {
+                dnf install -y gsettings-desktop-schemas
+                if (command -v gsettings) { return }
+            }
+            if (which yum) {
                 # CentOS, RedHat, etc.
-                yum install -y dconf
-            } elseif (which apk) {
+                yum install -y gsettings-desktop-schemas
+                if (command -v gsettings) { return }
+            }
+            if (which apk) {
                 # Alpine, etc.
                 apk update
-                apk add dconf
-            } elseif (which snap) {
-                # Snap
-                snap install dconf
-            } else {
-                Write-Error "Could not find a package manager to install DConf."
+                apk add glib-dev
+                apk add gsettings-desktop-schemas
+                if (command -v gsettings) { return }
             }
+            if (which pacman) {
+                # Pacman
+                pacman -S glib2
+                if (command -v gsettings) { return }
+            }
+            
+            Write-Error "Could not find a package manager to install gsettings."
             break
         }
         default {
@@ -209,16 +207,15 @@ function Set-TCHTPath() {
                 Write-Host "Saving gsettings path as /tc.ht/path, $path"
                 gsettings set tc.ht path "/Users/mish/Documents/TCHT"
             } else {
-                # If not dconf installed:
-                if (! $(command -v dconf)) {
-                    Write-Host "dconf not installed. Installing..."
-                    Install-Dconf
+                # If not gsettings installed:
+                if (! $(command -v gsettings)) {
+                    Write-Host "gsettings not installed. Installing..."
+                    Install-GSettings
                 }
 
-                Write-Host "Saving dconf path as /tc.ht/path, $path"
-                # If dconf installed:
-                $dconfPath = "/tcht/path"
-                dconf write $dconfPath "$path"
+                Write-Host "Saving gsettings path as /tc.ht/path, $path"
+                # If gsettings installed:
+                gsettings write "/tcht/path" "$path"
             }
             break
         }
