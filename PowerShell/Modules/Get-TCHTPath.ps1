@@ -118,6 +118,7 @@ or Enter a custom path
     return $installLocation
 }
 
+
 function Install-Dconf() {
     $os = [System.Environment]::OSVersion.Platform.ToString()
 
@@ -129,21 +130,21 @@ function Install-Dconf() {
         "Unix" {
             if (which apt-get) {
                 # Ubuntu, Debian, Raspbian, Kali, etc.
-                sudo apt-get update
-                sudo apt-get install -y dconf-cli
+                apt-get update
+                apt-get install -y dconf-cli
             } elseif (which dnf) {
                 # Fedora, RedHat, CentOS, etc.
-                sudo dnf install -y dconf
+                dnf install -y dconf
             } elseif (which yum) {
                 # CentOS, RedHat, etc.
-                sudo yum install -y dconf
+                yum install -y dconf
             } elseif (which apk) {
                 # Alpine, etc.
-                sudo apk update
-                sudo apk add dconf
+                apk update
+                apk add dconf
             } elseif (which snap) {
                 # Snap
-                sudo snap install dconf
+                snap install dconf
             } else {
                 Write-Error "Could not find a package manager to install DConf."
             }
@@ -154,9 +155,6 @@ function Install-Dconf() {
         }
     }
 }
-
-
-
 
 
 function Set-TCHTPath() {
@@ -230,6 +228,7 @@ function Set-TCHTPath() {
     }
 
 }
+
 
 Write-Host "Getting path from saved registry or gsettings: "
 $path = Get-TCHTPath
