@@ -66,7 +66,7 @@ or Enter a custom path
 "@
 
     $firstLoop = $True
-    if ($installLocation -eq "1") {
+    if ($installLocation -in "1", "", " ") {
         $installLocation = $path
         if (!(Test-Path $installLocation -PathType Container)) {
             Write-Host "Folder created: $installLocation"
