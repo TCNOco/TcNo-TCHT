@@ -80,7 +80,7 @@ function Get-VincunaCPU13B {
     $outputPath = "text-generation-webui\models\eachadea_ggml-vicuna-13b-1-1"
     Write-Host "Downloading: eachadea/ggml-vicuna-13b-1.1 (CPU model)" -ForegroundColor Cyan
     $files = @(
-        "ggml-vicuna-13b-1.1-q4_1.bin"
+        "ggml-vic13b-uncensored-q5_1.bin"
     )
 
     Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
@@ -94,7 +94,7 @@ function Get-VicunaCPU7B {
     $outputPath = "text-generation-webui\models\eachadea_ggml-vicuna-7b-1-1"
     Write-Host "Downloading: eachadea/ggml-vicuna-7b-1.1 (CPU model)" -ForegroundColor Cyan
     $files = @(
-        "ggml-vicuna-7b-1.1-q4_1.bin"
+        "ggml-vic7b-uncensored-q5_1.bin"
     )
 
     Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
