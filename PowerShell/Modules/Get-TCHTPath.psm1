@@ -5,7 +5,7 @@ function Get-TCHTPathSaved() {
 
     switch ($os) {
         "Win32NT" {
-            $registryPath = "HKCU:\Software\TCHT\Path"
+            $registryPath = "HKCU:\Software\TCHT"
             if (Test-Path $registryPath) {
                 return (Get-ItemProperty $registryPath).Path
             } else {
