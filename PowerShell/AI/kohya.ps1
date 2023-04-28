@@ -33,8 +33,8 @@ Write-Host "kohya_ss as well as all of its other dependencies and a model should
 Write-Host "[Version 2023-04-28]`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Host "This script needs to be run as an administrator." -ForegroundColor Red
-    Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
+    Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
+    Read-Host
 }
 
 # Allow importing remote functions
