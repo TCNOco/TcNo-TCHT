@@ -165,11 +165,11 @@ function Set-TCHTPath() {
 
     switch ($os) {
         "Win32NT" {
-            $registryPath = "HKCU:\Software\TCHT\Path"
+            $registryPath = "HKCU:\Software\TCHT"
             if (Test-Path $registryPath) {
                 Set-ItemProperty $registryPath -Name Path -Value $path
             } else {
-                New-Item -Path "HKCU:\Software\TCHT" -Force | Out-Null
+                New-Item -Path $registryPath -Force | Out-Null
                 New-ItemProperty -Path $registryPath -Name Path -Value $path -PropertyType String | Out-Null
             }
             break
