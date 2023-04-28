@@ -1,4 +1,26 @@
+# Copyright (C) 2023 TroubleChute (Wesley Pyburn)
+# Licensed under the GNU General Public License v3.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.gnu.org/licenses/gpl-3.0.en.html
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#    
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#    
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# ----------------------------------------
 # This function gets and/or sets the TCHT install path.
+# ----------------------------------------
 
 function Get-TCHTPathSaved() {
     $os = [System.Environment]::OSVersion.Platform.ToString()
@@ -39,6 +61,11 @@ function Get-TCHTPathFromUser() {
 
     switch ($os) {
         "Win32NT" {
+            if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+                Write-Host "This script needs to be run as an administrator." -ForegroundColor Red
+                Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
+            }
+
             $path = "C:\TCHT"
             break
         }
@@ -232,5 +259,9 @@ function Get-TCHTPath() {
         $path = Get-TCHTPathFromUser
     }
 
+    # We'll create $TCHT if it doesn't already exist:
+    if (!(Test-Path -Path $path)) {
+        New-Item -ItemType Directory -Path $path
+    }
     return $path
 }

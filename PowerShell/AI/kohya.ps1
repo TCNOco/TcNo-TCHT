@@ -30,26 +30,17 @@
 
 Write-Host "Welcome to TroubleChute's kohya_ss installer!" -ForegroundColor Cyan
 Write-Host "kohya_ss as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-19]`n`n" -ForegroundColor Cyan
-
-Write-Host "This installs to C:\TCHT by default. You can change this by setting 'TC.HT' to a path like 'D:\TCHT' in the System Variables (Start Menu -> Environment Variables)`n`n" -ForegroundColor Yellow
+Write-Host "[Version 2023-04-28]`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "This script needs to be run as an administrator." -ForegroundColor Red
     Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
 }
 
-$TCHT = [Environment]::GetEnvironmentVariable("TC.HT", "Machine")
-
-if ($TCHT -eq $null) {
-    [Environment]::SetEnvironmentVariable("TC.HT", "C:\TCHT", "Machine")
-    $TCHT = "C:\TCHT"
-}
-
-# We'll create $TCHT\Ooba if it doesn't already exist:
-if (!(Test-Path -Path $TCHT)) {
-    New-Item -ItemType Directory -Path $TCHT
-}
+# Allow importing remote functions
+iex (irm Import-RemoteFunction.tc.ht)
+Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
+$TCHT = Get-TCHTPath
 
 # Then CD into $TCHT\
 Set-Location "$TCHT\"

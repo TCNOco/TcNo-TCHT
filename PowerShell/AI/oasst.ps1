@@ -29,21 +29,18 @@
 
 Write-Host "Welcome to TroubleChute's OpenAssist (Pythia) installer!" -ForegroundColor Cyan
 Write-Host "OpenAssist (Pythia) as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-19]`n`n" -ForegroundColor Cyan
-
-Write-Host "This installs to C:\TCHT by default. You can change this by setting 'TC.HT' to a path like 'D:\TCHT' in the System Variables (Start Menu -> Environment Variables)`n`n" -ForegroundColor Yellow
+Write-Host "[Version 2023-04-28]`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "This script needs to be run as an administrator." -ForegroundColor Red
     Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
 }
 
-$TCHT = [Environment]::GetEnvironmentVariable("TC.HT", "Machine")
+# Allow importing remote functions
+iex (irm Import-RemoteFunction.tc.ht)
+Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
+$TCHT = Get-TCHTPath
 
-if ($TCHT -eq $null) {
-    [Environment]::SetEnvironmentVariable("TC.HT", "C:\TCHT", "Machine")
-    $TCHT = "C:\TCHT"
-}
 
 # 1. Check if has oobabooga_windows directory ($TCHT\oobabooga_windows) (Default C:\TCHT\oobabooga_windows)
 $toDownload = $True
@@ -65,8 +62,6 @@ if (Test-Path -Path "$TCHT\oobabooga_windows") {
 if ($toDownload) {
     Write-Host "I'll start by installing Oobabooga first, then we'll get to the model...`n`n"
     
-    # Allow importing remote functions
-    iex (irm Import-RemoteFunction.tc.ht)
     Import-FunctionIfNotExists -Command Install-Ooba -ScriptUri "Install-Ooba.tc.ht"
 
     Install-Ooba -skip_model 1 -skip_start 1
@@ -77,8 +72,6 @@ if ($toDownload) {
     Set-Location "$TCHT\oobabooga_windows"
 }
 
-# Allow importing remote functions
-iex (irm Import-RemoteFunction.tc.ht)
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
 Import-FunctionIfNotExists -Command Get-HuggingFaceRepo -ScriptUri "Get-HuggingFace.tc.ht"
 

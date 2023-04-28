@@ -45,12 +45,10 @@ function Install-Ooba {
         Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
     }
     
-    $TCHT = [Environment]::GetEnvironmentVariable("TC.HT", "Machine")
-
-    if ($TCHT -eq $null) {
-        [Environment]::SetEnvironmentVariable("TC.HT", "C:\TCHT", "Machine")
-        $TCHT = "C:\TCHT"
-    }
+    # Allow importing remote functions
+    iex (irm Import-RemoteFunction.tc.ht)
+    Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
+    $TCHT = Get-TCHTPath
 
     # Since the latest update, this program is unhappy with paths with a space in them.
     # The program will be installed to $TCHT\Ooba
