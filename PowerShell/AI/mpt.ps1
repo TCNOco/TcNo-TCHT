@@ -141,7 +141,7 @@ do {
         }
         "2" {
             Write-Host "Downloading MPT-7B-StoryWriter-65k+ 4bit 128g" -ForegroundColor Yellow
-            Get-HuggingFaceRepo -Model "OccamRazor/mpt-7b-storywriter-4bit-128g" -OutputPath "text-generation-webui\models\OccamRazor_mpt-7b-storywriter-4bit-128g"
+            Get-HuggingFaceRepo -Model "ooccamrazor/mpt-7b-storywriter-4bit-128g" -OutputPath "text-generation-webui\models\ooccamrazor_mpt-7b-storywriter-4bit-128g"
         }
         "3" {
             Write-Host "Downloading MPT-7B-Instruct" -ForegroundColor Yellow
@@ -185,16 +185,16 @@ foreach ($number in $selectedNumbers) {
     Write-Host "Creating launcher: $number"
     switch ($number) {
         "1" {
-            New-WebUIBat -model "mosaicml_mpt-7b-storywriter" -newBatchFile "start_mpt-7b-storywriter.bat" -otherArgs "--notebook --trust-remote-code"
+            New-WebUIBat -model "mosaicml_mpt-7b-storywriter" -newBatchFile "start_mpt-7b-storywriter.bat" -otherArgs "--trust-remote-code"
         }
         "2" {
-            New-WebUIBat -model "OccamRazor_mpt-7b-storywriter-4bit-128g" -newBatchFile "start_mpt-7b-storywriter-4bit.bat" -otherArgs "--notebook --trust-remote-code"
+            New-WebUIBat -model "ooccamrazor_mpt-7b-storywriter-4bit-128g" -newBatchFile "start_mpt-7b-storywriter-4bit.bat" -otherArgs "--trust-remote-code"
         }
         "3" {
-            New-WebUIBat -model "mosaicml_mpt-7b-instruct" -newBatchFile "start_mpt-7b-instruct.bat" -otherArgs "--notebook --trust-remote-code"
+            New-WebUIBat -model "mosaicml_mpt-7b-instruct" -newBatchFile "start_mpt-7b-instruct.bat" -otherArgs "--trust-remote-code"
         }
         "4" {
-            New-WebUIBat -model "mosaicml_mpt-7b-chat" -newBatchFile "start_mpt-7b-chat.bat" -otherArgs "--notebook --trust-remote-code"
+            New-WebUIBat -model "mosaicml_mpt-7b-chat" -newBatchFile "start_mpt-7b-chat.bat" -otherArgs "--trust-remote-code"
         }
     }
 }
@@ -257,20 +257,20 @@ if ($selectedNumbers.Count -eq 1) {
     foreach ($number in $selectedNumbers) {
         switch ($number) {
             "1" {
-                Write-Host "1 - " -ForegroundColor Green
-                Write-Host -NoNewline "Downloading MPT-7B-StoryWriter-65k+" -ForegroundColor Yellow
+                Write-Host -NoNewline "1 - " -ForegroundColor Green
+                Write-Host "Downloading MPT-7B-StoryWriter-65k+" -ForegroundColor Yellow
             }
             "2" {
-                Write-Host "2 - " -ForegroundColor Green
-                Write-Host -NoNewline "Downloading MPT-7B-StoryWriter-65k+ 4bit 128g" -ForegroundColor Yellow
+                Write-Host -NoNewline "2 - " -ForegroundColor Green
+                Write-Host "Downloading MPT-7B-StoryWriter-65k+ 4bit 128g" -ForegroundColor Yellow
             }
             "3" {
-                Write-Host "3 - " -ForegroundColor Green
-                Write-Host -NoNewline "Downloading MPT-7B-Instruct" -ForegroundColor Yellow
+                Write-Host -NoNewline "3 - " -ForegroundColor Green
+                Write-Host "Downloading MPT-7B-Instruct" -ForegroundColor Yellow
             }
             "4" {
-                Write-Host "4 - " -ForegroundColor Green
-                Write-Host -NoNewline "Downloading MPT-7B-Chat" -ForegroundColor Yellow
+                Write-Host -NoNewline "4 - " -ForegroundColor Green
+                Write-Host "Downloading MPT-7B-Chat" -ForegroundColor Yellow
             }
         }
     }

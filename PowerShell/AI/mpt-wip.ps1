@@ -184,9 +184,14 @@ function New-WebUIBat {
 }
 
 # 4. Replace commands in the start-webui.bat file
+$cpuOnly = Read-Host "The MPT models require a LOT of VRAM. As in a 3090+. Do you want to run in CPU-only mode? (Y/N)"
 foreach ($num in $selectedModels) {
     Write-Host "Creating launcher: $num"
-    New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "--notebook --trust-remote-code"
+    if ($cpuOnly -in "Y", "y") {
+        New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "--trust-remote-code --cpu"
+    } else {
+        New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "--trust-remote-code"
+    }
 }
 
 # 5. Create desktop shortcuts
@@ -224,8 +229,8 @@ if ($selectedModels.Count -eq 1) {
 } else {
     Write-Host "`nWhich model would you like to launch?" -ForegroundColor Cyan
     foreach ($num in $selectedModels) {
-        Write-Host "$num - " -ForegroundColor Green
-        Write-Host -NoNewline "Downloading $($models.$num.Name)" -ForegroundColor Yellow
+        Write-Host -NoNewline "$num - " -ForegroundColor Green
+        Write-Host "Downloading $($models.$num.Name)" -ForegroundColor Yellow
     }
     
     do {
