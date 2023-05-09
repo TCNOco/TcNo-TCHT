@@ -110,7 +110,7 @@ function Get-Aria2File {
     # Check if aria2c is available
     if (-not ($null -eq (Get-Command aria2c -ErrorAction SilentlyContinue))) {
         # Use aria2c to download the files
-        aria2c -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
+        aria2c --disable-ipv6 -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
     } elseif (-not ($null -eq (Get-Command $aria2Path -ErrorAction SilentlyContinue))) {
         # Use aria2c to download the files
         & $aria2Path -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
@@ -162,7 +162,7 @@ function Get-Aria2Files {
     if (-not ($null -eq (Get-Command aria2c -ErrorAction SilentlyContinue))) {
         # Use aria2c to download the files
         $files | ForEach-Object {
-            aria2c -x 8 -s 8 --continue --out="$outputPath\$_" "$Url/$_" --console-log-level=error --download-result=hide
+            aria2c --disable-ipv6 -x 8 -s 8 --continue --out="$outputPath\$_" "$Url/$_" --console-log-level=error --download-result=hide
         }
     } elseif (-not ($null -eq (Get-Command $aria2Path -ErrorAction SilentlyContinue))) {
         # Use aria2c to download the files

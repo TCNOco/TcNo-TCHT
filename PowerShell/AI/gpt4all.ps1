@@ -55,7 +55,7 @@ Update-SessionEnvironment
 
 # 5. Download the GPT4All Lora model
 Write-Host "`nDownloading the GPT4All model. This will take a while" -ForegroundColor Cyan
-aria2c -x 8 -s 8 --continue --out="./gpt4all/chat/gpt4all-lora-quantized.bin" https://the-eye.eu/public/AI/models/nomic-ai/gpt4all/gpt4all-lora-quantized.bin
+aria2c -x 8 -s 8 --disable-ipv6 --continue --out="./gpt4all/chat/gpt4all-lora-quantized.bin" https://the-eye.eu/public/AI/models/nomic-ai/gpt4all/gpt4all-lora-quantized.bin
 
 # 6. Install VCRedist (if missing any)
 Write-Host "`nInstalling required VCRuntimes..." -ForegroundColor Cyan

@@ -74,7 +74,9 @@ if ($toDownload) {
 
 # Run the oobabooga updater
 if (Test-Path -Path ./update_windows.bat) {
+    Write-Host "Updating Oobabooga...`n`n" -ForegroundColor Cyan
     ./update_windows.bat
+    Write-Host "Finished updating Oobabooga...`n`n" -ForegroundColor Cyan
 }
 
 # 2. Edit (or create and edit) settings.json
