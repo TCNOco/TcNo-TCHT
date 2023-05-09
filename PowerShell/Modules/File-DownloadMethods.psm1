@@ -113,7 +113,7 @@ function Get-Aria2File {
         aria2c --disable-ipv6 -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
     } elseif (-not ($null -eq (Get-Command $aria2Path -ErrorAction SilentlyContinue))) {
         # Use aria2c to download the files
-        & $aria2Path -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
+        & $aria2Path --disable-ipv6 -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
     } else {
         # Import download command if not already available
         Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1"
@@ -167,7 +167,7 @@ function Get-Aria2Files {
     } elseif (-not ($null -eq (Get-Command $aria2Path -ErrorAction SilentlyContinue))) {
         # Use aria2c to download the files
         $files | ForEach-Object {
-            & $aria2Path -x 8 -s 8 --continue --out="$outputPath\$_" "$Url/$_" --console-log-level=error --download-result=hide
+            & $aria2Path --disable-ipv6 -x 8 -s 8 --continue --out="$outputPath\$_" "$Url/$_" --console-log-level=error --download-result=hide
         }
     } else {
         # Import download command if not already available
