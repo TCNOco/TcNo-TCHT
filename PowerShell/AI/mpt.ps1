@@ -21,15 +21,16 @@
 # ----------------------------------------
 # This script:
 # 1. Check if current directory is oobabooga-windows, or oobabooga-windows is in directory
-# 2. Ask the user what models they want to download
-# 3. Replace commands in the start-webui.bat file
-# 4. Create desktop shortcuts
-# 5. Run the webui
+# 2. Edit (or create and edit) settings.json
+# 3. Ask the user what models they want to download
+# 4. Replace commands in the start-webui.bat file
+# 5. Create desktop shortcuts
+# 6. Run the webui
 # ----------------------------------------
 
-Write-Host "Welcome to TroubleChute's OpenAssist (Pythia) installer!" -ForegroundColor Cyan
-Write-Host "OpenAssist (Pythia) as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-28]`n`n" -ForegroundColor Cyan
+Write-Host "Welcome to TroubleChute's MPT installer!" -ForegroundColor Cyan
+Write-Host "MPT as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
+Write-Host "[Version 2023-05-09]`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
@@ -76,35 +77,77 @@ if (Test-Path -Path ./update_windows.bat) {
     ./update_windows.bat
 }
 
+# 2. Edit (or create and edit) settings.json
+$source = "./text-generation-webui/settings-template.json"
+$destination = "./text-generation-webui/settings.json"
+
+if (!(Test-Path -Path $destination)) {
+    Copy-Item -Path $source -Destination $destination
+}
+
+# Set:
+# "truncation_length": 65000,
+# "truncation_length_max": 65000,
+(Get-Content -Path $destination) |
+ForEach-Object { 
+    if ($_ -match '^\s*"truncation_length":\s*\d+,*\s*$') { 
+        $_ -replace '\d+', '65000'
+    }
+    elseif ($_ -match '^\s*"truncation_length_max":\s*\d+,*\s*$') { 
+        $_ -replace '\d+', '65000'
+    }
+    else { 
+        $_ 
+    }
+} | Set-Content -Path $destination
+
+
+
+
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
 Import-FunctionIfNotExists -Command Get-HuggingFaceRepo -ScriptUri "Get-HuggingFace.tc.ht"
 
-Write-Host "`nNOTE: (SFT: Supervised Fine-Tuning, RM: Reward Model)`n"  -ForegroundColor Cyan
 $selectedNumbers = @()
 $num = ""
 do {
-    # Ask user what model they want
+    #3. Ask user what model they want
     Write-Host "`n`nWhat model do you wan to download?" -ForegroundColor Cyan
     if ("1" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
-    Write-Host -NoNewline "- [11 Apr '23] Pythia SFT-4 12B epoch 3.5 (~24GB): " -ForegroundColor Red
+    Write-Host -NoNewline "- MPT-7B-StoryWriter-65k+ (~13.30GB): " -ForegroundColor Red
     Write-Host "1" -ForegroundColor Green
 
     if ("2" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
-    Write-Host -NoNewline "- [11 Mar '23] Pythia SFT-1 12B 7B (~24GB): " -ForegroundColor Red
+    Write-Host -NoNewline "- MPT-7B-StoryWriter-65k+ 4bit 128g (~3.9GB): " -ForegroundColor Red
     Write-Host "2" -ForegroundColor Green
+
+    if ("3" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
+    Write-Host -NoNewline "- MPT-7B-Instruct (~13.30GB): " -ForegroundColor Red
+    Write-Host "3" -ForegroundColor Green
+
+    if ("4" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
+    Write-Host -NoNewline "- MPT-7B-Chat (~13.30GB): " -ForegroundColor Red
+    Write-Host "4" -ForegroundColor Green
     
     do {
         $num = Read-Host "Enter a number"
-    } while ($num -notin "1", "2")
+    } while ($num -notin "1", "2", "3", "4")
     
     switch ($num) {
         "1" {
-            Write-Host "Downloading Open-Assistant SFT-4 12B Model Epoch 3.5" -ForegroundColor Yellow
-            Get-HuggingFaceRepo -Model "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5" -OutputPath "text-generation-webui\models\openassistant_oasst-sft-4-pythia-12b-epoch-3.5"
+            Write-Host "Downloading MPT-7B-StoryWriter-65k+" -ForegroundColor Yellow
+            Get-HuggingFaceRepo -Model "mosaicml/mpt-7b-storywriter" -OutputPath "text-generation-webui\models\mosaicml_mpt-7b-storywriter"
         }
         "2" {
-            Write-Host "Downloading Open-Assistant SFT-1 12B Model" -ForegroundColor Yellow
-            Get-HuggingFaceRepo -Model "OpenAssistant/oasst-sft-1-pythia-12b" -OutputPath "text-generation-webui\models\openassistant_oasst-sft-1-pythia-12b"
+            Write-Host "Downloading MPT-7B-StoryWriter-65k+ 4bit 128g" -ForegroundColor Yellow
+            Get-HuggingFaceRepo -Model "OccamRazor/mpt-7b-storywriter-4bit-128g" -OutputPath "text-generation-webui\models\OccamRazor_mpt-7b-storywriter-4bit-128g"
+        }
+        "3" {
+            Write-Host "Downloading MPT-7B-Instruct" -ForegroundColor Yellow
+            Get-HuggingFaceRepo -Model "mosaicml/mpt-7b-instruct" -OutputPath "text-generation-webui\models\mosaicml_mpt-7b-instruct"
+        }
+        "4" {
+            Write-Host "Downloading MPT-7B-Chat" -ForegroundColor Yellow
+            Get-HuggingFaceRepo -Model "mosaicml/mpt-7b-chat" -OutputPath "text-generation-webui\models\mosaicml_mpt-7b-chat"
         }
     }
 
@@ -131,24 +174,30 @@ function New-WebUIBat {
     (Get-Content -Path "start_windows.bat") | ForEach-Object {
         ($_ -replace
             'call python webui.py',
-            "cd text-generation-webui`npython server.py --auto-devices --chat --model $model $otherArgs")
+            "call pip install einops`ncd text-generation-webui`npython server.py --auto-devices --chat --model $model $otherArgs")
     } | Set-Content -Path $newBatchFile
 }
 
-# 3. Replace commands in the start-webui.bat file
+# 4. Replace commands in the start-webui.bat file
 foreach ($number in $selectedNumbers) {
     Write-Host "Creating launcher: $number"
     switch ($number) {
         "1" {
-            New-WebUIBat -model "openassistant_oasst-sft-4-pythia-12b-epoch-3.5" -newBatchFile "start_oasst-sft-4-12b.bat" -otherArgs ""
+            New-WebUIBat -model "mosaicml_mpt-7b-storywriter" -newBatchFile "start_mpt-7b-storywriter.bat" -otherArgs "--notebook --trust-remote-code"
         }
         "2" {
-            New-WebUIBat -model "openassistant_oasst-sft-1-pythia-12b" -newBatchFile "start_oasst-sft-1-12b.bat" -otherArgs ""
+            New-WebUIBat -model "OccamRazor_mpt-7b-storywriter-4bit-128g" -newBatchFile "start_mpt-7b-storywriter-4bit.bat" -otherArgs "--notebook --trust-remote-code"
+        }
+        "3" {
+            New-WebUIBat -model "mosaicml_mpt-7b-instruct" -newBatchFile "start_mpt-7b-instruct.bat" -otherArgs "--notebook --trust-remote-code"
+        }
+        "4" {
+            New-WebUIBat -model "mosaicml_mpt-7b-chat" -newBatchFile "start_mpt-7b-chat.bat" -otherArgs "--notebook --trust-remote-code"
         }
     }
 }
 
-# 4. Create desktop shortcuts
+# 5. Create desktop shortcuts
 function Deploy-Shortcut {
     param(
         [string]$name,
@@ -175,16 +224,22 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
         Write-Host "Creating shortcut: $number"
         switch ($number) {
             "1" {
-                Deploy-Shortcut -name "Open-Assistant SFT-4 12B - Oobabooga" -batFile "start_oasst-sft-4-12b.bat"
+                Deploy-Shortcut -name "MPT 7b Storywriter - Oobabooga" -batFile "start_mpt-7b-storywriter.bat"
             }
             "2" {
-                Deploy-Shortcut -name "Open-Assistant SFT-1 12B - Oobabooga" -batFile "start_oasst-sft-1-12b.bat"
+                Deploy-Shortcut -name "MPT 7b Storywriter 4bit - Oobabooga" -batFile "start_mpt-7b-storywriter-4bit.bat"
+            }
+            "3" {
+                Deploy-Shortcut -name "MPT 7b Instruct - Oobabooga" -batFile "start_mpt-7b-instruct.bat"
+            }
+            "4" {
+                Deploy-Shortcut -name "MPT 7b Chat - Oobabooga" -batFile "start_mpt-7b-chat.bat"
             }
         }
     }
 }
 
-# 5. Run the webui
+# 6. Run the webui
 if ($selectedNumbers.Count -eq 1) {
     if ("1" -in $selectedNumbers) {
         Start-Process ".\start_oasst-sft-4-12b.bat"
@@ -196,23 +251,35 @@ if ($selectedNumbers.Count -eq 1) {
     foreach ($number in $selectedNumbers) {
         switch ($number) {
             "1" {
-                Write-Host -NoNewline "- [11 Apr '23] Pythia SFT-4 12B epoch 3.5 (~24GB): " -ForegroundColor Red
+                Write-Host "Downloading MPT-7B-StoryWriter-65k+" -ForegroundColor Yellow
                 Write-Host "1" -ForegroundColor Green
             }
             "2" {
-                Write-Host -NoNewline "- [11 Mar '23] Pythia SFT-1 12B 7B (~24GB): " -ForegroundColor Red
+                Write-Host "Downloading MPT-7B-StoryWriter-65k+ 4bit 128g" -ForegroundColor Yellow
                 Write-Host "2" -ForegroundColor Green
+            }
+            "3" {
+                Write-Host "Downloading MPT-7B-Instruct" -ForegroundColor Yellow
+                Write-Host "3" -ForegroundColor Green
+            }
+            "4" {
+                Write-Host "Downloading MPT-7B-Chat" -ForegroundColor Yellow
+                Write-Host "4" -ForegroundColor Green
             }
         }
     }
     
     do {
         $num = Read-Host "Enter a number"
-    } while ($num -notin "1", "2")
+    } while ($num -notin "1", "2", "3", "4")
 
     if ("1" -in $selectedNumbers) {
-        Start-Process ".\start_oasst-sft-4-12b.bat"
+        Start-Process ".\start_mpt-7b-storywriter.bat"
     } elseif ("2" -in $selectedNumbers) {
-        Start-Process ".\start_oasst-sft-1-12b.bat"
+        Start-Process ".\start_mpt-7b-storywriter-4bit.bat"
+    } elseif ("3" -in $selectedNumbers) {
+        Start-Process ".\start_mpt-7b-instruct.bat"
+    } elseif ("4" -in $selectedNumbers) {
+        Start-Process ".\start_mpt-7b-chat.bat"
     }
 }

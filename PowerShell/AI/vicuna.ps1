@@ -73,6 +73,11 @@ if ($toDownload) {
     Set-Location "$TCHT\oobabooga_windows"
 }
 
+# Run the oobabooga updater
+if (Test-Path -Path ./update_windows.bat) {
+    ./update_windows.bat
+}
+
 function Get-VincunaCPU13B {
     # Download CPU model 13B
     Write-Host "Downloading CPU model 13B" -ForegroundColor Yellow
