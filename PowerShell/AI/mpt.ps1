@@ -154,7 +154,7 @@ do {
     }
 
     $selectedNumbers += $num
-    if ($selectedNumbers.Count -lt 2) {
+    if ($selectedNumbers.Count -lt 4) {
         Write-Host "Done downloading model`n`n" -ForegroundColor Yellow
         $again = Read-Host "Do you want to download another model? (y/n)"
     } else {
@@ -176,7 +176,7 @@ function New-WebUIBat {
     (Get-Content -Path "start_windows.bat") | ForEach-Object {
         ($_ -replace
             'call python webui.py',
-            "call pip install einops`ncd text-generation-webui`npython server.py --auto-devices --chat --model $model $otherArgs")
+            "call pip install einops`ncd text-generation-webui`npython server.py --chat --model $model $otherArgs")
     } | Set-Content -Path $newBatchFile
 }
 
@@ -205,7 +205,7 @@ function Deploy-Shortcut {
         [string]$name,
         [string]$batFile
     )
-    New-Shortcut -ShortcutName $name -TargetPath $batFile -IconLocation 'oasst.ico'
+    New-Shortcut -ShortcutName $name -TargetPath $batFile -IconLocation 'mpt.ico'
 }
 
 do {
@@ -218,8 +218,8 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
-    Write-Host "Downloading OpenAssist icon..."
-    Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/oasst.ico' -OutFile 'oasst.ico'
+    Write-Host "Downloading MPT icon..."
+    Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/mpt.ico' -OutFile 'mpt.ico'
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
 
     foreach ($number in $selectedNumbers) {
@@ -244,29 +244,33 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 # 6. Run the webui
 if ($selectedNumbers.Count -eq 1) {
     if ("1" -in $selectedNumbers) {
-        Start-Process ".\start_oasst-sft-4-12b.bat"
+        Start-Process ".\start_mpt-7b-storywriter.bat"
     } elseif ("2" -in $selectedNumbers) {
-        Start-Process ".\start_oasst-sft-1-12b.bat"
+        Start-Process ".\start_mpt-7b-storywriter-4bit.bat"
+    } elseif ("3" -in $selectedNumbers) {
+        Start-Process ".\start_mpt-7b-instruct.bat"
+    } elseif ("4" -in $selectedNumbers) {
+        Start-Process ".\start_mpt-7b-chat.bat"
     }
 } else {
     Write-Host "`nWhich model would you like to launch?" -ForegroundColor Cyan
     foreach ($number in $selectedNumbers) {
         switch ($number) {
             "1" {
-                Write-Host "Downloading MPT-7B-StoryWriter-65k+" -ForegroundColor Yellow
-                Write-Host "1" -ForegroundColor Green
+                Write-Host "1 - " -ForegroundColor Green
+                Write-Host -NoNewline "Downloading MPT-7B-StoryWriter-65k+" -ForegroundColor Yellow
             }
             "2" {
-                Write-Host "Downloading MPT-7B-StoryWriter-65k+ 4bit 128g" -ForegroundColor Yellow
-                Write-Host "2" -ForegroundColor Green
+                Write-Host "2 - " -ForegroundColor Green
+                Write-Host -NoNewline "Downloading MPT-7B-StoryWriter-65k+ 4bit 128g" -ForegroundColor Yellow
             }
             "3" {
-                Write-Host "Downloading MPT-7B-Instruct" -ForegroundColor Yellow
-                Write-Host "3" -ForegroundColor Green
+                Write-Host "3 - " -ForegroundColor Green
+                Write-Host -NoNewline "Downloading MPT-7B-Instruct" -ForegroundColor Yellow
             }
             "4" {
-                Write-Host "Downloading MPT-7B-Chat" -ForegroundColor Yellow
-                Write-Host "4" -ForegroundColor Green
+                Write-Host "4 - " -ForegroundColor Green
+                Write-Host -NoNewline "Downloading MPT-7B-Chat" -ForegroundColor Yellow
             }
         }
     }
