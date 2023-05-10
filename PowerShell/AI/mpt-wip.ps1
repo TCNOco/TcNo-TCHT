@@ -116,27 +116,23 @@ $models = @{
         "Repo" = "mosaicml/mpt-7b-storywriter"
         "BatName" = "start_mpt-7b-storywriter.bat"
         "ShortcutName" = "MPT 7b Storywriter - Oobabooga"
+        "Args" = "--notebook --trust-remote-code"
     }
     "2" = @{
-        "Name" = "MPT-7B-StoryWriter-65k+ 4bit 128g"
-        "Size" = "~3.9GB"
-        "Repo" = "OccamRazor/mpt-7b-storywriter-4bit-128g"
-        "BatName" = "start_mpt-7b-storywriter-4bit.bat"
-        "ShortcutName" = "MPT 7b Storywriter 4bit - Oobabooga"
-    }
-    "3" = @{
         "Name" = "MPT-7B-Instruct"
         "Size" = "~13.30GB"
         "Repo" = "mosaicml/mpt-7b-instruct"
         "BatName" = "start_mpt-7b-instruct.bat"
         "ShortcutName" = "MPT 7b Instruct - Oobabooga"
+        "Args" = "--notebook --trust-remote-code"
     }
-    "4" = @{
+    "3" = @{
         "Name" = "MPT-7B-Chat"
         "Size" = "~13.30GB"
         "Repo" = "mosaicml/mpt-7b-chat"
         "BatName" = "start_mpt-7b-chat.bat"
         "ShortcutName" = "MPT 7b Chat - Oobabooga"
+        "Args" = "--chat --trust-remote-code"
     }
 }
 
@@ -145,7 +141,7 @@ $selectedModels = @()
 # 3. Ask user what model they want
 do {
     Write-Host "`n`nWhat model do you want to download?" -ForegroundColor Cyan
-    foreach ($key in $models.Keys) {
+    foreach ($key in ($models.Keys | Sort-Object)) {
         if ($key -in $selectedModels) { Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
         Write-Host -NoNewline "- $($models.$key.Name) $($models.$key.Size): " -ForegroundColor Red
         Write-Host $key -ForegroundColor Green
@@ -179,7 +175,7 @@ function New-WebUIBat {
     (Get-Content -Path "start_windows.bat") | ForEach-Object {
         ($_ -replace
             'call python webui.py',
-            "call pip install einops`ncd text-generation-webui`npython server.py --chat --model $model $otherArgs")
+            "call pip install einops`ncd text-generation-webui`npython server.py --model $model $otherArgs")
     } | Set-Content -Path $newBatchFile
 }
 
@@ -187,10 +183,13 @@ function New-WebUIBat {
 $cpuOnly = Read-Host "The MPT models require a LOT of VRAM. As in a 3090+. Do you want to run in CPU-only mode? (Y/N)"
 foreach ($num in $selectedModels) {
     Write-Host "Creating launcher: $num"
+
+    $modelArgs = $models.$num.Args
+
     if ($cpuOnly -in "Y", "y") {
-        New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "--trust-remote-code --cpu"
+        New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "--cpu $modelArgs"
     } else {
-        New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "--trust-remote-code"
+        New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "$modelArgs"
     }
 }
 
@@ -237,5 +236,5 @@ if ($selectedModels.Count -eq 1) {
         $num = Read-Host "Enter a number"
     } while ($num -notin $selectedModels)
 
-    Start-Process ".\$($models.$num.BatName)"
+    .\$($models.$num.BatName)
 }
