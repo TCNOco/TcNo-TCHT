@@ -140,7 +140,7 @@ $selectedModels = @()
 
 # 3. Ask user what model they want
 do {
-    Write-Host "`n`nWhat model do you want to download?" -ForegroundColor Cyan
+    Write-Host "`n`n`n`nWhat model do you want to download?" -ForegroundColor Cyan
     foreach ($key in ($models.Keys | Sort-Object)) {
         if ($key -in $selectedModels) { Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
         Write-Host -NoNewline "- $($models.$key.Name) $($models.$key.Size): " -ForegroundColor Red
