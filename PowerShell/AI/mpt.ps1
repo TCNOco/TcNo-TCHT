@@ -109,59 +109,58 @@ ForEach-Object {
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
 Import-FunctionIfNotExists -Command Get-HuggingFaceRepo -ScriptUri "Get-HuggingFace.tc.ht"
 
-$selectedNumbers = @()
-$num = ""
+$models = @{
+    "1" = @{
+        "Name" = "MPT-7B-StoryWriter-65k+"
+        "Size" = "~13.30GB"
+        "Repo" = "mosaicml/mpt-7b-storywriter"
+        "BatName" = "start_mpt-7b-storywriter.bat"
+        "ShortcutName" = "MPT 7b Storywriter - Oobabooga"
+        "Args" = "--notebook --trust-remote-code"
+    }
+    "2" = @{
+        "Name" = "MPT-7B-Instruct"
+        "Size" = "~13.30GB"
+        "Repo" = "mosaicml/mpt-7b-instruct"
+        "BatName" = "start_mpt-7b-instruct.bat"
+        "ShortcutName" = "MPT 7b Instruct - Oobabooga"
+        "Args" = "--notebook --trust-remote-code"
+    }
+    "3" = @{
+        "Name" = "MPT-7B-Chat"
+        "Size" = "~13.30GB"
+        "Repo" = "mosaicml/mpt-7b-chat"
+        "BatName" = "start_mpt-7b-chat.bat"
+        "ShortcutName" = "MPT 7b Chat - Oobabooga"
+        "Args" = "--chat --trust-remote-code"
+    }
+}
+
+$selectedModels = @()
+
+# 3. Ask user what model they want
 do {
-    #3. Ask user what model they want
-    Write-Host "`n`nWhat model do you wan to download?" -ForegroundColor Cyan
-    if ("1" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
-    Write-Host -NoNewline "- MPT-7B-StoryWriter-65k+ (~13.30GB): " -ForegroundColor Red
-    Write-Host "1" -ForegroundColor Green
-
-    if ("2" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
-    Write-Host -NoNewline "- MPT-7B-StoryWriter-65k+ 4bit 128g (~3.9GB): " -ForegroundColor Red
-    Write-Host "2" -ForegroundColor Green
-
-    if ("3" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
-    Write-Host -NoNewline "- MPT-7B-Instruct (~13.30GB): " -ForegroundColor Red
-    Write-Host "3" -ForegroundColor Green
-
-    if ("4" -in $selectedNumbers){ Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
-    Write-Host -NoNewline "- MPT-7B-Chat (~13.30GB): " -ForegroundColor Red
-    Write-Host "4" -ForegroundColor Green
-    
-    do {
-        $num = Read-Host "Enter a number"
-    } while ($num -notin "1", "2", "3", "4")
-    
-    switch ($num) {
-        "1" {
-            Write-Host "Downloading MPT-7B-StoryWriter-65k+" -ForegroundColor Yellow
-            Get-HuggingFaceRepo -Model "mosaicml/mpt-7b-storywriter" -OutputPath "text-generation-webui\models\mosaicml_mpt-7b-storywriter"
-        }
-        "2" {
-            Write-Host "Downloading MPT-7B-StoryWriter-65k+ 4bit 128g" -ForegroundColor Yellow
-            Get-HuggingFaceRepo -Model "ooccamrazor/mpt-7b-storywriter-4bit-128g" -OutputPath "text-generation-webui\models\ooccamrazor_mpt-7b-storywriter-4bit-128g"
-        }
-        "3" {
-            Write-Host "Downloading MPT-7B-Instruct" -ForegroundColor Yellow
-            Get-HuggingFaceRepo -Model "mosaicml/mpt-7b-instruct" -OutputPath "text-generation-webui\models\mosaicml_mpt-7b-instruct"
-        }
-        "4" {
-            Write-Host "Downloading MPT-7B-Chat" -ForegroundColor Yellow
-            Get-HuggingFaceRepo -Model "mosaicml/mpt-7b-chat" -OutputPath "text-generation-webui\models\mosaicml_mpt-7b-chat"
-        }
+    Write-Host "`n`nWhat model do you want to download?" -ForegroundColor Cyan
+    foreach ($key in ($models.Keys | Sort-Object)) {
+        if ($key -in $selectedModels) { Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
+        Write-Host -NoNewline "- $($models.$key.Name) $($models.$key.Size): " -ForegroundColor Red
+        Write-Host $key -ForegroundColor Green
     }
 
-    $selectedNumbers += $num
-    if ($selectedNumbers.Count -lt 4) {
+    do {
+        $num = Read-Host "Enter a number"
+    } while ($num -notin $models.Keys)
+    $selectedModels += $num
+    Write-Host "Downloading $($models.$num.Name)" -ForegroundColor Yellow
+    Get-HuggingFaceRepo -Model $models.$num.Repo -OutputPath "text-generation-webui\models\$($models.$num.Repo -replace '/','_')"
+
+    if ($selectedModels.Count -lt $models.Count) {
         Write-Host "Done downloading model`n`n" -ForegroundColor Yellow
         $again = Read-Host "Do you want to download another model? (y/n)"
     } else {
         $again = "N"
     }
 } while ($again -notin "N", "n")
-
 
 Write-Host "NOTE: Should you need less memory usage, see: https://github.com/oobabooga/text-generation-webui/wiki/Low-VRAM-guide" -ForegroundColor Green
 Write-Host "(These will be added to the .bat you're trying to run in the oobabooga_windows folder)" -ForegroundColor Green
@@ -176,26 +175,21 @@ function New-WebUIBat {
     (Get-Content -Path "start_windows.bat") | ForEach-Object {
         ($_ -replace
             'call python webui.py',
-            "call pip install einops`ncd text-generation-webui`npython server.py --chat --model $model $otherArgs")
+            "call pip install einops`ncd text-generation-webui`npython server.py --model $model $otherArgs")
     } | Set-Content -Path $newBatchFile
 }
 
 # 4. Replace commands in the start-webui.bat file
-foreach ($number in $selectedNumbers) {
-    Write-Host "Creating launcher: $number"
-    switch ($number) {
-        "1" {
-            New-WebUIBat -model "mosaicml_mpt-7b-storywriter" -newBatchFile "start_mpt-7b-storywriter.bat" -otherArgs "--trust-remote-code"
-        }
-        "2" {
-            New-WebUIBat -model "ooccamrazor_mpt-7b-storywriter-4bit-128g" -newBatchFile "start_mpt-7b-storywriter-4bit.bat" -otherArgs "--trust-remote-code"
-        }
-        "3" {
-            New-WebUIBat -model "mosaicml_mpt-7b-instruct" -newBatchFile "start_mpt-7b-instruct.bat" -otherArgs "--trust-remote-code"
-        }
-        "4" {
-            New-WebUIBat -model "mosaicml_mpt-7b-chat" -newBatchFile "start_mpt-7b-chat.bat" -otherArgs "--trust-remote-code"
-        }
+$cpuOnly = Read-Host "The MPT models require a LOT of VRAM. As in a 3090+. Do you want to run in CPU-only mode? (Y/N)"
+foreach ($num in $selectedModels) {
+    Write-Host "Creating launcher: $num"
+
+    $modelArgs = $models.$num.Args
+
+    if ($cpuOnly -in "Y", "y") {
+        New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "--cpu $modelArgs"
+    } else {
+        New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "$modelArgs"
     }
 }
 
@@ -222,70 +216,25 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/mpt.ico' -OutFile 'mpt.ico'
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
 
-    foreach ($number in $selectedNumbers) {
-        Write-Host "Creating shortcut: $number"
-        switch ($number) {
-            "1" {
-                Deploy-Shortcut -name "MPT 7b Storywriter - Oobabooga" -batFile "start_mpt-7b-storywriter.bat"
-            }
-            "2" {
-                Deploy-Shortcut -name "MPT 7b Storywriter 4bit - Oobabooga" -batFile "start_mpt-7b-storywriter-4bit.bat"
-            }
-            "3" {
-                Deploy-Shortcut -name "MPT 7b Instruct - Oobabooga" -batFile "start_mpt-7b-instruct.bat"
-            }
-            "4" {
-                Deploy-Shortcut -name "MPT 7b Chat - Oobabooga" -batFile "start_mpt-7b-chat.bat"
-            }
-        }
+    foreach ($num in $selectedModels) {
+        Write-Host "Creating shortcut: $num"
+        Deploy-Shortcut -name $models.$num.ShortcutName -batFile $models.$num.BatName
     }
 }
 
 # 6. Run the webui
-if ($selectedNumbers.Count -eq 1) {
-    if ("1" -in $selectedNumbers) {
-        Start-Process ".\start_mpt-7b-storywriter.bat"
-    } elseif ("2" -in $selectedNumbers) {
-        Start-Process ".\start_mpt-7b-storywriter-4bit.bat"
-    } elseif ("3" -in $selectedNumbers) {
-        Start-Process ".\start_mpt-7b-instruct.bat"
-    } elseif ("4" -in $selectedNumbers) {
-        Start-Process ".\start_mpt-7b-chat.bat"
-    }
+if ($selectedModels.Count -eq 1) {
+    Start-Process ".\$($models.$selectedModels[0].BatName)"
 } else {
     Write-Host "`nWhich model would you like to launch?" -ForegroundColor Cyan
-    foreach ($number in $selectedNumbers) {
-        switch ($number) {
-            "1" {
-                Write-Host -NoNewline "1 - " -ForegroundColor Green
-                Write-Host "Downloading MPT-7B-StoryWriter-65k+" -ForegroundColor Yellow
-            }
-            "2" {
-                Write-Host -NoNewline "2 - " -ForegroundColor Green
-                Write-Host "Downloading MPT-7B-StoryWriter-65k+ 4bit 128g" -ForegroundColor Yellow
-            }
-            "3" {
-                Write-Host -NoNewline "3 - " -ForegroundColor Green
-                Write-Host "Downloading MPT-7B-Instruct" -ForegroundColor Yellow
-            }
-            "4" {
-                Write-Host -NoNewline "4 - " -ForegroundColor Green
-                Write-Host "Downloading MPT-7B-Chat" -ForegroundColor Yellow
-            }
-        }
+    foreach ($num in $selectedModels) {
+        Write-Host -NoNewline "$num - " -ForegroundColor Green
+        Write-Host "Downloading $($models.$num.Name)" -ForegroundColor Yellow
     }
     
     do {
         $num = Read-Host "Enter a number"
-    } while ($num -notin "1", "2", "3", "4")
+    } while ($num -notin $selectedModels)
 
-    if ("1" -in $selectedNumbers) {
-        Start-Process ".\start_mpt-7b-storywriter.bat"
-    } elseif ("2" -in $selectedNumbers) {
-        Start-Process ".\start_mpt-7b-storywriter-4bit.bat"
-    } elseif ("3" -in $selectedNumbers) {
-        Start-Process ".\start_mpt-7b-instruct.bat"
-    } elseif ("4" -in $selectedNumbers) {
-        Start-Process ".\start_mpt-7b-chat.bat"
-    }
+    .\$($models.$num.BatName)
 }
