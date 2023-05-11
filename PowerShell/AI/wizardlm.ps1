@@ -196,17 +196,19 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 # 5. Run the webui
 Clear-Host
 if ($selectedModels.Count -eq 1) {
-    & ./$models.$num.BatName
+    $batFilePath = Join-Path -Path $PSScriptRoot -ChildPath $models.$selectedModels[0].BatName
+    Start-Process -FilePath cmd.exe -ArgumentList "/C $batFilePath"
 } else {
     Write-Host "Which model would you like to launch?" -ForegroundColor Cyan
     foreach ($num in ($selectedModels | Sort-Object)) {
         Write-Host -NoNewline "$num - " -ForegroundColor Green
-        Write-Host "Downloading $($models.$num.Name)" -ForegroundColor Yellow
+        Write-Host "$($models.$num.Name)" -ForegroundColor Yellow
     }
     
     do {
         $num = Read-Host "Enter a number"
     } while ($num -notin $selectedModels)
 
-    & ./$models.$num.BatName
+    $batFilePath = Join-Path -Path $PSScriptRoot -ChildPath $models.$num.BatName
+    Start-Process -FilePath cmd.exe -ArgumentList "/C $batFilePath"
 }
