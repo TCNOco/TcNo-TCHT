@@ -114,7 +114,7 @@ $selectedModels = @()
 
 # 2. Ask user what model they want
 do {
-   Clear-Host
+    Clear-Host
     Write-Host "What model do you want to download?" -ForegroundColor Cyan
     foreach ($key in ($models.Keys | Sort-Object)) {
         if ($key -in $selectedModels) { Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
@@ -196,7 +196,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 # 5. Run the webui
 Clear-Host
 if ($selectedModels.Count -eq 1) {
-    Start-Process ".\$($models.$selectedModels[0].BatName)"
+    & $models.$num.BatName
 } else {
     Write-Host "Which model would you like to launch?" -ForegroundColor Cyan
     foreach ($num in $selectedModels) {
