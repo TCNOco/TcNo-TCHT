@@ -40,6 +40,7 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
+Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 $TCHT = Get-TCHTPath
 
 # 1. Check if has oobabooga_windows directory ($TCHT\oobabooga_windows) (Default C:\TCHT\oobabooga_windows)
@@ -74,8 +75,10 @@ if ($toDownload) {
 
 # Run the oobabooga updater
 if (Test-Path -Path ./update_windows.bat) {
+    Clear-ConsoleScreen
     Write-Host "Updating Oobabooga...`n`n" -ForegroundColor Cyan
     ./update_windows.bat
+    Clear-ConsoleScreen
     Write-Host "Finished updating Oobabooga...`n`n" -ForegroundColor Cyan
 }
 
@@ -140,7 +143,8 @@ $selectedModels = @()
 
 # 3. Ask user what model they want
 do {
-    Write-Host "`n`n`n`nWhat model do you want to download?" -ForegroundColor Cyan
+    Clear-ConsoleScreen
+    Write-Host "What model do you want to download?" -ForegroundColor Cyan
     foreach ($key in ($models.Keys | Sort-Object)) {
         if ($key -in $selectedModels) { Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
         Write-Host -NoNewline "- $($models.$key.Name) $($models.$key.Size): " -ForegroundColor Red
@@ -155,6 +159,7 @@ do {
     Get-HuggingFaceRepo -Model $models.$num.Repo -OutputPath "text-generation-webui\models\$($models.$num.Repo -replace '/','_')"
 
     if ($selectedModels.Count -lt $models.Count) {
+        Clear-ConsoleScreen
         Write-Host "Done downloading model`n`n" -ForegroundColor Yellow
         $again = Read-Host "Do you want to download another model? (y/n)"
     } else {
@@ -202,8 +207,9 @@ function Deploy-Shortcut {
     New-Shortcut -ShortcutName $name -TargetPath $batFile -IconLocation 'mpt.ico'
 }
 
+Clear-ConsoleScreen
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "Do you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
 } while ($shortcuts -notin "Y", "y", "N", "n")
 
@@ -223,6 +229,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 }
 
 # 5. Run the webui
+Clear-ConsoleScreen
 if ($selectedModels.Count -eq 1) {
     $batFilePath = Join-Path -Path $PSScriptRoot -ChildPath $models.$selectedModels[0].BatName
     Start-Process -FilePath cmd.exe -ArgumentList "/C $batFilePath"
