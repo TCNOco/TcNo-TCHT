@@ -75,6 +75,7 @@ if ($toDownload) {
 if (Test-Path -Path ./update_windows.bat) {
     Write-Host "Updating Oobabooga...`n`n" -ForegroundColor Cyan
     ./update_windows.bat
+    Clear-Host
     Write-Host "Finished updating Oobabooga...`n`n" -ForegroundColor Cyan
 }
 
@@ -113,7 +114,7 @@ $selectedModels = @()
 
 # 2. Ask user what model they want
 do {
-    Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
+   Clear-Host
     Write-Host "What model do you want to download?" -ForegroundColor Cyan
     foreach ($key in ($models.Keys | Sort-Object)) {
         if ($key -in $selectedModels) { Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
@@ -129,7 +130,7 @@ do {
     Get-HuggingFaceRepo -Model $models.$num.Repo -OutputPath "text-generation-webui\models\$($models.$num.Repo -replace '/','_')" -SkipFiles $($models.$num.SkipFiles) -IncludeFiles $($models.$num.IncludeFiles)    
 
     if ($selectedModels.Count -lt $models.Count) {
-        Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
+       Clear-Host
         Write-Host "Done downloading model`n`n" -ForegroundColor Yellow
         $again = Read-Host "Do you want to download another model? (y/n)"
     } else {
@@ -137,7 +138,6 @@ do {
     }
 } while ($again -notin "N", "n")
 
-Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
 Write-Host "NOTE: Should you need less memory usage, see: https://github.com/oobabooga/text-generation-webui/wiki/Low-VRAM-guide" -ForegroundColor Green
 Write-Host "(These will be added to the .bat you're trying to run in the oobabooga_windows folder)" -ForegroundColor Green
 
@@ -172,7 +172,7 @@ function Deploy-Shortcut {
     New-Shortcut -ShortcutName $name -TargetPath $batFile -IconLocation 'wizardlm.ico'
 }
 
-Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
+Clear-Host
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "Do you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
@@ -194,7 +194,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 }
 
 # 5. Run the webui
-    Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
+Clear-Host
 if ($selectedModels.Count -eq 1) {
     Start-Process ".\$($models.$selectedModels[0].BatName)"
 } else {
