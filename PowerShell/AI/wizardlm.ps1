@@ -156,7 +156,7 @@ function New-WebUIBat {
 }
 
 # 3. Replace commands in the start-webui.bat file
-foreach ($num in $selectedModels) {
+foreach ($num in ($selectedModels | Sort-Object)) {
     Write-Host "Creating launcher: $num"
 
     $modelArgs = $models.$num.Args
@@ -187,7 +187,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/wizardlm.ico' -OutFile 'wizardlm.ico'
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
 
-    foreach ($num in $selectedModels) {
+    foreach ($num in ($selectedModels | Sort-Object)) {
         Write-Host "Creating shortcut: $num"
         Deploy-Shortcut -name $models.$num.ShortcutName -batFile $models.$num.BatName
     }
@@ -196,10 +196,10 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 # 5. Run the webui
 Clear-Host
 if ($selectedModels.Count -eq 1) {
-    & $models.$num.BatName
+    & ./$models.$num.BatName
 } else {
     Write-Host "Which model would you like to launch?" -ForegroundColor Cyan
-    foreach ($num in $selectedModels) {
+    foreach ($num in ($selectedModels | Sort-Object)) {
         Write-Host -NoNewline "$num - " -ForegroundColor Green
         Write-Host "Downloading $($models.$num.Name)" -ForegroundColor Yellow
     }
@@ -208,5 +208,5 @@ if ($selectedModels.Count -eq 1) {
         $num = Read-Host "Enter a number"
     } while ($num -notin $selectedModels)
 
-    & $models.$num.BatName
+    & ./$models.$num.BatName
 }

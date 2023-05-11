@@ -181,7 +181,7 @@ function New-WebUIBat {
 
 # 4. Replace commands in the start-webui.bat file
 $cpuOnly = Read-Host "The MPT models require a LOT of VRAM. As in a 3090+. Do you want to run in CPU-only mode? (Y/N)"
-foreach ($num in $selectedModels) {
+foreach ($num in ($selectedModels | Sort-Object)) {
     Write-Host "Creating launcher: $num"
 
     $modelArgs = $models.$num.Args
@@ -216,7 +216,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/mpt.ico' -OutFile 'mpt.ico'
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
 
-    foreach ($num in $selectedModels) {
+    foreach ($num in ($selectedModels | Sort-Object)) {
         Write-Host "Creating shortcut: $num"
         Deploy-Shortcut -name $models.$num.ShortcutName -batFile $models.$num.BatName
     }
@@ -227,7 +227,7 @@ if ($selectedModels.Count -eq 1) {
     Start-Process ".\$($models.$selectedModels[0].BatName)"
 } else {
     Write-Host "`nWhich model would you like to launch?" -ForegroundColor Cyan
-    foreach ($num in $selectedModels) {
+    foreach ($num in ($selectedModels | Sort-Object)) {
         Write-Host -NoNewline "$num - " -ForegroundColor Green
         Write-Host "Downloading $($models.$num.Name)" -ForegroundColor Yellow
     }
