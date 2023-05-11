@@ -92,7 +92,7 @@ $models = @{
         "BatName" = "start_wizardLM-7B-GPTQ.bat"
         "ShortcutName" = "WizardLM 7B - Oobabooga"
         "Args" = "--chat --model_type llama --wbits 4 --groupsize 128"
-        "SkipFiles" = @("wizardLM-7B-GPTQ-4bit.compat.no-act-order.safetensors")
+        "SkipFiles" = @("wizardLM-7B-GPTQ-4bit.compat.latest.act-order.safetensors")
     }
     "2" = @{
         "Name" = "WizardLM-7B-uncensored-GPTQ 4bit"
