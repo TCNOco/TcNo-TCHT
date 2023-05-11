@@ -52,7 +52,13 @@ function Get-HuggingFaceRepo {
         [string]$Model,
         
         [Parameter(Mandatory=$true)]
-        [string]$OutputPath
+        [string]$OutputPath,
+
+        [Parameter(Mandatory=$false)]
+        [string[]]$SkipFiles = @(),
+
+        [Parameter(Mandatory=$false)]
+        [string[]]$IncludeFiles = @()
     )
 
     # Allow importing remote functions
@@ -71,8 +77,35 @@ function Get-HuggingFaceRepo {
     $filenames = @()
     foreach ($file in $filesResponse.siblings) {
         $filename = Split-Path $file.rfilename -Leaf
-        $filenames += $filename
+        # Check each file against the SkipFiles array
+        $skip = $false
+        if ($SkipFiles.Count -gt 0) {
+            foreach ($skipFile in $SkipFiles) {
+                if ($filename -match $skipFile) {
+                    $skip = $true
+                    break
+                }
+            }
+        }
+        
+        # Check each file against the IncludeFiles array
+        $include = $true
+        if ($IncludeFiles.Count -gt 0) {
+            $include = $false
+            foreach ($includeFile in $IncludeFiles) {
+                if ($filename -match $includeFile) {
+                    $include = $true
+                    break
+                }
+            }
+        }
+
+        if (!$skip -and $include) {
+            $filenames += $filename
+        }
     }
 
     Get-Aria2Files -Url $fileDownloadUrl -OutputPath $OutputPath -Files $filenames
 }
+
+

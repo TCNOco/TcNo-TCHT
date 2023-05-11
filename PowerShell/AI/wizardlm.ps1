@@ -84,23 +84,24 @@ Import-FunctionIfNotExists -Command Get-HuggingFaceRepo -ScriptUri "Get-HuggingF
 $models = @{
     "1" = @{
         "Name" = "WizardLM-7B-GPTQ"
-        "Size" = "~13.30GB"
+        "Size" = "~7.78 GB"
         "Repo" = "TheBloke/wizardLM-7B-GPTQ"
         "BatName" = "start_wizardLM-7B-GPTQ.bat"
         "ShortcutName" = "WizardLM 7B - Oobabooga"
         "Args" = "--chat --model_type llama --wbits 4 --groupsize 128"
+        "SkipFiles" = @("wizardLM-7B-GPTQ-4bit.compat.no-act-order.safetensors")
     }
     "2" = @{
-        "Name" = "WizardLM-7B-uncensored"
-        "Size" = "~13.30GB"
+        "Name" = "WizardLM-7B-uncensored-GPTQ 4bit"
+        "Size" = "~3.89 GB"
         "Repo" = "TheBloke/WizardLM-7B-uncensored-GPTQ"
-        "BatName" = "start_WizardLM-7B-uncensored-GPTQ.bat"
-        "ShortcutName" = "WizardLM 7B Uncensored - Oobabooga"
+        "BatName" = "start_WizardLM-7B-uncensored-GPTQ-4bit.bat"
+        "ShortcutName" = "WizardLM 7B Uncensored 4bit - Oobabooga"
         "Args" = "--chat --model_type llama --wbits 4 --groupsize 128"
     }
     "3" = @{
         "Name" = "WizardLM 13B Uncensored 4bit 128g"
-        "Size" = "~13.30GB"
+        "Size" = "~7.45 GB"
         "Repo" = "ausboss/WizardLM-13B-Uncensored-4bit-128g"
         "BatName" = "start_WizardLM-13B-Uncensored-4bit-128g.bat"
         "ShortcutName" = "WizardLM 13B Uncensored - Oobabooga"
@@ -112,7 +113,8 @@ $selectedModels = @()
 
 # 2. Ask user what model they want
 do {
-    Write-Host "`n`n`n`nWhat model do you want to download?" -ForegroundColor Cyan
+    Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
+    Write-Host "What model do you want to download?" -ForegroundColor Cyan
     foreach ($key in ($models.Keys | Sort-Object)) {
         if ($key -in $selectedModels) { Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
         Write-Host -NoNewline "- $($models.$key.Name) $($models.$key.Size): " -ForegroundColor Red
@@ -124,9 +126,10 @@ do {
     } while ($num -notin $models.Keys)
     $selectedModels += $num
     Write-Host "Downloading $($models.$num.Name)" -ForegroundColor Yellow
-    Get-HuggingFaceRepo -Model $models.$num.Repo -OutputPath "text-generation-webui\models\$($models.$num.Repo -replace '/','_')"
+    Get-HuggingFaceRepo -Model $models.$num.Repo -OutputPath "text-generation-webui\models\$($models.$num.Repo -replace '/','_')" -SkipFiles $($models.$num.SkipFiles) -IncludeFiles $($models.$num.IncludeFiles)    
 
     if ($selectedModels.Count -lt $models.Count) {
+        Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
         Write-Host "Done downloading model`n`n" -ForegroundColor Yellow
         $again = Read-Host "Do you want to download another model? (y/n)"
     } else {
@@ -134,6 +137,7 @@ do {
     }
 } while ($again -notin "N", "n")
 
+Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
 Write-Host "NOTE: Should you need less memory usage, see: https://github.com/oobabooga/text-generation-webui/wiki/Low-VRAM-guide" -ForegroundColor Green
 Write-Host "(These will be added to the .bat you're trying to run in the oobabooga_windows folder)" -ForegroundColor Green
 
@@ -168,8 +172,9 @@ function Deploy-Shortcut {
     New-Shortcut -ShortcutName $name -TargetPath $batFile -IconLocation 'wizardlm.ico'
 }
 
+Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "Do you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
 } while ($shortcuts -notin "Y", "y", "N", "n")
 
@@ -189,10 +194,11 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 }
 
 # 5. Run the webui
+    Write-Host "`n" * $Host.UI.RawUI.WindowSize.Height | Out-Host
 if ($selectedModels.Count -eq 1) {
     Start-Process ".\$($models.$selectedModels[0].BatName)"
 } else {
-    Write-Host "`nWhich model would you like to launch?" -ForegroundColor Cyan
+    Write-Host "Which model would you like to launch?" -ForegroundColor Cyan
     foreach ($num in $selectedModels) {
         Write-Host -NoNewline "$num - " -ForegroundColor Green
         Write-Host "Downloading $($models.$num.Name)" -ForegroundColor Yellow
