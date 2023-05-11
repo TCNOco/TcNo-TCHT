@@ -232,7 +232,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 Clear-ConsoleScreen
 if (@($selectedModels).Count -eq 1) {
     # Run the only model by running the ".BatName"
-    $batFilePath = Join-Path -Path $PSScriptRoot -ChildPath $models.($selectedModels[0]).BatName
+    $batFilePath = $models.($selectedModels[0]).BatName
     Start-Process -FilePath cmd.exe -ArgumentList "/C $batFilePath"
 } else {
     Write-Host "Which model would you like to launch?" -ForegroundColor Cyan
@@ -246,6 +246,6 @@ if (@($selectedModels).Count -eq 1) {
     } while ($num -notin $selectedModels)
 
     # Run the selected model by running the ".BatName"
-    $batFilePath = Join-Path -Path $PSScriptRoot -ChildPath $models.$num.BatName
+    $batFilePath = $models.$num.BatName
     Start-Process -FilePath cmd.exe -ArgumentList "/C $batFilePath"
 }
