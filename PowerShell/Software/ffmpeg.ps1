@@ -74,3 +74,9 @@ switch ($selection) {
         Write-Host "Invalid selection. Please choose a valid option." -ForegroundColor Red
     }
 }
+
+ffmpeg -version
+
+Write-Host "`nThe above was returned after running 'ffmpeg -version" -ForegroundColor Green
+Write-Host "You should now be able to use 'ffmpeg' anywhere on your computer." -ForegroundColor Green
+Write-Host "To update in the future, run 'choco upgrade all -y'" -ForegroundColor Cyan
