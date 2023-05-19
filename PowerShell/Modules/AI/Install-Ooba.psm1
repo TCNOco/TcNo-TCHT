@@ -73,13 +73,13 @@ function Install-Ooba {
 
     # 2. Ask user about installation and create a modified installer
     Write-Host "What version do you want to install?" -ForegroundColor Cyan
-    if ((Get-WmiObject Win32_VideoController).Name -match "NVIDIA") {
+    if ((Get-CimInstance Win32_VideoController).Name -match "NVIDIA") {
         Write-Host "A) NVIDIA (Detected)" -ForegroundColor Cyan
     } else {
         Write-Host "A) NVIDIA" -ForegroundColor Cyan
     }
-
-    if ((Get-WmiObject Win32_VideoController).Name -match "AMD") {
+    
+    if ((Get-CimInstance Win32_VideoController).Name -match "AMD") {
         Write-Host "B) AMD (Detected)"
     } else {
         Write-Host "B) AMD" -ForegroundColor Cyan
