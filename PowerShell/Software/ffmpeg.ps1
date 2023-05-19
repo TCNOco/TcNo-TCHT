@@ -30,11 +30,14 @@ Write-Host "Welcome to TroubleChute's FFMPEG installer!" -ForegroundColor Cyan
 Write-Host "Chocolatey [package manager] and FFMPEG will now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-05-19]`n`n" -ForegroundColor Cyan
 
+Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+
 # 1. Install Chocolatey
 Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # 2. Install FFMPEG using Chocolatey
+Clear-ConsoleScreen
 Write-Host "Which FFMPEG would you like to install?" -ForegroundColor Cyan
 Write-Host -NoNewline "- FFMPEG: " -ForegroundColor Red
 Write-Host "1" -ForegroundColor Green
@@ -47,21 +50,27 @@ $selection = Read-Host "Enter the number corresponding to your choice"
 
 switch ($selection) {
     1 {
-        Write-Host "Installing FFMPEG..."
+        Clear-ConsoleScreen
+        Write-Host "Installing FFMPEG..." -ForegroundColor Cyan
         choco upgrade ffmpeg -y
+        Write-Host "Done." -ForegroundColor Green
         break
     }
     2 {
-        Write-Host "Installing FFMPEG-Shared..."
+        Clear-ConsoleScreen
+        Write-Host "Installing FFMPEG-Shared..." -ForegroundColor Cyan
         choco upgrade ffmpeg-shared -y
+        Write-Host "Done." -ForegroundColor Green
         break
     }
     3 {
-        Write-Host "Installing FFMPEG-Full..."
+        Clear-ConsoleScreen
+        Write-Host "Installing FFMPEG-Full..." -ForegroundColor Cyan
         choco upgrade ffmpeg-full -y
+        Write-Host "Done." -ForegroundColor Green
         break
     }
     default {
-        Write-Host "Invalid selection. Please choose a valid option."
+        Write-Host "Invalid selection. Please choose a valid option." -ForegroundColor Red
     }
 }

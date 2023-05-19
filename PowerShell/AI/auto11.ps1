@@ -94,7 +94,7 @@ if (-not ($condaFound)) {
     Catch {
         Write-Host "Python is not installed." -ForegroundColor Yellow
         Write-Host "`nInstalling Python 3.10.11." -ForegroundColor Cyan
-        choco upgrade python --version=3.10.11 -y
+        choco install python --version=3.10.11 -y
         Update-SessionEnvironment
     }
 
