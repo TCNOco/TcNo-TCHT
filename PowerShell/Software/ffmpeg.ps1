@@ -47,7 +47,7 @@ Write-Host "2" -ForegroundColor Green
 Write-Host -NoNewline "- FFMPEG-Full [This has the most codecs]: " -ForegroundColor Red
 Write-Host "3" -ForegroundColor Green
 
-$selection = Read-Host "Enter the number corresponding to your choice"
+$selection = Read-Host "Enter a number"
 
 switch ($selection) {
     1 {
