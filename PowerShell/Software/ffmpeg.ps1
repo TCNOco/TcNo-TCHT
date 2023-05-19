@@ -30,6 +30,7 @@ Write-Host "Welcome to TroubleChute's FFMPEG installer!" -ForegroundColor Cyan
 Write-Host "Chocolatey [package manager] and FFMPEG will now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-05-19]`n`n" -ForegroundColor Cyan
 
+iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 
 # 1. Install Chocolatey
