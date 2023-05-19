@@ -120,7 +120,7 @@ if (-not ($condaFound)) {
 if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
     Write-Host "`nFFMPEG is not installed. Installing..." -ForegroundColor Cyan
 
-    choco install ffmpeg -y
+    choco upgrade ffmpeg -y
     Update-SessionEnvironment
 }
 
@@ -145,7 +145,7 @@ try {
             if (-not (Get-Command nvcc -ErrorAction SilentlyContinue)) {
                 Write-Host "`nCUDA is not installed. Installing..." -ForegroundColor Cyan
             
-                choco install cuda -y
+                choco upgrade cuda -y
                 Update-SessionEnvironment
             }
         }

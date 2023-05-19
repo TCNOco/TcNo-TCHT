@@ -47,7 +47,7 @@ function Initialize-Aria2 {
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
         # 2. Install aria2
         Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
-        choco install aria2 -y
+        choco upgrade aria2 -y
 
         if (-not (Get-Command Update-SessionEnvironment -ErrorAction SilentlyContinue)) {
             # Import function to reload without needing to re-open Powershell

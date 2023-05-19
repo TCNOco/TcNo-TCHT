@@ -50,7 +50,7 @@ iex (irm refreshenv.tc.ht)
 
 # 4. Before downloading the model, we'll install aria2c to make the download MUCH faster
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
-choco install aria2 -y
+choco upgrade aria2 -y
 Update-SessionEnvironment
 
 # 5. Download the GPT4All Lora model
@@ -59,7 +59,7 @@ aria2c -x 8 -s 8 --disable-ipv6 --continue --out="./gpt4all/chat/gpt4all-lora-qu
 
 # 6. Install VCRedist (if missing any)
 Write-Host "`nInstalling required VCRuntimes..." -ForegroundColor Cyan
-choco install vcredist2015 -y
+choco upgrade vcredist2015 -y
 
 iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
 Import-RemoteFunction -ScriptUri "New-Shortcut.tc.ht" # Import function to create a shortcut

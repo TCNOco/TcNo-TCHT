@@ -49,7 +49,7 @@ iex (irm install-git.tc.ht)
 
 # 3. Install aria2c to make the model downloads MUCH faster
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
-choco install aria2 -y
+choco upgrade aria2 -y
 Update-SessionEnvironment
 
 # 4. Check if Conda or Python is installed
@@ -94,7 +94,7 @@ if (-not ($condaFound)) {
     Catch {
         Write-Host "Python is not installed." -ForegroundColor Yellow
         Write-Host "`nInstalling Python 3.10.11." -ForegroundColor Cyan
-        choco install python --version=3.10.11 -y
+        choco upgrade python --version=3.10.11 -y
         Update-SessionEnvironment
     }
 
