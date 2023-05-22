@@ -165,6 +165,7 @@ if (Test-Path -Path "$TCHT\privateGPT") {
     Set-Location "$TCHT\privateGPT"
 }
 
+Import-FunctionIfNotExists -Command Get-Aria2Files -ScriptUri "File-DownloadMethods.tc.ht"
 function Get-VincunaCPU13B {
     # Download Vicuna 13B
     Write-Host "Downloading Vicuna 13B" -ForegroundColor Yellow
