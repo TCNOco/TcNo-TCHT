@@ -49,6 +49,9 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
+# Import function to reload without needing to re-open Powershell
+iex (irm refreshenv.tc.ht)
+
 # 3. Installs Python should Python not be installed and > 3.8, or Conda
 $condaFound = Get-Command conda -ErrorAction SilentlyContinue
 if (-not $condaFound) {

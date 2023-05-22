@@ -50,6 +50,9 @@ iex (irm install-git.tc.ht)
 # 3. Install aria2c to make the model downloads MUCH faster
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
+
+# Import function to reload without needing to re-open Powershell
+iex (irm refreshenv.tc.ht)
 Update-SessionEnvironment
 
 # 4. Check if Conda or Python is installed
@@ -69,10 +72,10 @@ if ($condaFound) {
 
     do {
         Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda (y/n): "
-        $installWhisper = Read-Host
-    } while ($installWhisper -notin "Y", "y", "N", "n")
+        $useConda = Read-Host
+    } while ($useConda -notin "Y", "y", "N", "n")
     
-    if ($installWhisper -eq "y" -or $installWhisper -eq "Y") {
+    if ($useConda -eq "y" -or $useConda -eq "Y") {
         conda create -n a11 python=3.10.6 -y
         conda activate a11
     } else {

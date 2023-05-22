@@ -57,6 +57,9 @@ iex (irm install-git.tc.ht)
 git clone https://github.com/bmaltais/kohya_ss.git
 cd kohya_ss
 
+# Import function to reload without needing to re-open Powershell
+iex (irm refreshenv.tc.ht)
+
 # 4. Check if Conda or Python is installed
 # Check if Conda is installed
 $condaFound = Get-Command conda -ErrorAction SilentlyContinue
