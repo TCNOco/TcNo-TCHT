@@ -42,6 +42,8 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     Read-Host
 }
 
+# Allow importing remote functions
+iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 
 # 1. Install Chocolatey
@@ -63,8 +65,6 @@ Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cya
 choco upgrade aria2 -y
 Update-SessionEnvironment
 
-# Allow importing remote functions
-iex (irm Import-RemoteFunction.tc.ht)
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath
 
