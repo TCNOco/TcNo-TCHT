@@ -42,11 +42,15 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     Read-Host
 }
 
+Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+
 # 1. Install Chocolatey
+Clear-ConsoleScreen
 Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # 2. Install or update Git if not already installed
+Clear-ConsoleScreen
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
@@ -54,6 +58,7 @@ iex (irm install-git.tc.ht)
 iex (irm refreshenv.tc.ht)
 
 # 3. Install aria2c to make the model downloads MUCH faster
+Clear-ConsoleScreen
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
 Update-SessionEnvironment
@@ -75,8 +80,9 @@ if (-not $condaFound) {
 }
 
 # If conda found: create environment
+Clear-ConsoleScreen
 if ($condaFound) {
-    Write-Host "`n`nDo you want to install privateGPT in a Conda environment called 'pgpt'?`nYou'll need to use 'conda activate pgpt' before being able to use it?"-ForegroundColor Cyan
+    Write-Host "Do you want to install privateGPT in a Conda environment called 'pgpt'?`nYou'll need to use 'conda activate pgpt' before being able to use it?"-ForegroundColor Cyan
 
     do {
         Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda (y/n): "
@@ -139,6 +145,7 @@ if (-not ($condaFound)) {
 }
 
 # 5. Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
+Clear-ConsoleScreen
 if (Test-Path -Path "$TCHT\privateGPT") {
     Write-Host "The 'privateGPT' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\privateGPT"
@@ -268,6 +275,7 @@ if (Test-Path "example.env") {
 
 # 6. Download a model
 do {
+    Clear-ConsoleScreen
     Write-Host "Which model would you like to download and use:" -ForegroundColor Cyan
     Write-Host -NoNewline "Vicuna 13B: " -ForegroundColor Red
     Write-Host "1" -ForegroundColor Green
@@ -311,6 +319,7 @@ if ($choice -eq "1") {
 }
 
 # 7. Set up the models in env:
+Write-Host "Configuring privateGPT" -ForegroundColor Yellow
 $filePath = ".env"
 $content = Get-Content $filePath
 if ($choice -eq "7") {
@@ -337,6 +346,7 @@ if ($choice -eq "7") {
 Set-Content -Path $filePath -Value $updatedContent
 
 # 8. Create Launcher files
+Write-Host "Creating launcher files..." -ForegroundColor Yellow
 # - Updater
 $OutputFilePath = "update.bat"
 $OutputText = "@echo off`ngit pull"
@@ -376,7 +386,8 @@ if ($condaFound) {
 }
 
 # 9. Create desktop shortcuts?
-Write-Host "`n`nCreate desktop shortcuts for privateGPT?" -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Create desktop shortcuts for privateGPT?" -ForegroundColor Cyan
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
@@ -396,5 +407,6 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 }
 
 # 10. Launch privateGPT
-Write-Host "`n`nLaunching privateGPT!" -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Launching privateGPT!" -ForegroundColor Cyan
 ./run-privategpt.bat
