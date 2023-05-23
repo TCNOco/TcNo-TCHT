@@ -187,7 +187,7 @@ function Get-VincunaUncensoredCPU13B {
     $outputPath = "models"
     Write-Host "Downloading: eachadea/ggml-vicuna-13b-1.1 (CPU model)" -ForegroundColor Cyan
     $files = @(
-        "ggml-vic13b-uncensored-q5_1.bin"
+        "ggml-vic13b-uncensored-q4_0.bin"
     )
 
     Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
@@ -201,7 +201,7 @@ function Get-VicunaCPU7B {
     $outputPath = "models"
     Write-Host "Downloading: eachadea/ggml-vicuna-7b-1.1 (CPU model)" -ForegroundColor Cyan
     $files = @(
-        "ggml-vic7b-q5_1.bin"
+        "ggml-vic7b-q4_0.bin"
     )
 
     Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
@@ -215,7 +215,7 @@ function Get-VicunaUncensoredCPU7B {
     $outputPath = "models"
     Write-Host "Downloading: eachadea/ggml-vicuna-7b-1.1 (CPU model)" -ForegroundColor Cyan
     $files = @(
-        "ggml-vic7b-uncensored-q5_1.bin"
+        "ggml-vic7b-uncensored-q4_0.bin"
     )
 
     Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
@@ -229,7 +229,7 @@ function Get-KoalaCPU7B {
     $outputPath = "models"
     Write-Host "Downloading: TheBloke/koala-7B-GGML(CPU model)" -ForegroundColor Cyan
     $files = @(
-        "koala-7B.ggmlv3.q5_1.bin"
+        "koala-7B.ggmlv3.q4_0.bin"
     )
 
     Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
@@ -243,7 +243,7 @@ function Get-KoalaCPU13B {
     $outputPath = "models"
     Write-Host "Downloading: TheBloke/koala-13B-GGML(CPU model)" -ForegroundColor Cyan
     $files = @(
-        "koala-13B.ggmlv3.q5_1.bin"
+        "koala-13B.ggmlv3.q4_0.bin"
     )
 
     Get-Aria2Files -Url $blob -OutputPath $outputPath -Files $files
@@ -301,22 +301,22 @@ if ($choice -eq "1") {
     $modelFile = "ggml-vic13b-q5_1.bin"
 } elseif ($choice -eq "2") {
     Get-VincunaUncensoredCPU13B
-    $modelFile = "ggml-vic13b-uncensored-q5_1.bin"
+    $modelFile = "ggml-vic13b-uncensored-q4_0.bin"
 } elseif ($choice -eq "3") {
     Get-VicunaCPU7B
-    $modelFile = "ggml-vic7b-q5_1.bin"
+    $modelFile = "ggml-vic7b-q4_0.bin"
 } elseif ($choice -eq "4") {
     Get-VicunaUncensoredCPU7B
-    $modelFile = "ggml-vic7b-uncensored-q5_1.bin"
+    $modelFile = "ggml-vic7b-uncensored-q4_0.bin"
 } elseif ($choice -eq "5") {
     Get-KoalaCPU7B
-    $modelFile = "koala-7B.ggmlv3.q5_1.bin"
+    $modelFile = "koala-7B.ggmlv3.q4_0.bin"
 } elseif ($choice -eq "6") {
     Get-KoalaCPU13B
-    $modelFile = "koala-13B.ggmlv3.q5_1.bin"
+    $modelFile = "koala-13B.ggmlv3.q4_0.bin"
 } elseif ($choice -eq "7") {
     Get-Gpt4All
-    $modelFile = "koala-13B.ggmlv3.q5_1.bin"
+    $modelFile = "koala-13B.ggmlv3.q4_0.bin"
 }
 
 # 7. Set up the models in env:
