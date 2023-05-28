@@ -48,14 +48,20 @@ function Get-CondaPath {
     # Define the file paths to check
     $filePaths1 = @(
         "C:\ProgramData\anaconda3\shell\condabin\conda-hook.ps1",
-        "C:\ProgramData\miniconda3\shell\condabin\conda-hook.ps1"
+        "C:\ProgramData\miniconda3\shell\condabin\conda-hook.ps1",
+        "$env:USERPROFILE\anaconda3\shell\condabin\conda-hook.ps1"
+        "$env:USERPROFILE\miniconda3\shell\condabin\conda-hook.ps1"
     )
 
     $filePaths2 = @(
         "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt.lnk",
         "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3\Anaconda Powershell Prompt.lnk",
+        "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt.lnk",
+        "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Anaconda3\Anaconda Powershell Prompt.lnk",
         "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Miniconda3 (64-bit)\Anaconda Powershell Prompt (miniconda3).lnk",
         "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Miniconda3\Anaconda Powershell Prompt (miniconda3).lnk"
+        "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Miniconda3 (64-bit)\Anaconda Powershell Prompt (miniconda3).lnk",
+        "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Miniconda3\Anaconda Powershell Prompt (miniconda3).lnk"
     )
 
     # Check if any of the first set of file paths exist
