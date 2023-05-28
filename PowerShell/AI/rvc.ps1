@@ -23,17 +23,18 @@
 # 1. Install Chocolatey
 # 2. Install or update Git if not already installed
 # 3. Install FFMPEG if not already registered with PATH
-# 4. Install aria2c to make the model downloads MUCH faster
-# 5. Check if Conda or Python is installed
-# 6. Check if has rvc directory ($TCHT\Retrieval-based-Voice-Conversion-WebUI) (Default C:\TCHT\Retrieval-based-Voice-Conversion-WebUI)
-# 7. Download required files/models:
+# 4. Install VCRedist (if missing any)
+# 5. Install aria2c to make the model downloads MUCH faster
+# 6. Check if Conda or Python is installed
+# 7. Check if has rvc directory ($TCHT\Retrieval-based-Voice-Conversion-WebUI) (Default C:\TCHT\Retrieval-based-Voice-Conversion-WebUI)
+# 8. Download required files/models:
 # - Install 7zip
 # - Download file
 # - Extract file
-# 8. Install PyTorch and requirements:
-# 9. Create launcher files
-# 10. Create shortcuts
-# 11. Launch
+# 9. Install PyTorch and requirements:
+# 10. Create launcher files
+# 11. Create shortcuts
+# 12. Launch
 # ----------------------------------------
 
 Write-Host "Welcome to TroubleChute's Retrieval-based Voice Conversion WebUI installer!" -ForegroundColor Cyan
@@ -71,7 +72,11 @@ if (-not $ffmpegFound) {
     Write-Host "Done." -ForegroundColor Green
 }
 
-# 4. Install aria2c to make the model downloads MUCH faster
+# 4. Install VCRedist (if missing any)
+Write-Host "`nInstalling required VCRuntimes..." -ForegroundColor Cyan
+choco upgrade vcredist2015 -y
+
+# 5. Install aria2c to make the model downloads MUCH faster
 Clear-ConsoleScreen
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
@@ -80,7 +85,7 @@ Update-SessionEnvironment
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath
 
-# 5. Check if Conda or Python is installed
+# 6. Check if Conda or Python is installed
 # Check if Conda is installed
 $condaFound = Get-Command conda -ErrorAction SilentlyContinue
 iex (irm Get-CondaPath.tc.ht)
@@ -155,7 +160,7 @@ if (-not ($condaFound)) {
     }
 }
 
-# 6. Check if has rvc directory ($TCHT\Retrieval-based-Voice-Conversion-WebUI) (Default C:\TCHT\Retrieval-based-Voice-Conversion-WebUI)
+# 7. Check if has rvc directory ($TCHT\Retrieval-based-Voice-Conversion-WebUI) (Default C:\TCHT\Retrieval-based-Voice-Conversion-WebUI)
 Clear-ConsoleScreen
 if (Test-Path -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI") {
     Write-Host "The 'Retrieval-based-Voice-Conversion-WebUI' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
@@ -176,7 +181,7 @@ if (Test-Path -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI") {
     Set-Location "$TCHT\Retrieval-based-Voice-Conversion-WebUI"
 }
 
-# 7. Download required files/models:
+# 8. Download required files/models:
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
 
 # - Install 7zip
@@ -201,22 +206,25 @@ $sourcefile = "RVC-beta.7z"
 7z x $sourcefile -y
 
 
-# 8. Install PyTorch and requirements:
+# 9. Install PyTorch and requirements:
 if ($condaFound) {
     # For some reason conda NEEDS to be deactivated and reactivated to use pip reliably... Otherwise python and pip are not found.
     conda deactivate
     #Open-Conda
     conda activate rvc
+    conda install -c conda-forge faiss -y
     pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     pip install -r requirements.txt
 } else {
     &$python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     &$python -m pip install -r requirements.txt
+    &$python -m pip uninstall faiss-cpu
+    &$python -m pip install faiss-cpu
     Update-SessionEnvironment
 }
 
 
-# 9. Create launcher files
+# 10. Create launcher files
 Write-Host "Creating launcher files..." -ForegroundColor Yellow
 # - Updater
 $OutputFilePath = "update.bat"
@@ -243,7 +251,7 @@ if ($condaFound) {
 }
 
 
-# 10. Create shortcuts
+# 11. Create shortcuts
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for RVC?" -ForegroundColor Cyan
 do {
@@ -264,7 +272,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
-# 11. Launch
+# 12. Launch
 Clear-ConsoleScreen
 Write-Host "Launching Retrieval-based Voice Conversion WebUI!" -ForegroundColor Cyan
 ./run-rvc.bat
