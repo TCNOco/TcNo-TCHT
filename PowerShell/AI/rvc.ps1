@@ -83,10 +83,9 @@ $TCHT = Get-TCHTPath
 # 5. Check if Conda or Python is installed
 # Check if Conda is installed
 $condaFound = Get-Command conda -ErrorAction SilentlyContinue
+iex (irm Get-CondaPath.tc.ht)
 if (-not $condaFound) {
     # Try checking if conda is installed a little deeper... (May not always be activated for user)
-    # Allow importing remote functions
-    iex (irm Get-CondaPath.tc.ht)
     $condaFound = Open-Conda # This checks for Conda, returns true if conda is hoooked
     Update-SessionEnvironment
 }
