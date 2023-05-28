@@ -202,8 +202,18 @@ $sourcefile = "RVC-beta.7z"
 
 
 # 8. Install PyTorch and requirements:
-&$python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-&$python -m pip install -r requirements.txt
+if ($condaFound) {
+    # For some reason conda NEEDS to be deactivated and reactivated to use pip reliably... Otherwise python and pip are not found.
+    conda deactivate
+    #Open-Conda
+    conda activate rvc
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    pip install -r requirements.txt
+} else {
+    &$python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    &$python -m pip install -r requirements.txt
+    Update-SessionEnvironment
+}
 
 
 # 9. Create launcher files
