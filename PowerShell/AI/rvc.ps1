@@ -106,6 +106,7 @@ if ($condaFound) {
     } while ($useConda -notin "Y", "y", "N", "n")
     
     if ($useConda -eq "y" -or $useConda -eq "Y") {
+        conda remove -n rvc --all -y
         conda create -n rvc python=3.10.6 -y
         conda activate rvc
     } else {
@@ -202,8 +203,10 @@ Get-Aria2File -Url $url -OutputPath $outputPath
 
 # - Extract file
 Write-Host "Extracting the latest required models (RVC-beta.7z)" -ForegroundColor Yellow
-$sourcefile = "RVC-beta.7z"
-7z x $sourcefile -y
+7z x $outputPath -y
+$sourceFolder = (Get-ChildItem -Directory -Filter "RVC-beta*" | Select-Object -Last 1).FullName
+Get-ChildItem -Path $sourceFolder -Recurse -File | Move-Item -Destination (Get-Location) -Force
+Remove-Item -Path $sourceFolder -Recurse -Force
 
 
 # 9. Install PyTorch and requirements:
