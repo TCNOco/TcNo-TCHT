@@ -192,7 +192,7 @@ if (-not $sevenZipFound) {
     choco upgrade 7zip.install -y
     Write-Host "Done." -ForegroundColor Green
 }
-refreshenv
+Update-SessionEnvironment
 
 # - Download file
 Clear-ConsoleScreen
@@ -204,15 +204,19 @@ Get-Aria2File -Url $url -OutputPath $outputPath
 # - Extract file
 Write-Host "Extracting the latest required models (RVC-beta.7z)" -ForegroundColor Yellow
 7z x $outputPath -y
-$sourceFolder = (Get-ChildItem -Directory -Filter "RVC-beta*" | Select-Object -Last 1).FullName
-Get-ChildItem -Path $sourceFolder -Recurse -File | Move-Item -Destination (Get-Location) -Force
-Remove-Item -Path $sourceFolder -Recurse -Force
-
+$source = (Get-ChildItem -Directory -Filter "RVC-beta*" | Select-Object -Last 1).FullName
+$destination = (Get-Location)
+# Recursively move files and folders
+Write-Host "Moving files..." -ForegroundColor Yellow
+Copy-Item $source\* -Destination $destination -Force -Recurse
+Write-Host "Deleting duplicate files..." -ForegroundColor Yellow
+Remove-Item -Path $source -Recurse -Force
 
 # 9. Install PyTorch and requirements:
 if ($condaFound) {
     # For some reason conda NEEDS to be deactivated and reactivated to use pip reliably... Otherwise python and pip are not found.
     conda deactivate
+    Update-SessionEnvironment
     #Open-Conda
     conda activate rvc
     conda install -c conda-forge faiss -y
