@@ -25,6 +25,8 @@
 # NOTE: This can't automatically re-run the one-line installer command as that usually requires admin.
 # ----------------------------------------
 
+$Host.UI.RawUI.WindowTitle = '%PROGRAMNAME%'
+
 Write-Host "-----------------------------------------" -ForegroundColor Cyan
 Write-Host "TroubleChute %PROGRAMNAME% One-Line Launcher" -ForegroundColor Cyan
 Write-Host "https://tc.ht/ & YouTube.com/TroubleChute" -ForegroundColor Cyan
@@ -89,7 +91,7 @@ Write-Host "--------------------------------" -ForegroundColor Cyan
 if ($LASTEXITCODE -eq 1){
     Write-Host "Python exited with an error code." -ForegroundColor Red
     do {
-        Write-Host -ForegroundColor Cyan -NoNewline "Did you see something about 'ModuleNotFound above'? (y/n): "
+        Write-Host -ForegroundColor Cyan -NoNewline "Did you see something about 'ModuleNotFoundError' above? (y/n): "
         $reinstall = Read-Host
     } while ($reinstall -notin "Y", "y", "N", "n")
 
@@ -98,6 +100,7 @@ if ($LASTEXITCODE -eq 1){
         
         %REINSTALLCOMMAND%
 
+        Write-Host "`n`nIf you see any errors about 'access' in installing required packages above, please run this program as Administrator." -ForegroundColor Cya
         Write-Host "`nTrying to launch again!`nAssuming you get another ModuleNotFound error consider running the one-line installer again or contacting the software's developer.`n--------------------------------`n" -ForegroundColor Cyan
 
         %RUNCOMMAND%

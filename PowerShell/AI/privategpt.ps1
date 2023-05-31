@@ -355,35 +355,40 @@ Set-Content -Path $OutputFilePath -Value $OutputText
 
 if ($condaFound) {
     # As the Windows Target path can only have 260 chars, we easily hit that limit... (Shortcuts) and some users don't know about running ps1 files.
-    $condaPath = Get-CondaPath
-    # - Ingest
-    $OutputFilePath = "ingest.bat"
-    $OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"ingest.ps1`""
-    Set-Content -Path $OutputFilePath -Value $OutputText
+    $condaPath = "`"$(Get-CondaPath)`""
+    $CondaEnvironmentName = "pgpt"
+    $InstallLocation = "`"$TCHT\privateGPT`""
+    $ReinstallCommand = "python -m pip install -r requirements.txt`npython -m pip install requests 'urllib3<2'"
 
-    $OutputFilePath = "ingest.ps1"
-    $OutputText = "& '$condaPath'`nconda activate pgpt`nSet-Location `"$(Get-Location)`"`npython ingest.py"
-    Set-Content -Path $OutputFilePath -Value $OutputText
+    # - Ingest
+    $ProgramName = "privateGPT Ingest"
+    $RunCommand = "python ingest.py"
+    $LauncherName = "ingest"
+    
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
 
     # - Run PrivateGPT
-    $OutputFilePath = "run-privategpt.bat"
-    $OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"run-privategpt.ps1`""
-    Set-Content -Path $OutputFilePath -Value $OutputText
+    $ProgramName = "privateGPT"
+    $RunCommand = "python privateGPT.py"
+    $LauncherName = "run-privategpt"
+    
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
 
-    $OutputFilePath = "run-privategpt.ps1"
-    $OutputText = "& '$condaPath'`nconda activate pgpt`nSet-Location `"$(Get-Location)`"`npython privateGPT.py"
-    Set-Content -Path $OutputFilePath -Value $OutputText
 } else {
+    $InstallLocation = "`"$TCHT\privateGPT`""
+    $ReinstallCommand = "python -m pip install -r requirements.txt`npython -m pip install requests `"urllib3<2`""
+
     # - Ingest
-    $OutputFilePath = "ingest.bat"
-    $OutputText = "@echo off`npython ingest.py"
-    Set-Content -Path $OutputFilePath -Value $OutputText
+    $ProgramName = "privateGPT Ingest"
+    $RunCommand = "python ingest.py"
+    $LauncherName = "ingest"
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 
     # - Run PrivateGPT
-    $OutputFilePath = "run-privategpt.bat"
-    $OutputText = "@echo off`npython privateGPT.py"
-    Set-Content -Path $OutputFilePath -Value $OutputText
-
+    $ProgramName = "privateGPT"
+    $RunCommand = "python privateGPT.py"
+    $LauncherName = "run-privategpt"
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 }
 
 # 9. Create desktop shortcuts?
@@ -409,5 +414,5 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 
 # 10. Launch privateGPT
 Clear-ConsoleScreen
-Write-Host "Launching privateGPT!" -ForegroundColor Cyan
+Write-Host "Launching privateGPT!`n" -ForegroundColor Cyan
 ./run-privategpt.bat

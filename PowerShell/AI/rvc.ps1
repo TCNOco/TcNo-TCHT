@@ -220,8 +220,8 @@ if ($condaFound) {
     #Open-Conda
     conda activate rvc
     conda install -c conda-forge faiss -y
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    pip install -r requirements.txt
+    python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    python -m pip install -r requirements.txt
 } else {
     &$python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     &$python -m pip install -r requirements.txt
@@ -240,21 +240,25 @@ Set-Content -Path $OutputFilePath -Value $OutputText
 
 if ($condaFound) {
     # As the Windows Target path can only have 260 chars, we easily hit that limit... (Shortcuts) and some users don't know about running ps1 files.
-    $condaPath = Get-CondaPath
-    # - Run RVC
-    $OutputFilePath = "run-rvc.bat"
-    $OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"run-rvc.ps1`""
-    Set-Content -Path $OutputFilePath -Value $OutputText
+    $condaPath = "`"$(Get-CondaPath)`""
+    $CondaEnvironmentName = "rvc"
+    $InstallLocation = "`"$(Get-Location)`""
+    $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu"
 
-    $OutputFilePath = "run-rvc.ps1"
-    $OutputText = "& '$condaPath'`nconda activate rvc`nSet-Location `"$(Get-Location)`"`npython infer-web.py"
-    Set-Content -Path $OutputFilePath -Value $OutputText
+    $ProgramName = "Retrieval-based Voice Conversion WebUI"
+    $RunCommand = "python infer-web.py"
+    $LauncherName = "run-rvc"
+    
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
 } else {
-    # - Run RVC
-    $OutputFilePath = "run-rvc.bat"
-    $OutputText = "@echo off`npython infer-web.py"
-    Set-Content -Path $OutputFilePath -Value $OutputText
+    $InstallLocation = "`"$(Get-Location)`""
+    $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu"
 
+    $ProgramName = "Retrieval-based Voice Conversion WebUI"
+    $RunCommand = "python infer-web.py"
+    $LauncherName = "run-rvc"
+
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 }
 
 

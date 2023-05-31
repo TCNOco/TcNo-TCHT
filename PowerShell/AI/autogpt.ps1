@@ -254,22 +254,35 @@ if (-not [String]::IsNullOrEmpty($hfApi)) {
 $condaPath = Get-CondaPath
 # %windir%\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy ByPass -NoExit -Command "& 'C:\ProgramData\miniconda3\shell\condabin\conda-hook.ps1' ; conda activate 'C:\ProgramData\miniconda3' "
 
+iex (irm Import-RemoteFunction.tc.ht)
+Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+
 # 7. Create a desktop shortcut
 # Create start bat and ps1 files
 if ($condaFound) {
     # As the Windows Target path can only have 260 chars, we easily hit that limit...
-    $OutputFilePath = "start.ps1"
-    $OutputText = "`$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`n& '$condaPath'`nconda activate autogpt`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
-    Set-Content -Path $OutputFilePath -Value $OutputText
-} else {
-    $OutputFilePath = "start.ps1"
-    $OutputText = "`$Host.UI.RawUI.WindowTitle = 'Auto-GPT'`nSet-Location `"$(Get-Location)`"`npython -m autogpt"
-    Set-Content -Path $OutputFilePath -Value $OutputText
-}
+    $condaPath = "`"$(Get-CondaPath)`""
+    $CondaEnvironmentName = "autogpt"
+    $InstallLocation = "`"$(Get-Location)`""
+    $ReinstallCommand = "python -m pip install -r requirements.txt"
 
-$OutputFilePath = "start.bat"
-$OutputText = "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"start.ps1`""
-Set-Content -Path $OutputFilePath -Value $OutputText
+    $ProgramName = "Auto-GPT"
+    $RunCommand = "python -m autogpt"
+    $LauncherName = "start"
+    
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
+
+
+} else {
+    $InstallLocation = "`"$(Get-Location)`""
+    $ReinstallCommand = "python -m pip install -r requirements.txt"
+
+    $ProgramName = "Auto-GPT"
+    $RunCommand = "python -m autogpt"
+    $LauncherName = "start"
+
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
+}
 
 # Create shortcut
 do {
@@ -279,7 +292,6 @@ do {
 
 if ($createShortcut -in "Y", "y") {
     # Create desktop shortcut
-    iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
     Import-RemoteFunction -ScriptUri "New-Shortcut.tc.ht" # Import function to create a shortcut
     
     Write-Host "Downloading Auto-GPT icon (not official)..."
