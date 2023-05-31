@@ -43,17 +43,17 @@ function New-LauncherWithErrorHandling {
         [Parameter(Mandatory=$true)] [string]$RunCommand,
         [Parameter(Mandatory=$true)] [string]$ReinstallCommand,
         [Parameter()] [string]$CondaPath,
-        [Parameter()] [string]$CondaEnvironmentName
+        [Parameter()] [string]$CondaEnvironmentName,
+        [Parameter()] [string]$LauncherName = "Launcher.ps1"
     )
 
     if ($CondaPath) {
-        Invoke-WebRequest -Uri "https://scriptlauncher-conda.tc.ht/" -OutFile "Launcher.ps1"
+        Invoke-WebRequest -Uri "https://scriptlauncher-conda.tc.ht/" -OutFile $LauncherName
     } else {
-        Invoke-WebRequest -Uri "https://scriptlauncher.tc.ht/" -OutFile "Launcher.ps1"
+        Invoke-WebRequest -Uri "https://scriptlauncher.tc.ht/" -OutFile $LauncherName
     }
 
-    $filePath = "Launcher.ps1"
-    $content = Get-Content $filePath
+    $content = Get-Content $LauncherName
     $content = $content -replace '%PROGRAMNAME%', $ProgramName -replace '%INSTALLLOCATION%', $InstallLocation -replace '%RUNCOMMAND%', $RunCommand -replace '%REINSTALLCOMMAND%', $ReinstallCommand
     if ($CondaPath) {
         $content = $content -replace '%CONDAPATH%', $CondaPath
@@ -62,5 +62,5 @@ function New-LauncherWithErrorHandling {
         $content = $content -replace '%CONDAENVIRONMENTNAME%', $CondaEnvironmentName
     }
     
-    $content | Set-Content $filePath
+    $content | Set-Content $LauncherName
 }
