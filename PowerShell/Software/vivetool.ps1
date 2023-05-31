@@ -109,8 +109,7 @@ if ($vivetool -eq "1") {
     Write-Host "To update in the future, you can run this install script again, or update in-app." -ForegroundColor Cyan
     Write-Host "Your ViVeTool is located HERE: $TCHT\ViVeTool" -ForegroundColor Cyan
 
-    Write-Host "`nPress any key to exit..."
-    [void]($host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown"))
+    Read-Host "`nPress any key to exit..."
     exit
 } elseif ($vivetool -eq "2") {
     if (!(Test-Path -Path "$TCHT\ViVeTool-GUI")) {
@@ -178,7 +177,6 @@ if ($vivetool -eq "1") {
         ./ViVeTool_GUI.exe
     }
 
-    Write-Host "`nPress any key to exit..."
-    [void]($host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown"))
+    Read-Host "`nPress any key to exit..."
     exit
 }
