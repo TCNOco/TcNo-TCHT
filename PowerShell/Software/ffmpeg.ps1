@@ -19,7 +19,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ----------------------------------------
-# This script lets you install AutoGPT in an even faster, easier way.
+# This script lets you install FFMPEG in an even faster, easier way.
 # The installation is already super simple, but this is next-level.
 # This script:
 # 1. Install Chocolatey
