@@ -35,3 +35,32 @@ function Clear-ConsoleScreen {
 
     $e = [char]27; Write-Host "$e[2J$e[H" -NoNewline
 }
+
+function New-LauncherWithErrorHandling {
+    param(
+        [Parameter(Mandatory=$true)] [string]$ProgramName,
+        [Parameter(Mandatory=$true)] [string]$InstallLocation,
+        [Parameter(Mandatory=$true)] [string]$RunCommand,
+        [Parameter(Mandatory=$true)] [string]$ReinstallCommand,
+        [Parameter()] [string]$CondaPath,
+        [Parameter()] [string]$CondaEnvironmentName
+    )
+
+    if ($CondaPath) {
+        Invoke-WebRequest -Uri "https://scriptlauncher-conda.tc.ht/" -OutFile "Launcher.ps1"
+    } else {
+        Invoke-WebRequest -Uri "https://scriptlauncher.tc.ht/" -OutFile "Launcher.ps1"
+    }
+
+    $filePath = "Launcher.ps1"
+    $content = Get-Content $filePath
+    $content = $content -replace '%PROGRAMNAME%', $ProgramName -replace '%INSTALLLOCATION%', $InstallLocation -replace '%RUNCOMMAND%', $RunCommand -replace '%REINSTALLCOMMAND%', $ReinstallCommand
+    if ($CondaPath) {
+        $content = $content -replace '%CONDAPATH%', $CondaPath
+    }
+    if ($CondaEnvironmentName) {
+        $content = $content -replace '%CONDAENVIRONMENTNAME%', $CondaEnvironmentName
+    }
+    
+    $content | Set-Content $filePath
+}
