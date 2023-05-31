@@ -44,16 +44,16 @@ function New-LauncherWithErrorHandling {
         [Parameter(Mandatory=$true)] [string]$ReinstallCommand,
         [Parameter()] [string]$CondaPath,
         [Parameter()] [string]$CondaEnvironmentName,
-        [Parameter()] [string]$LauncherName = "Launcher.ps1"
+        [Parameter()] [string]$LauncherName = "Launcher"
     )
 
     if ($CondaPath) {
-        Invoke-WebRequest -Uri "https://scriptlauncher-conda.tc.ht/" -OutFile $LauncherName
+        Invoke-WebRequest -Uri "https://scriptlauncher-conda.tc.ht/" -OutFile "$LauncherName.ps1"
     } else {
-        Invoke-WebRequest -Uri "https://scriptlauncher.tc.ht/" -OutFile $LauncherName
+        Invoke-WebRequest -Uri "https://scriptlauncher.tc.ht/" -OutFile "$LauncherName.ps1"
     }
 
-    $content = Get-Content $LauncherName
+    $content = Get-Content "$LauncherName.ps1"
     $content = $content -replace '%PROGRAMNAME%', $ProgramName -replace '%INSTALLLOCATION%', $InstallLocation -replace '%RUNCOMMAND%', $RunCommand -replace '%REINSTALLCOMMAND%', $ReinstallCommand
     if ($CondaPath) {
         $content = $content -replace '%CONDAPATH%', $CondaPath
@@ -62,5 +62,8 @@ function New-LauncherWithErrorHandling {
         $content = $content -replace '%CONDAENVIRONMENTNAME%', $CondaEnvironmentName
     }
     
-    $content | Set-Content $LauncherName
+    $content | Set-Content "$LauncherName.ps1"
+
+    # Create bat launcher for those who like batch files (or don't know what ps1 files are)
+    Set-Content -Path "$LauncherName.bat" -Value "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$LauncherName.ps1`""
 }
