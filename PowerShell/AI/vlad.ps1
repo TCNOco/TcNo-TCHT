@@ -155,21 +155,19 @@ Clear-ConsoleScreen
 if ((Test-Path -Path "$TCHT\vladmandic") -and -not $isSymlink) {
     Write-Host "The 'vladmandic' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\vladmandic"
-    git clone https://github.com/vladmandic/automatic.git vladmandic
     git pull
 } else {
     Write-Host "I'll start by installing Vladmandic SD.Next first, then we'll get to the models...`n`n"
     
-    if (!(Test-Path -Path "$TCHT")) {
-        New-Item -ItemType Directory -Path "$TCHT"
+    if (!(Test-Path -Path "$TCHT\vladmandic")) {
+        New-Item -ItemType Directory -Path "$TCHT\vladmandic"
     }
 
     # Then CD into $TCHT\
-    Set-Location "$TCHT\"
+    Set-Location "$TCHT\vladmandic"
 
     # - Clone https://github.com/vladmandic/automatic
-    git clone https://github.com/vladmandic/automatic.git vladmandic
-    Set-Location "$TCHT\vladmandic"
+    git clone https://github.com/vladmandic/automatic.git .
 }
 
 
@@ -201,7 +199,7 @@ do {
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
-    Write-Host "Downloading Vladmandic SD.Next icon (not official)..."
+    Write-Host "Downloading Vladmandic SD.Next icon..."
     Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/vlad.ico' -OutFile 'vlad.ico'
 
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
@@ -227,4 +225,4 @@ if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
 
 # 9. Launch SD.Next
 Write-Host "`n`nLaunching Vladmandic SD.Next!" -ForegroundColor Cyan
-webui-user.bat
+./webui-user.bat

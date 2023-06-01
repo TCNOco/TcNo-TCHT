@@ -382,6 +382,8 @@ function Sync-ProgramFolder() {
         Write-Host "This is performed so shortcuts still work, easy management, etc." -ForegroundColor Cyan
         Write-Host "Interactions between the symlink (`"shortcut`") will appear in the actual location they are installed to. New files, changes, etc.`n`n" -ForegroundColor Cyan
 
+        Write-Host "Continuing in 5 seconds... Scroll up to continue reading!" -ForegroundColor Yellow
+        Start-Sleep -s 5
         return $true
     }
 
