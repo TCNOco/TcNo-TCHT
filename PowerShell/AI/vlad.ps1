@@ -55,7 +55,7 @@ Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPathWIP
 
 # If user chose to install this program in another path, create a symlink for easy access and management.
-Sync-ProgramFolder -ChosenPath "$TCHT" -Subfolder "vladmandic"
+$isSymlink = Sync-ProgramFolder -ChosenPath "$TCHT" -Subfolder "vladmandic"
 
 # Then CD into $TCHT\
 Set-Location "$TCHT\"
@@ -152,9 +152,10 @@ if (-not ($condaFound)) {
 
 # 5. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)
 Clear-ConsoleScreen
-if (Test-Path -Path "$TCHT\vladmandic") {
+if ((Test-Path -Path "$TCHT\vladmandic") -and -not $isSymlink) {
     Write-Host "The 'vladmandic' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\vladmandic"
+    git clone https://github.com/vladmandic/automatic.git vladmandic
     git pull
 } else {
     Write-Host "I'll start by installing Vladmandic SD.Next first, then we'll get to the models...`n`n"
@@ -184,7 +185,7 @@ if ($answer -eq "y" -or $answer -eq "Y") {
     $extraArgs = $extraArgs + "--upgrade"
 }
 
-Set-Content -Path "webui-user.bat" -Value "@echo off`n./webui.bat $extraArgs`npause"
+Set-Content -Path "webui-user.bat" -Value "@echo off`webui.bat $extraArgs`npause"
 Set-Content -Path "webui-user.sh" -Value "@echo off`n./webui.sh $extraArgs`nread -p `"Press enter to continue`""
 
 # 7. Share with Gradio?
@@ -226,4 +227,4 @@ if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
 
 # 9. Launch SD.Next
 Write-Host "`n`nLaunching Vladmandic SD.Next!" -ForegroundColor Cyan
-./webui-user.bat
+webui-user.bat

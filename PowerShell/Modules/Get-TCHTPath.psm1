@@ -329,6 +329,7 @@ function Get-TCHTPathWIP() {
 <#
 .SYNOPSIS
 When a TCHT program is NOT being installed to the default path, then a symlink in the default path is created.
+Returns whether is symlink or not.
 
 .PARAMETER Path
 Path to the new chosen install path (not including the program name)
@@ -380,6 +381,9 @@ function Sync-ProgramFolder() {
         Write-Host "`n`nEven though the files appear to be on $symlinkPath, they take up no space, and are actually on $actualInstallPath" -ForegroundColor Cyan
         Write-Host "This is performed so shortcuts still work, easy management, etc." -ForegroundColor Cyan
         Write-Host "Interactions between the symlink (`"shortcut`") will appear in the actual location they are installed to. New files, changes, etc.`n`n" -ForegroundColor Cyan
+
+        return $true
     }
 
+    return $false
 }
