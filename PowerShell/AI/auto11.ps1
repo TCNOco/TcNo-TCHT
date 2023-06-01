@@ -24,7 +24,7 @@
 # 2. Install or update Git if not already installed
 # 3. Install aria2c to make the download models MUCH faster
 # 4. Check if Conda or Python is installed (is installed - also is 3.10.6 - 3.10.11)
-# 5. Download AUTOMATIC1111 repo
+# 5. Check if has AUTOMATIC1111 directory ($TCHT\stable-diffusion-webui) (Default C:\TCHT\stable-diffusion-webui)
 # 6. Enable xformers?
 # 7. Fix for AMD GPUs (untested)
 # 8. Low VRAM
@@ -39,9 +39,23 @@ Write-Host "Welcome to TroubleChute's AUTOMATIC1111 installer!" -ForegroundColor
 Write-Host "AUTOMATIC1111 as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-04-11]`n`n" -ForegroundColor Cyan
 
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
+    Read-Host
+}
+
 # 1. Install Chocolatey
 Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# Allow importing remote functions
+iex (irm Import-RemoteFunction.tc.ht)
+Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
+$TCHT = Get-TCHTPath
+
+# Then CD into $TCHT\
+Set-Location "$TCHT\"
+
 
 # 2. Install or update Git if not already installed
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
@@ -131,14 +145,27 @@ if (-not ($condaFound)) {
 
 
 
-# 5. Download AUTOMATIC1111 repo (but also find out where it is, incase we're in the folder already)
-$currentDir = (Get-Item -Path ".\" -Verbose).FullName
-if ($currentDir -like "*\stable-diffusion-webui") {
-    Set-Location ../
+# 5. Check if has AUTOMATIC1111 directory ($TCHT\stable-diffusion-webui) (Default C:\TCHT\stable-diffusion-webui)
+Clear-ConsoleScreen
+if (Test-Path -Path "$TCHT\stable-diffusion-webui") {
+    Write-Host "The 'stable-diffusion-webui' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
+    Set-Location "$TCHT\stable-diffusion-webui"
+    git pull
+} else {
+    Write-Host "I'll start by installing AUTOMATIC1111 Stable Diffusion WebUI first, then we'll get to the models...`n`n"
+    
+    if (!(Test-Path -Path "$TCHT")) {
+        New-Item -ItemType Directory -Path "$TCHT"
+    }
+
+    # Then CD into $TCHT\
+    Set-Location "$TCHT\"
+
+    # - Clone https://github.com/vladmandic/automatic
+    git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+    Set-Location "$TCHT\stable-diffusion-webui"
 }
 
-git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git # Download A1 SDUI if not already here
-Set-Location stable-diffusion-webui
 git pull # Update A1 SDUI
 
 # 6. Enable xformers?
@@ -236,7 +263,6 @@ do {
     $shortcuts = Read-Host
 } while ($shortcuts -notin "Y", "y", "N", "n")
 
-iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
@@ -257,8 +283,16 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 }
 
 # 11. Download Stable Diffusion 1.5 model
-Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
-Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
+Write-Host "`n`nGetting started? Do you have models?" -ForegroundColor Cyan
+do {
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download the Stable Diffusion 1.5 model? (y/n): "
+    $defaultModel = Read-Host
+} while ($defaultModel -notin "Y", "y", "N", "n")
+
+if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
+    Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
+    Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
+}
 
 # 12. Launch AUTOMATIC1111 Stable Diffusion WebUI
 Write-Host "`n`nLaunching AUTOMATIC1111 Stable Diffusion WebUI!" -ForegroundColor Cyan

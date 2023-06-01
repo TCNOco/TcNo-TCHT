@@ -24,7 +24,7 @@
 # 2. Install or update Git if not already installed
 # 3. Install aria2c to make the download models MUCH faster
 # 4. Check if Conda or Python is installed (is installed - also is 3.10.6 - 3.10.11)
-# 5. Download Vladmandic SD.Next repo (but also find out where it is, incase we're in the folder already)
+# 5. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)
 # 6. Enable auto-update?
 # 7. Create desktop shortcuts?
 # 8. Download Stable Diffusion 1.5 model
@@ -36,9 +36,22 @@ Write-Host "Welcome to TroubleChute's Vladmandic SD.Next (Automatic) installer!"
 Write-Host "Vladmandic SD.Next (Automatic) as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-06-01]`n`n" -ForegroundColor Cyan
 
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
+    Read-Host
+}
+
 # 1. Install Chocolatey
 Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# Allow importing remote functions
+iex (irm Import-RemoteFunction.tc.ht)
+Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
+$TCHT = Get-TCHTPath
+
+# Then CD into $TCHT\
+Set-Location "$TCHT\"
 
 # 2. Install or update Git if not already installed
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
@@ -127,15 +140,26 @@ if (-not ($condaFound)) {
 }
 
 
-# 5. Download Vladmandic SD.Next repo (but also find out where it is, incase we're in the folder already)
-$currentDir = (Get-Item -Path ".\" -Verbose).FullName
-if ($currentDir -like "*\vladmandic") {
-    Set-Location ../
-}
+# 5. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)
+Clear-ConsoleScreen
+if (Test-Path -Path "$TCHT\vladmandic") {
+    Write-Host "The 'vladmandic' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
+    Set-Location "$TCHT\vladmandic"
+    git pull
+} else {
+    Write-Host "I'll start by installing Vladmandic SD.Next first, then we'll get to the models...`n`n"
+    
+    if (!(Test-Path -Path "$TCHT")) {
+        New-Item -ItemType Directory -Path "$TCHT"
+    }
 
-git clone https://github.com/vladmandic/automatic.git # Download SD.Next if not already here
-Set-Location vladmandic
-git pull # Update SD.Next
+    # Then CD into $TCHT\
+    Set-Location "$TCHT\"
+
+    # - Clone https://github.com/vladmandic/automatic
+    git clone https://github.com/vladmandic/automatic.git vladmandic
+    Set-Location "$TCHT\vladmandic"
+}
 
 
 # 6. Enable auto-update?
@@ -161,7 +185,6 @@ do {
     $shortcuts = Read-Host
 } while ($shortcuts -notin "Y", "y", "N", "n")
 
-iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
 if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
@@ -180,10 +203,10 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 Write-Host "`n`nGetting started? Do you have models?" -ForegroundColor Cyan
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download the Stable Diffusion 1.5 model? (y/n): "
-    $shortcuts = Read-Host
-} while ($shortcuts -notin "Y", "y", "N", "n")
+    $defaultModel = Read-Host
+} while ($defaultModel -notin "Y", "y", "N", "n")
 
-if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
+if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
     Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
     Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
 }
