@@ -266,7 +266,18 @@ function Get-TCHTPath() {
     return $path
 }
 
+# From: https://stackoverflow.com/a/818054
+# Tests to see if path is a symlink
+function Test-ReparsePoint([string]$path) {
+    $file = Get-Item $path -Force -ea SilentlyContinue
+    return [bool]($file.Attributes -band [IO.FileAttributes]::ReparsePoint)
+  }
+  
 function Get-TCHTPathWIP() {
+    param (
+        [Parameter()]
+        [string]$Subfolder = ""
+    )
     $path = Get-TCHTPathSaved
     if ($path -eq "") {
         $path = Get-TCHTPathFromUser
@@ -298,6 +309,29 @@ function Get-TCHTPathWIP() {
             # If doesn't exist, create the path
             if (!(Test-Path -Path $chosenPath)) {
                 New-Item -ItemType Directory -Path $chosenPath
+            }
+
+            # If $Subfolder is set
+            if ($Subfolder -ne "") {
+                $originalPath = Join-Path -Path $path -ChildPath $Subfolder
+                $chosenPath = Join-Path -Path $chosenPath -ChildPath $Subfolder
+                
+                # If the $originalPath exists:
+                if (Test-Path -Path $originalPath) {
+                    $existsAsSymlink = Test-ReparsePoint -path $originalPath
+
+                    # If $existsAsSymlink: Expand symlink path to real path
+                    if ($existsAsSymlink) {
+                        $symlinkPath = $originalPath
+                        $originalPath = (Get-Item $originalPath).Target
+
+                        # Remove existing, now wrong, symlink:
+                        Remove-Item -Path $symlinkPath | Out-Null
+                    }
+
+                    Write-Host "Moving existing files from $originalPath to $chosenPath..." -ForegroundColor Yellow
+                    Move-Item -Path $originalPath -Destination $chosenPath -Recurse
+                }
             }
 
             do {

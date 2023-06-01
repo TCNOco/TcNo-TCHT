@@ -49,10 +49,10 @@ Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 
 # 1. Install Chocolatey
 Clear-ConsoleScreen
-Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
+Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
-$TCHT = Get-TCHTPathWIP
+$TCHT = Get-TCHTPathWIP -Subfolder "vladmandic"
 
 # If user chose to install this program in another path, create a symlink for easy access and management.
 $isSymlink = Sync-ProgramFolder -ChosenPath "$TCHT" -Subfolder "vladmandic"
@@ -62,12 +62,12 @@ Set-Location "$TCHT\"
 
 # 2. Install or update Git if not already installed
 Clear-ConsoleScreen
-Write-Host "`nInstalling Git..." -ForegroundColor Cyan
+Write-Host "Installing Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
 # 3. Install aria2c to make the model downloads MUCH faster
 Clear-ConsoleScreen
-Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
+Write-Host "Installing aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
 
 # Import function to reload without needing to re-open Powershell
@@ -159,14 +159,9 @@ if ((Test-Path -Path "$TCHT\vladmandic") -and -not $isSymlink) {
 } else {
     Write-Host "I'll start by installing Vladmandic SD.Next first, then we'll get to the models...`n`n"
     
-    if (!(Test-Path -Path "$TCHT\vladmandic")) {
-        New-Item -ItemType Directory -Path "$TCHT\vladmandic"
-    }
-
-    # Then CD into $TCHT\
+    New-Item -ItemType Directory -Path "$TCHT\vladmandic" | Out-Null
     Set-Location "$TCHT\vladmandic"
 
-    # - Clone https://github.com/vladmandic/automatic
     git clone https://github.com/vladmandic/automatic.git .
 }
 
