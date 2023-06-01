@@ -54,8 +54,18 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPathWIP -Subfolder "vladmandic"
 
+Write-Host "TYPEOF: $(($chosenPath).GetType())"
+if (($chosenPath).GetType() -eq [System.Object[]]) {
+    $returnValue = $chosenPath.FullName
+} else {
+    $returnValue = $chosenPath
+}
+Write-Host "TYPEOF END: $(($chosenPath).GetType())"
+
 # If user chose to install this program in another path, create a symlink for easy access and management.
 $isSymlink = Sync-ProgramFolder -ChosenPath $TCHT -Subfolder "vladmandic"
+
+Write-Host "TYPEOF END 2: $(($chosenPath).GetType())"
 
 # Then CD into $TCHT\
 Set-Location "$TCHT\"
