@@ -306,6 +306,9 @@ function Get-TCHTPathWIP() {
                 $chosenPath = Read-Host
             } while ($chosenPath -eq "")
 
+            # For some reason POWERSHELL LOVES CHANGING THE TYPE OF THIS TO AN OBJECT
+            $returnValue = $chosenPath
+
             # If doesn't exist, create the path
             if (!(Test-Path -Path $chosenPath)) {
                 New-Item -ItemType Directory -Path $chosenPath | Out-Null
@@ -349,7 +352,7 @@ function Get-TCHTPathWIP() {
                 # TODO: Also, option to check and update shortcuts on desktop, that could take a few moments.
             }
 
-            return $chosenPath
+            return $returnValue
         }
     }
 
