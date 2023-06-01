@@ -351,17 +351,10 @@ function Sync-ProgramFolder() {
 
     $savedPath = Get-TCHTPathSaved
 
-    Write-Host "ChosenPath: `"$ChosenPath`""
-    Write-Host "Subfolder: `"$Subfolder`""
-    Write-Host "SavedPath: `"$savedPath`""
-
     if (!($ChosenPath -eq $savedPath)) {
         # User has chosen to install this in another directory
         $actualInstallPath = Join-Path -Path $ChosenPath -ChildPath $Subfolder
         $symlinkPath = Join-Path -Path $savedPath -ChildPath $Subfolder
-
-        Write-Host "actualInstallPath: `"$actualInstallPath`""
-        Write-Host "symlinkPath: `"$symlinkPath`""
 
         # If actualInstallPath doesn't exist, create it
         if (!(Test-Path -Path $actualInstallPath)) {
@@ -377,7 +370,7 @@ function Sync-ProgramFolder() {
         New-Item -ItemType SymbolicLink -Path $symlinkPath -Target $actualInstallPath | Out-Null
 
         Clear-ConsoleScreen
-        Write-Host "`n`nThe installer has created a link between your default ($savedPath) and where it is actually installed ($actualInstallPath)" -ForegroundColor Cyan
+        Write-Host "The installer has created a link between your default ($savedPath) and where it is actually installed ($actualInstallPath)" -ForegroundColor Cyan
         Write-Host "`n`nEven though the files appear to be on $symlinkPath, they take up no space, and are actually on $actualInstallPath" -ForegroundColor Cyan
         Write-Host "This is performed so shortcuts still work, easy management, etc." -ForegroundColor Cyan
         Write-Host "Interactions between the symlink (`"shortcut`") will appear in the actual location they are installed to. New files, changes, etc.`n`n" -ForegroundColor Cyan

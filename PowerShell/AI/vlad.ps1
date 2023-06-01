@@ -183,7 +183,7 @@ if ($answer -eq "y" -or $answer -eq "Y") {
     $extraArgs = $extraArgs + "--upgrade"
 }
 
-Set-Content -Path "webui-user.bat" -Value "@echo off`webui.bat $extraArgs`npause"
+Set-Content -Path "webui-user.bat" -Value "@echo off`nwebui.bat $extraArgs`npause"
 Set-Content -Path "webui-user.sh" -Value "@echo off`n./webui.sh $extraArgs`nread -p `"Press enter to continue`""
 
 # 7. Share with Gradio?
