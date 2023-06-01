@@ -159,7 +159,9 @@ if ((Test-Path -Path "$TCHT\vladmandic") -and -not $isSymlink) {
 } else {
     Write-Host "I'll start by installing Vladmandic SD.Next first, then we'll get to the models...`n`n"
     
-    New-Item -ItemType Directory -Path "$TCHT\vladmandic" | Out-Null
+    if (!(Test-Path -Path "$TCHT\vladmandic")) {
+        New-Item -ItemType Directory -Path "$TCHT\vladmandic" | Out-Null
+    }
     Set-Location "$TCHT\vladmandic"
 
     git clone https://github.com/vladmandic/automatic.git .
