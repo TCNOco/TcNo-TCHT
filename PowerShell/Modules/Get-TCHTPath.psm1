@@ -257,6 +257,19 @@ function Get-TCHTPath() {
     $path = Get-TCHTPathSaved
     if ($path -eq "") {
         $path = Get-TCHTPathFromUser
+    }
+
+    # We'll create $TCHT if it doesn't already exist:
+    if (!(Test-Path -Path $path)) {
+        New-Item -ItemType Directory -Path $path
+    }
+    return $path
+}
+
+function Get-TCHTPath-WIP() {
+    $path = Get-TCHTPathSaved
+    if ($path -eq "") {
+        $path = Get-TCHTPathFromUser
     } else {
         # Ask the user if they want to install this software here, or in another location
         Write-Host "The program will install to $path." -ForegroundColor Cyan
