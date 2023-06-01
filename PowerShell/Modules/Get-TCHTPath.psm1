@@ -257,6 +257,44 @@ function Get-TCHTPath() {
     $path = Get-TCHTPathSaved
     if ($path -eq "") {
         $path = Get-TCHTPathFromUser
+    } else {
+        # Ask the user if they want to install this software here, or in another location
+        Write-Host "The program will install to $path." -ForegroundColor Cyan
+        do {
+            Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to install it somewhere else? (y/n): "
+            $installElsewhere = Read-Host
+        } while ($installElsewhere -notin "Y", "y", "N", "n")
+        
+        if ($installElsewhere -in "Y", "y") {
+            Write-Host "The install script choses a folder, and installs programs inside of it. Enter a new path, but remember each program will have a subfolder." -ForegroundColor Cyan
+            Write-Host "The default is C:\TCHT" -ForegroundColor Cyan
+            $chosenPath = ""
+            do {
+                Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter a path to install this (and possibly other programs) to: "
+                $chosenPath = Read-Host
+            } while ($chosenPath -eq "")
+
+            # If doesn't exist, create the path
+            if (!(Test-Path -Path $chosenPath)) {
+                New-Item -ItemType Directory -Path $chosenPath
+            }
+
+            do {
+                Write-Host -ForegroundColor Cyan -NoNewline "`n`nWould you like to install all future TCHT programs to this path? ($chosenPath) (y/n): "
+                $changeDefault = Read-Host
+            } while ($changeDefault -notin "Y", "y", "N", "n")
+
+            # Set default if chosen
+            if ($changeDefault -in "Y", "y") {
+                Set-TCHTPath -Path $chosenPath
+
+                # TODO: Offer to move existing programs from previous path
+                # TODO: or Create Symlinks to existing programs from previous path
+                # TODO: Also, option to check and update shortcuts on desktop, that could take a few moments.
+            }
+
+            return $chosenPath
+        }
     }
 
     # We'll create $TCHT if it doesn't already exist:
@@ -264,4 +302,36 @@ function Get-TCHTPath() {
         New-Item -ItemType Directory -Path $path
     }
     return $path
+}
+
+<#
+.SYNOPSIS
+When a TCHT program is NOT being installed to the default path, then a symlink in the default path is created.
+
+.PARAMETER Path
+Path to the new chosen install path (not including the program name)
+
+.PARAMETER Subfolder
+The programs name to be appended to Path
+#>
+function Sync-ProgramFolder() {
+    [parameter()] [string]$Path = ""
+    [parameter()] [string]$Subfolder = ""
+
+    $savedPath = Get-TCHTPathSaved
+
+    if (!($Path -eq $savedPath)) {
+        # User has chosen to install this in another directory
+        $actualInstallPath = Join-Path -Path $Path -ChildPath $Subfolder
+        $symlinkPath = Join-Path -Path $savedPath -ChildPath $Subfolder
+
+        # Create a symlink to the subfolder in savedPath
+        New-Item -ItemType SymbolicLink -Path $symlinkPath -Target $actualInstallPath
+
+        Write-Host "The installer has created a link between your default ($savedPath) and where it is actually installed ($actualInstallPath)" -ForegroundColor Cyan
+        Write-Host "Even though the files appear to be on $symlinkPath, they take up no space, and are actually on $actualInstallPath" -ForegroundColor Cyan
+        Write-Host "This is performed so shortcuts still work, easy management, etc." -ForegroundColor Cyan
+        Write-Host "Interactions between the symlink (`"shortcut`") will appear in the actual location they are installed to. New files, changes, etc." -ForegroundColor Cyan
+    }
+
 }

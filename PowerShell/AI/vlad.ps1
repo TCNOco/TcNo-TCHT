@@ -54,6 +54,9 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath
 
+# If user chose to install this program in another path, create a symlink for easy access and management.
+Sync-ProgramFolder -Path $TCHT -Subfolder "vladmandic"
+
 # Then CD into $TCHT\
 Set-Location "$TCHT\"
 
@@ -91,7 +94,7 @@ if ($condaFound) {
         $useConda = Read-Host
     } while ($useConda -notin "Y", "y", "N", "n")
     
-    if ($useConda -eq "y" -or $useConda -eq "Y") {
+    if ($useConda -in "Y", "y") {
         conda create -n vlad python=3.10.11 -y
         conda activate vlad
     } else {
