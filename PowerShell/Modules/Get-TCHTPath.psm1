@@ -349,6 +349,11 @@ function Get-TCHTPathWIP() {
                 # TODO: Also, option to check and update shortcuts on desktop, that could take a few moments.
             }
 
+            # MAKE SURE IS STRING - This breaks things if not... Thanks, PowerShell. Creating a folder with a path makes the path an object... Somehow...
+            if (($chosenPath).GetType() -eq [System.Object[]]) {
+                $chosenPath = $chosenPath.FullName
+            }
+
             return $chosenPath
         }
     }
