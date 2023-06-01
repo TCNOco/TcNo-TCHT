@@ -349,7 +349,7 @@ function Get-TCHTPathWIP() {
                 # TODO: Also, option to check and update shortcuts on desktop, that could take a few moments.
             }
 
-            return $returnValue
+            return $chosenPath
         }
     }
 
