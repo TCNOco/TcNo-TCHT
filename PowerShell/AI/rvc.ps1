@@ -222,11 +222,13 @@ if ($condaFound) {
     conda install -c conda-forge faiss -y
     python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     python -m pip install -r requirements.txt
+    pip install --upgrade --no-deps --force-reinstall torchcrepe
 } else {
     &$python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     &$python -m pip install -r requirements.txt
     &$python -m pip uninstall faiss-cpu
     &$python -m pip install faiss-cpu
+    pip install --upgrade --no-deps --force-reinstall torchcrepe
     Update-SessionEnvironment
 }
 
@@ -243,7 +245,7 @@ if ($condaFound) {
     $condaPath = "`"$(Get-CondaPath)`""
     $CondaEnvironmentName = "rvc"
     $InstallLocation = "`"$(Get-Location)`""
-    $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu"
+    $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt`npip install --upgrade --no-deps --force-reinstall torchcrepe`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu"
 
     $ProgramName = "Retrieval-based Voice Conversion WebUI"
     $RunCommand = "python infer-web.py"
@@ -252,7 +254,7 @@ if ($condaFound) {
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
 } else {
     $InstallLocation = "`"$(Get-Location)`""
-    $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu"
+    $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt`npip install --upgrade --no-deps --force-reinstall torchcrepe`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu"
 
     $ProgramName = "Retrieval-based Voice Conversion WebUI"
     $RunCommand = "python infer-web.py"
