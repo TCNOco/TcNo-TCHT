@@ -350,11 +350,15 @@ function Get-TCHTPathWIP() {
             }
 
             # MAKE SURE IS STRING - This breaks things if not... Thanks, PowerShell. Creating a folder with a path makes the path an object... Somehow...
+            Write-Host "TYPEOF: $(($chosenPath).GetType())"
             if (($chosenPath).GetType() -eq [System.Object[]]) {
-                $chosenPath = $chosenPath.FullName
+                $returnValue = $chosenPath.FullName
+            } else {
+                $returnValue = $chosenPath
             }
+            Write-Host "TYPEOF END: $(($chosenPath).GetType())"
 
-            return $chosenPath
+            return $returnValue
         }
     }
 
