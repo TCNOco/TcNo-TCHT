@@ -55,7 +55,7 @@ Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPathWIP
 
 # If user chose to install this program in another path, create a symlink for easy access and management.
-Sync-ProgramFolder -Path "$TCHT" -Subfolder "vladmandic"
+Sync-ProgramFolder -ChosenPath "$TCHT" -Subfolder "vladmandic"
 
 # Then CD into $TCHT\
 Set-Location "$TCHT\"

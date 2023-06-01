@@ -302,7 +302,7 @@ function Get-TCHTPathWIP() {
 
             do {
                 Clear-ConsoleScreen
-                Write-Host -ForegroundColor Cyan -NoNewline "`n`nWould you like to install all future TCHT programs to this path? ($chosenPath) (y/n): "
+                Write-Host -ForegroundColor Cyan -NoNewline "Would you like to install all future TCHT programs to this path? ($chosenPath) (y/n): "
                 $changeDefault = Read-Host
             } while ($changeDefault -notin "Y", "y", "N", "n")
 
@@ -338,8 +338,8 @@ The programs name to be appended to Path
 #>
 function Sync-ProgramFolder() {
     param(
-        [parameter(Mandatory=$true)][string]$Path = "",
-        [parameter(Mandatory=$true)][string]$Subfolder = ""
+        [parameter(Mandatory=$true)][string]$ChosenPath,
+        [parameter(Mandatory=$true)][string]$Subfolder
     )
 
     $clearScreenFound = Get-Command Clear-ConsoleScreen -erroraction silentlycontinue
@@ -350,13 +350,13 @@ function Sync-ProgramFolder() {
 
     $savedPath = Get-TCHTPathSaved
 
-    Write-Host "Path: `"$Path`""
+    Write-Host "ChosenPath: `"$ChosenPath`""
     Write-Host "Subfolder: `"$Subfolder`""
     Write-Host "SavedPath: `"$savedPath`""
 
-    if (!($Path -eq $savedPath)) {
+    if (!($ChosenPath -eq $savedPath)) {
         # User has chosen to install this in another directory
-        $actualInstallPath = Join-Path -Path $Path -ChildPath $Subfolder
+        $actualInstallPath = Join-Path -Path $ChosenPath -ChildPath $Subfolder
         $symlinkPath = Join-Path -Path $savedPath -ChildPath $Subfolder
 
         Write-Host "actualInstallPath: `"$actualInstallPath`""
