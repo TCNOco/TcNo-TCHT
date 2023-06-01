@@ -290,7 +290,7 @@ function Get-TCHTPathWIP() {
         }
 
         Clear-ConsoleScreen
-        Write-Host "`nThe program will install to $path." -ForegroundColor Cyan
+        Write-Host "The program will install to $path." -ForegroundColor Cyan
         do {
             Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to install it somewhere else? (y/n): "
             $installElsewhere = Read-Host
@@ -389,6 +389,11 @@ function Sync-ProgramFolder() {
         # User has chosen to install this in another directory
         $actualInstallPath = Join-Path -Path $ChosenPath -ChildPath $Subfolder
         $symlinkPath = Join-Path -Path $savedPath -ChildPath $Subfolder
+
+        Write-Host "savedPath: $savedPath"
+        Write-Host "ChosenPath: $ChosenPath"
+        Write-Host "actualInstallPath: $actualInstallPath"
+        Write-Host "symlinkPath: $symlinkPath"
 
         # If actualInstallPath doesn't exist, create it
         if (!(Test-Path -Path $actualInstallPath)) {
