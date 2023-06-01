@@ -31,22 +31,26 @@
 # 9. Launch SD.Next
 # ----------------------------------------
 
-
+Write-Host "-------------------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's Vladmandic SD.Next (Automatic) installer!" -ForegroundColor Cyan
 Write-Host "Vladmandic SD.Next (Automatic) as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
+Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "[Version 2023-06-01]`n`n" -ForegroundColor Cyan
+Write-Host "-------------------------------------------------------------------" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
     Read-Host
 }
 
-# 1. Install Chocolatey
-Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
+Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+
+# 1. Install Chocolatey
+Clear-ConsoleScreen
+Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath
 
@@ -54,10 +58,12 @@ $TCHT = Get-TCHTPath
 Set-Location "$TCHT\"
 
 # 2. Install or update Git if not already installed
+Clear-ConsoleScreen
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
 # 3. Install aria2c to make the model downloads MUCH faster
+Clear-ConsoleScreen
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
 
@@ -76,6 +82,7 @@ if (-not $condaFound) {
 }
 
 # If conda found: create environment
+Clear-ConsoleScreen
 if ($condaFound) {
     Write-Host "`n`nDo you want to install Vladmandic SD.Next in a Conda environment called 'vlad'?`nYou'll need to use 'conda activate vlad' before being able to use it?"-ForegroundColor Cyan
 
@@ -163,6 +170,7 @@ if (Test-Path -Path "$TCHT\vladmandic") {
 
 
 # 6. Enable auto-update?
+Clear-ConsoleScreen
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to enable auto-update? (You can always update manually. This is a Vladmandic SD.Next launch option) (y/n): "
     $answer = Read-Host
@@ -179,6 +187,7 @@ Set-Content -Path "webui-user.sh" -Value "@echo off`n./webui.sh $extraArgs`nread
 # 7. Share with Gradio?
 
 # 7. Create desktop shortcuts?
+Clear-ConsoleScreen
 Write-Host "`n`nCreate desktop shortcuts for SD.Next?" -ForegroundColor Cyan
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
@@ -200,6 +209,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 }
 
 # 8. Download Stable Diffusion 1.5 model
+Clear-ConsoleScreen
 Write-Host "`n`nGetting started? Do you have models?" -ForegroundColor Cyan
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download the Stable Diffusion 1.5 model? (y/n): "
