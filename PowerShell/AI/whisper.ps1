@@ -32,8 +32,8 @@ Write-Host "--------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's Whisper installer!" -ForegroundColor Cyan
 Write-Host "Whisper as well as all of its other dependencies should now be installed..." -ForegroundColor Cyan
 Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
-Write-Host "[Version 2023-04-14]`n`n" -ForegroundColor Cyan
-Write-Host "--------------------------------------------" -ForegroundColor Cyan
+Write-Host "[Version 2023-04-14]" -ForegroundColor Cyan
+Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
 
 # 1. Install Chocolatey
 Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan

@@ -39,8 +39,8 @@ Write-Host "--------------------------------------------------" -ForegroundColor
 Write-Host "Welcome to TroubleChute's AUTOMATIC1111 installer!" -ForegroundColor Cyan
 Write-Host "AUTOMATIC1111 as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
-Write-Host "[Version 2023-04-11]`n`n" -ForegroundColor Cyan
-Write-Host "--------------------------------------------------" -ForegroundColor Cyan
+Write-Host "[Version 2023-04-11]" -ForegroundColor Cyan
+Write-Host "--------------------------------------------------`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red

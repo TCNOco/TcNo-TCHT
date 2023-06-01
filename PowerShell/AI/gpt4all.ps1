@@ -33,8 +33,8 @@ Write-Host "--------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's GPT4All installer!" -ForegroundColor Cyan
 Write-Host "GPT4All as well as all of its other dependencies should now be installed..." -ForegroundColor Cyan
 Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
-Write-Host "[Version 2023-04-06 (version 2)]`n`n" -ForegroundColor Cyan
-Write-Host "--------------------------------------------" -ForegroundColor Cyan
+Write-Host "[Version 2023-04-06 (version 2)]" -ForegroundColor Cyan
+Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
 
 # 1. Install Chocolatey
 Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan

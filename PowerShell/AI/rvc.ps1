@@ -41,8 +41,8 @@ Write-Host "--------------------------------------------------------------------
 Write-Host "Welcome to TroubleChute's Retrieval-based Voice Conversion WebUI installer!" -ForegroundColor Cyan
 Write-Host "RVC as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
-Write-Host "[Version 2023-05-28]`n`n" -ForegroundColor Cyan
-Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
+Write-Host "[Version 2023-05-28]" -ForegroundColor Cyan
+Write-Host "---------------------------------------------------------------------------`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red

@@ -31,8 +31,8 @@ Write-Host "---------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's WizardLM installer!" -ForegroundColor Cyan
 Write-Host "WizardLM as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
-Write-Host "[Version 2023-05-11]`n`n" -ForegroundColor Cyan
-Write-Host "---------------------------------------------" -ForegroundColor Cyan
+Write-Host "[Version 2023-05-11]" -ForegroundColor Cyan
+Write-Host "---------------------------------------------`n`n" -ForegroundColor Cyan
 
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {

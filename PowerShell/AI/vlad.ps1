@@ -35,8 +35,8 @@ Write-Host "-------------------------------------------------------------------"
 Write-Host "Welcome to TroubleChute's Vladmandic SD.Next (Automatic) installer!" -ForegroundColor Cyan
 Write-Host "Vladmandic SD.Next (Automatic) as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
-Write-Host "[Version 2023-06-01]`n`n" -ForegroundColor Cyan
-Write-Host "-------------------------------------------------------------------" -ForegroundColor Cyan
+Write-Host "[Version 2023-06-01]" -ForegroundColor Cyan
+Write-Host "-------------------------------------------------------------------`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
@@ -84,7 +84,7 @@ if (-not $condaFound) {
 # If conda found: create environment
 Clear-ConsoleScreen
 if ($condaFound) {
-    Write-Host "`n`nDo you want to install Vladmandic SD.Next in a Conda environment called 'vlad'?`nYou'll need to use 'conda activate vlad' before being able to use it?"-ForegroundColor Cyan
+    Write-Host "Do you want to install Vladmandic SD.Next in a Conda environment called 'vlad'?`nYou'll need to use 'conda activate vlad' before being able to use it?"-ForegroundColor Cyan
 
     do {
         Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda (y/n): "
@@ -172,7 +172,7 @@ if (Test-Path -Path "$TCHT\vladmandic") {
 # 6. Enable auto-update?
 Clear-ConsoleScreen
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to enable auto-update? (You can always update manually. This is a Vladmandic SD.Next launch option) (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to enable auto-update? (You can always update manually. This is a Vladmandic SD.Next launch option) (y/n): "
     $answer = Read-Host
 } while ($answer -notin "Y", "y", "N", "n")
 
@@ -188,7 +188,7 @@ Set-Content -Path "webui-user.sh" -Value "@echo off`n./webui.sh $extraArgs`nread
 
 # 7. Create desktop shortcuts?
 Clear-ConsoleScreen
-Write-Host "`n`nCreate desktop shortcuts for SD.Next?" -ForegroundColor Cyan
+Write-Host "Create desktop shortcuts for SD.Next?" -ForegroundColor Cyan
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
@@ -210,7 +210,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 
 # 8. Download Stable Diffusion 1.5 model
 Clear-ConsoleScreen
-Write-Host "`n`nGetting started? Do you have models?" -ForegroundColor Cyan
+Write-Host "Getting started? Do you have models?" -ForegroundColor Cyan
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download the Stable Diffusion 1.5 model? (y/n): "
     $defaultModel = Read-Host

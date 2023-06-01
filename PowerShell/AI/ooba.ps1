@@ -26,8 +26,8 @@ Write-Host "-----------------------------------------------" -ForegroundColor Cy
 Write-Host "Welcome to TroubleChute's Oobabooga installer!" -ForegroundColor Cyan
 Write-Host "Oobabooga should now be installed..." -ForegroundColor Cyan
 Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
-Write-Host "[Version 2023-04-28]`n`n" -ForegroundColor Cyan
-Write-Host "-----------------------------------------------" -ForegroundColor Cyan
+Write-Host "[Version 2023-04-28]" -ForegroundColor Cyan
+Write-Host "-----------------------------------------------`n`n" -ForegroundColor Cyan
 
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
