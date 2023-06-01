@@ -272,15 +272,23 @@ function Get-TCHTPathWIP() {
         $path = Get-TCHTPathFromUser
     } else {
         # Ask the user if they want to install this software here, or in another location
-        Write-Host "The program will install to $path." -ForegroundColor Cyan
+        $clearScreenFound = Get-Command Clear-ConsoleScreen -erroraction silentlycontinue
+        if (!$clearScreenFound) {
+            iex (irm Import-RemoteFunction.tc.ht)
+            Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+        }
+
+        Clear-ConsoleScreen
+        Write-Host "`nThe program will install to $path." -ForegroundColor Cyan
         do {
             Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to install it somewhere else? (y/n): "
             $installElsewhere = Read-Host
         } while ($installElsewhere -notin "Y", "y", "N", "n")
         
         if ($installElsewhere -in "Y", "y") {
-            Write-Host "`n`nThe install script choses a folder, and installs programs inside of it. This is what you're setting." -ForegroundColor Cyan
-            Write-Host "The default is C:\TCHT" -ForegroundColor Cyan
+            Clear-ConsoleScreen
+            Write-Host "The install script choses a folder, and installs programs inside of it. This is what you're setting." -ForegroundColor Cyan
+            Write-Host "The default is C:\TCHT"
             $chosenPath = ""
             do {
                 Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter a path to install this (and possibly other programs) to: "
@@ -293,6 +301,7 @@ function Get-TCHTPathWIP() {
             }
 
             do {
+                Clear-ConsoleScreen
                 Write-Host -ForegroundColor Cyan -NoNewline "`n`nWould you like to install all future TCHT programs to this path? ($chosenPath) (y/n): "
                 $changeDefault = Read-Host
             } while ($changeDefault -notin "Y", "y", "N", "n")
@@ -333,16 +342,25 @@ function Sync-ProgramFolder() {
         [parameter(Mandatory=$true)][string]$Subfolder = ""
     )
 
-    Write-Host "Path: $Path"
-    Write-Host "Subfolder: $Subfolder"
-
+    $clearScreenFound = Get-Command Clear-ConsoleScreen -erroraction silentlycontinue
+    if (!$clearScreenFound) {
+        iex (irm Import-RemoteFunction.tc.ht)
+        Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+    }
 
     $savedPath = Get-TCHTPathSaved
+
+    Write-Host "Path: `"$Path`""
+    Write-Host "Subfolder: `"$Subfolder`""
+    Write-Host "SavedPath: `"$savedPath`""
 
     if (!($Path -eq $savedPath)) {
         # User has chosen to install this in another directory
         $actualInstallPath = Join-Path -Path $Path -ChildPath $Subfolder
         $symlinkPath = Join-Path -Path $savedPath -ChildPath $Subfolder
+
+        Write-Host "actualInstallPath: `"$actualInstallPath`""
+        Write-Host "symlinkPath: `"$symlinkPath`""
 
         # If actualInstallPath doesn't exist, create it
         if (!(Test-Path -Path $actualInstallPath)) {
@@ -357,6 +375,7 @@ function Sync-ProgramFolder() {
         # Create a symlink to the subfolder in savedPath
         New-Item -ItemType SymbolicLink -Path $symlinkPath -Target $actualInstallPath | Out-Null
 
+        Clear-ConsoleScreen
         Write-Host "`n`nThe installer has created a link between your default ($savedPath) and where it is actually installed ($actualInstallPath)" -ForegroundColor Cyan
         Write-Host "`n`nEven though the files appear to be on $symlinkPath, they take up no space, and are actually on $actualInstallPath" -ForegroundColor Cyan
         Write-Host "This is performed so shortcuts still work, easy management, etc." -ForegroundColor Cyan
