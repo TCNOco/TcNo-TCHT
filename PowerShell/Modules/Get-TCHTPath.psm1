@@ -314,7 +314,7 @@ function Get-TCHTPathWIP() {
             # If $Subfolder is set
             if ($Subfolder -ne "") {
                 $originalPath = Join-Path -Path $path -ChildPath $Subfolder
-                $chosenPath = Join-Path -Path $chosenPath -ChildPath $Subfolder
+                $chosenPathSubfolder = Join-Path -Path $chosenPath -ChildPath $Subfolder
                 
                 # If the $originalPath exists:
                 if (Test-Path -Path $originalPath) {
@@ -329,8 +329,8 @@ function Get-TCHTPathWIP() {
                         Remove-Item -Path $symlinkPath | Out-Null
                     }
 
-                    Write-Host "Moving existing files from $originalPath to $chosenPath..." -ForegroundColor Yellow
-                    Move-Item -Path $originalPath -Destination $chosenPath -Recurse
+                    Write-Host "Moving existing files from $originalPath to $chosenPathSubfolder..." -ForegroundColor Yellow
+                    Move-Item -Path $originalPath -Destination $chosenPathSubfolder -Recurse
                 }
             }
 
