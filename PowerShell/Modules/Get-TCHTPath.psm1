@@ -330,7 +330,7 @@ function Get-TCHTPathWIP() {
                     }
 
                     Write-Host "Moving existing files from $originalPath to $chosenPathSubfolder..." -ForegroundColor Yellow
-                    Move-Item -Path $originalPath -Destination $chosenPathSubfolder -Recurse
+                    Move-Item -Path $originalPath -Destination $chosenPath
                 }
             }
 
