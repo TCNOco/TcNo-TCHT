@@ -54,7 +54,7 @@ function Install-Ooba {
     # The program will be installed to $TCHT\Ooba
     # So, we'll create $TCHT\Ooba if it doesn't already exist:
     if (!(Test-Path -Path "$TCHT")) {
-        New-Item -ItemType Directory -Path "$TCHT"
+        New-Item -ItemType Directory -Path "$TCHT" | Out-Null
     }
 
     # Then CD into $TCHT\

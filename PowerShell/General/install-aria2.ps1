@@ -35,7 +35,7 @@ function Install-Aria2() {
     
         # Create the destination folder if it doesn't exist
         if (!(Test-Path $destFolder)) {
-            New-Item -ItemType Directory -Force -Path $destFolder
+            New-Item -ItemType Directory -Force -Path $destFolder | Out-Null
         }
     
         # Download the aria2 zip file

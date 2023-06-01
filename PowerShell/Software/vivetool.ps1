@@ -53,7 +53,7 @@ $TCHT = Get-TCHTPath
 # 2. Install ViveTool or ViveTool-GUI
 if ($vivetool -eq "1") {
     if (!(Test-Path -Path "$TCHT\ViVeTool")) {
-        [void](New-Item -ItemType Directory -Path "$TCHT\ViVeTool") # Void to silence console output.
+        New-Item -ItemType Directory -Path "$TCHT\ViVeTool" | Out-Null
     }
     
     # Then CD into $TCHT\
@@ -113,7 +113,7 @@ if ($vivetool -eq "1") {
     exit
 } elseif ($vivetool -eq "2") {
     if (!(Test-Path -Path "$TCHT\ViVeTool-GUI")) {
-        [void](New-Item -ItemType Directory -Path "$TCHT\ViVeTool-GUI") # Void to silence console output.
+        New-Item -ItemType Directory -Path "$TCHT\ViVeTool-GUI" | Out-Null
     }
     
     # Then CD into $TCHT\

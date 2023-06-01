@@ -157,7 +157,7 @@ if (Test-Path -Path "$TCHT\privateGPT") {
     Write-Host "I'll start by installing privateGPT first, then we'll get to the model...`n`n"
     
     if (!(Test-Path -Path "$TCHT")) {
-        New-Item -ItemType Directory -Path "$TCHT"
+        New-Item -ItemType Directory -Path "$TCHT" | Out-Null
     }
 
     # Then CD into $TCHT\
@@ -268,7 +268,7 @@ function Get-Gpt4All {
 
 # Create models folder
 if (!(Test-Path -Path "models")) {
-    New-Item -ItemType Directory -Path "models"
+    New-Item -ItemType Directory -Path "models" | Out-Null
 }
 
 # Rename env file

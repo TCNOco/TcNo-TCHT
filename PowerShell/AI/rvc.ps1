@@ -174,7 +174,7 @@ if (Test-Path -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI") {
     Write-Host "I'll start by installing RVC first, then we'll get to the models...`n`n"
     
     if (!(Test-Path -Path "$TCHT")) {
-        New-Item -ItemType Directory -Path "$TCHT"
+        New-Item -ItemType Directory -Path "$TCHT" | Out-Null
     }
 
     # Then CD into $TCHT\

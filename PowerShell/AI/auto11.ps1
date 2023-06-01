@@ -158,7 +158,7 @@ if (Test-Path -Path "$TCHT\stable-diffusion-webui") {
     Write-Host "I'll start by installing AUTOMATIC1111 Stable Diffusion WebUI first, then we'll get to the models...`n`n"
     
     if (!(Test-Path -Path "$TCHT")) {
-        New-Item -ItemType Directory -Path "$TCHT"
+        New-Item -ItemType Directory -Path "$TCHT" | Out-Null
     }
 
     # Then CD into $TCHT\

@@ -225,7 +225,7 @@ function Set-TCHTPath() {
                 
                 $SchemaDir = "$HOME/.local/share/glib-2.0/schemas"
                 if (-not (Test-Path -Path $SchemaDir)) {
-                    New-Item -ItemType Directory -Path $SchemaDir -Force
+                    New-Item -ItemType Directory -Path $SchemaDir -Force | Out-Null
                 }
 
                 glib-compile-schemas . --strict --targetdir=$HOME/.local/share/glib-2.0/schemas
@@ -261,7 +261,7 @@ function Get-TCHTPath() {
 
     # We'll create $TCHT if it doesn't already exist:
     if (!(Test-Path -Path $path)) {
-        New-Item -ItemType Directory -Path $path
+        New-Item -ItemType Directory -Path $path | Out-Null
     }
     return $path
 }
@@ -308,7 +308,7 @@ function Get-TCHTPathWIP() {
 
             # If doesn't exist, create the path
             if (!(Test-Path -Path $chosenPath)) {
-                New-Item -ItemType Directory -Path $chosenPath
+                New-Item -ItemType Directory -Path $chosenPath | Out-Null
             }
 
             # If $Subfolder is set
@@ -349,22 +349,13 @@ function Get-TCHTPathWIP() {
                 # TODO: Also, option to check and update shortcuts on desktop, that could take a few moments.
             }
 
-            # MAKE SURE IS STRING - This breaks things if not... Thanks, PowerShell. Creating a folder with a path makes the path an object... Somehow...
-            Write-Host "TYPEOF: $(($chosenPath).GetType())"
-            if (($chosenPath).GetType() -eq [System.Object[]]) {
-                $returnValue = $chosenPath.FullName
-            } else {
-                $returnValue = $chosenPath
-            }
-            Write-Host "TYPEOF END: $(($chosenPath).GetType())"
-
             return $returnValue
         }
     }
 
     # We'll create $TCHT if it doesn't already exist:
     if (!(Test-Path -Path $path)) {
-        New-Item -ItemType Directory -Path $path
+        New-Item -ItemType Directory -Path $path | Out-Null
     }
     return $path
 }
@@ -399,14 +390,9 @@ function Sync-ProgramFolder() {
         $actualInstallPath = Join-Path -Path $ChosenPath -ChildPath $Subfolder
         $symlinkPath = Join-Path -Path $savedPath -ChildPath $Subfolder
 
-        Write-Host "savedPath: $savedPath"
-        Write-Host "ChosenPath: $ChosenPath"
-        Write-Host "actualInstallPath: $actualInstallPath"
-        Write-Host "symlinkPath: $symlinkPath"
-
         # If actualInstallPath doesn't exist, create it
         if (!(Test-Path -Path $actualInstallPath)) {
-            New-Item -ItemType Directory -Path $actualInstallPath
+            New-Item -ItemType Directory -Path $actualInstallPath | Out-Null
         }
 
         # If savedPath doesn't exist, create it
