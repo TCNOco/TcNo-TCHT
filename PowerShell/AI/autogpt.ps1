@@ -34,8 +34,8 @@
 Write-Host "---------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's Auto-GPT installer!" -ForegroundColor Cyan
 Write-Host "Auto-GPT as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "[Version 2023-04-16]" -ForegroundColor Cyan
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "---------------------------------------------`n`n" -ForegroundColor Cyan
 
 Write-Host -NoNewline "Important: " -ForegroundColor Red

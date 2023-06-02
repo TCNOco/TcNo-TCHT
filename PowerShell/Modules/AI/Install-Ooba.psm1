@@ -47,8 +47,13 @@ function Install-Ooba {
     
     # Allow importing remote functions
     iex (irm Import-RemoteFunction.tc.ht)
+    Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+
     Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
-    $TCHT = Get-TCHTPath
+    $TCHT = Get-TCHTPath -Subfolder "oobabooga_windows"
+
+    # If user chose to install this program in another path, create a symlink for easy access and management.
+    $isSymlink = Sync-ProgramFolder -ChosenPath $TCHT -Subfolder "oobabooga_windows"
 
     # Since the latest update, this program is unhappy with paths with a space in them.
     # The program will be installed to $TCHT\Ooba

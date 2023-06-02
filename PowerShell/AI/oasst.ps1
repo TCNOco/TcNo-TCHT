@@ -30,8 +30,8 @@
 Write-Host "--------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's OpenAssist (Pythia) installer!" -ForegroundColor Cyan
 Write-Host "OpenAssist (Pythia) as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "[Version 2023-04-28]" -ForegroundColor Cyan
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "--------------------------------------------------------`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
@@ -49,7 +49,7 @@ $toDownload = $True
 if (Test-Path -Path "$TCHT\oobabooga_windows") {
     Write-Host "The 'oobabooga_windows' folder already exists." -ForegroundColor Green
     do {
-        Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again? (y/n): "
+        Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again [NEW: Choose yes to move]? (y/n): "
         $downloadAgain = Read-Host
     } while ($downloadAgain -notin "Y", "y", "N", "n")
 

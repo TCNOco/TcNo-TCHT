@@ -40,8 +40,8 @@
 Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's Retrieval-based Voice Conversion WebUI installer!" -ForegroundColor Cyan
 Write-Host "RVC as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "[Version 2023-05-28]" -ForegroundColor Cyan
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "---------------------------------------------------------------------------`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
@@ -52,6 +52,15 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+
+Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
+$TCHT = Get-TCHTPath -Subfolder "Retrieval-based-Voice-Conversion-WebUI"
+
+# If user chose to install this program in another path, create a symlink for easy access and management.
+$isSymlink = Sync-ProgramFolder -ChosenPath $TCHT -Subfolder "Retrieval-based-Voice-Conversion-WebUI"
+
+# Then CD into $TCHT\
+Set-Location "$TCHT\"
 
 # 1. Install Chocolatey
 Clear-ConsoleScreen
@@ -84,9 +93,6 @@ Clear-ConsoleScreen
 Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
 Update-SessionEnvironment
-
-Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
-$TCHT = Get-TCHTPath
 
 # 6. Check if Conda or Python is installed
 # Check if Conda is installed
@@ -166,23 +172,19 @@ if (-not ($condaFound)) {
 
 # 7. Check if has rvc directory ($TCHT\Retrieval-based-Voice-Conversion-WebUI) (Default C:\TCHT\Retrieval-based-Voice-Conversion-WebUI)
 Clear-ConsoleScreen
-if (Test-Path -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI") {
+if ((Test-Path -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI") -and -not $isSymlink) {
     Write-Host "The 'Retrieval-based-Voice-Conversion-WebUI' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\Retrieval-based-Voice-Conversion-WebUI"
     git pull
 } else {
     Write-Host "I'll start by installing RVC first, then we'll get to the models...`n`n"
     
-    if (!(Test-Path -Path "$TCHT")) {
-        New-Item -ItemType Directory -Path "$TCHT" | Out-Null
+    if (!(Test-Path -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI")) {
+        New-Item -ItemType Directory -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI" | Out-Null
     }
-
-    # Then CD into $TCHT\
-    Set-Location "$TCHT\"
-
-    # - Clone https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI
-    git clone https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI
     Set-Location "$TCHT\Retrieval-based-Voice-Conversion-WebUI"
+
+    git clone https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI .
 }
 
 # 8. Download required files/models:

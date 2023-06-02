@@ -31,8 +31,8 @@
 Write-Host "---------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's kohya_ss installer!" -ForegroundColor Cyan
 Write-Host "kohya_ss as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "[Version 2023-04-28]" -ForegroundColor Cyan
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "---------------------------------------------`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
@@ -42,8 +42,13 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
+Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
-$TCHT = Get-TCHTPath
+$TCHT = Get-TCHTPath -Subfolder "kohya_ss"
+
+# If user chose to install this program in another path, create a symlink for easy access and management.
+$isSymlink = Sync-ProgramFolder -ChosenPath $TCHT -Subfolder "kohya_ss"
 
 # Then CD into $TCHT\
 Set-Location "$TCHT\"

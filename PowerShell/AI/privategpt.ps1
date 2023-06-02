@@ -36,8 +36,8 @@
 Write-Host "-----------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's privateGPT installer!" -ForegroundColor Cyan
 Write-Host "privateGPT as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "[Version 2023-05-22]" -ForegroundColor Cyan
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "-----------------------------------------------`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
@@ -48,6 +48,16 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+
+Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
+$TCHT = Get-TCHTPath -Subfolder "privateGPT"
+
+# If user chose to install this program in another path, create a symlink for easy access and management.
+$isSymlink = Sync-ProgramFolder -ChosenPath $TCHT -Subfolder "privateGPT"
+
+# Then CD into $TCHT\
+Set-Location "$TCHT\"
+
 
 # 1. Install Chocolatey
 Clear-ConsoleScreen
@@ -149,23 +159,19 @@ if (-not ($condaFound)) {
 
 # 5. Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
 Clear-ConsoleScreen
-if (Test-Path -Path "$TCHT\privateGPT") {
+if ((Test-Path -Path "$TCHT\privateGPT") -and -not $isSymlink) {
     Write-Host "The 'privateGPT' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\privateGPT"
     git pull
 } else {
     Write-Host "I'll start by installing privateGPT first, then we'll get to the model...`n`n"
     
-    if (!(Test-Path -Path "$TCHT")) {
-        New-Item -ItemType Directory -Path "$TCHT" | Out-Null
+    if (!(Test-Path -Path "$TCHT\privateGPT")) {
+        New-Item -ItemType Directory -Path "$TCHT\privateGPT" | Out-Null
     }
-
-    # Then CD into $TCHT\
-    Set-Location "$TCHT\"
-
-    # - Clone https://github.com/imartinez/privateGPT
-    git clone https://github.com/imartinez/privateGPT
     Set-Location "$TCHT\privateGPT"
+
+    git clone https://github.com/imartinez/privateGPT .
 }
 
 Import-FunctionIfNotExists -Command Get-Aria2Files -ScriptUri "File-DownloadMethods.tc.ht"
