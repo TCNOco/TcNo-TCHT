@@ -68,7 +68,7 @@ function New-LauncherWithErrorHandling {
     Set-Content -Path "$LauncherName.bat" -Value "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$LauncherName.ps1`""
 }
 
-function Get-TotalFolderSize {
+function Get-FolderSize {
     param(
         [Parameter(Mandatory=$true)] [string]$Path
     )
