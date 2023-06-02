@@ -351,6 +351,11 @@ function Get-TCHTPathWIP() {
                 # TODO: or Create Symlinks to existing programs from previous path
 
                 Write-Host "Calculating existing folder size..." -ForegroundColor Cyan
+                $getTotalFolderSize = Get-Command Get-TotalFolderSize -erroraction silentlycontinue
+                if (!$getTotalFolderSize) {
+                    iex (irm Import-RemoteFunction.tc.ht)
+                    Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+                }
                 $existingFolderSize = Get-TotalFolderSize -Path $path
                 
                 do {
