@@ -413,14 +413,49 @@ function Get-TCHTPath() {
             }
 
             return $returnValue
+        } else {
+            # Wants to install to default location, but may be moving everything back on update/reinstall
+            $returnValue = "$path"
+
+            $existsAsSymlink = Test-ReparsePoint -path $path
+            # If $existsAsSymlink: Expand symlink path to real path
+            if ($existsAsSymlink -and $Subfolder -ne "") {
+                $folderPath = Join-Path -Path $path -ChildPath $Subfolder
+
+                $existsAsSymlink = Test-ReparsePoint -path $originalFolderPath
+                # If $existsAsSymlink: Expand symlink path to real path
+                if ($existsAsSymlink) {
+                    $toDelete = $folderPath
+                    $folderPath = (Get-Item $folderPath).Target
+                    Remove-Item $toDelete -Recurse -Force
+                }
+
+                $folderPathChosen = Join-Path -Path $folderPath -ChildPath $path
+
+                Write-Host "`nCreating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
+                New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force | Out-Null
+
+
+
+
+                $symlinkPath = $originalPath
+                $originalPath = (Get-Item $originalPath).Target
+
+                # Remove existing, now wrong, symlink:
+                Remove-Item -Path $symlinkPath | Out-Null
+            }
+
+            Write-Host "Moving existing files from $originalPath to $chosenPathSubfolder..." -ForegroundColor Yellow
+            Move-Item -Path $originalPath -Destination $chosenPath -Force
+
         }
     }
 
     # We'll create $TCHT if it doesn't already exist:
-    if (!(Test-Path -Path $path)) {
-        New-Item -ItemType Directory -Path $path | Out-Null
+    if (!(Test-Path -Path $returnValue)) {
+        New-Item -ItemType Directory -Path $returnValue | Out-Null
     }
-    return $path
+    return $returnValue
 }
 
 <#
