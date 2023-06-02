@@ -47,14 +47,10 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     Read-Host
 }
 
-# 1. Install Chocolatey
-Clear-ConsoleScreen
-Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath -Subfolder "stable-diffusion-webui"
 
@@ -64,6 +60,11 @@ $isSymlink = Sync-ProgramFolder -ChosenPath $TCHT -Subfolder "stable-diffusion-w
 # Then CD into $TCHT\
 Set-Location "$TCHT\"
 
+
+# 1. Install Chocolatey
+Clear-ConsoleScreen
+Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # 2. Install or update Git if not already installed
 Clear-ConsoleScreen
