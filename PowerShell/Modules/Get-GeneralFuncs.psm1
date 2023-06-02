@@ -67,3 +67,17 @@ function New-LauncherWithErrorHandling {
     # Create bat launcher for those who like batch files (or don't know what ps1 files are)
     Set-Content -Path "$LauncherName.bat" -Value "@echo off`npowershell -ExecutionPolicy ByPass -NoExit -File `"$LauncherName.ps1`""
 }
+
+function Get-TotalFolderSize {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Path
+    )
+
+    $Foldersize = Get-ChildItem $Path -recurse | Measure-Object -property length -sum
+    $outputSize = [math]::Round(($FolderSize.sum / 1MB),2)
+    if ("$outputSize".Length -gt 6) {
+        $outputSize = [math]::Round(($FolderSize.sum / 1GB),2)
+    }
+
+    return "$Foldersize MB"
+}

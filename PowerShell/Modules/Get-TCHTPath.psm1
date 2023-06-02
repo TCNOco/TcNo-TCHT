@@ -349,6 +349,54 @@ function Get-TCHTPathWIP() {
 
                 # TODO: Offer to move existing programs from previous path
                 # TODO: or Create Symlinks to existing programs from previous path
+
+                Write-Host "Calculating existing folder size..." -ForegroundColor Cyan
+                $existingFolderSize = Get-TotalFolderSize -Path $path
+                
+                do {
+                    Clear-ConsoleScreen
+                    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to move existing programs installed to ($path) to ($chosenPath)? Total size: $existingFolderSize (y/n): "
+                    $moveExisting = Read-Host
+                } while ($moveExisting -notin "Y", "y", "N", "n")
+                
+                if ($moveExisting -in "Y", "y") {
+                    # Foreach folder in $path
+                    # Move to $chosenPath
+                    # Create symlink in $path to $chosenPath
+                    ForEach-Object -InputObject (Get-ChildItem -Path $path -Directory) -Process {
+                        $folderName = $_.Name
+                        $folderPath = Join-Path -Path $path -ChildPath $folderName
+                        $folderPathChosen = Join-Path -Path $chosenPath -ChildPath $folderName
+
+                        Write-Host "`nMoving $folderPath to $folderPathChosen..." -ForegroundColor Yellow
+                        Move-Item -Path $folderPath -Destination $chosenPath -Force
+
+                        Write-Host "Creating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
+                        New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force
+                    }
+
+                    Write-Host "Done moving!" -ForegroundColor Green
+                    Write-Host "The files have physically moved, but will still 'appear' to exist in the original path - This is so shortcuts still work." -ForegroundColor Cyan
+                } else {
+                    # Else, just symlink all the existing folders in the new folder
+                    # And copy any symlinks that may exist in the old folder, so no symlinks are symlinked.
+                    ForEach-Object -InputObject (Get-ChildItem -Path $path -Directory) -Process {
+                        $folderName = $_.Name
+                        $folderPath = Join-Path -Path $path -ChildPath $folderName
+
+                        $existsAsSymlink = Test-ReparsePoint -path $originalPath
+                        # If $existsAsSymlink: Expand symlink path to real path
+                        if ($existsAsSymlink) {
+                            $folderPath = (Get-Item $folderPath).Target
+                        }
+
+                        $folderPathChosen = Join-Path -Path $chosenPath -ChildPath $folderName
+
+                        Write-Host "`nCreating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
+                        New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force
+                    }
+                }
+
                 # TODO: Also, option to check and update shortcuts on desktop, that could take a few moments.
             }
 
@@ -408,9 +456,9 @@ function Sync-ProgramFolder() {
 
         Clear-ConsoleScreen
         Write-Host "The installer has created a link between your default ($savedPath) and where it is actually installed ($actualInstallPath)" -ForegroundColor Cyan
-        Write-Host "`n`nEven though the files appear to be on $symlinkPath, they take up no space, and are actually on $actualInstallPath" -ForegroundColor Cyan
-        Write-Host "This is performed so shortcuts still work, easy management, etc." -ForegroundColor Cyan
-        Write-Host "Interactions between the symlink (`"shortcut`") will appear in the actual location they are installed to. New files, changes, etc.`n`n" -ForegroundColor Cyan
+        Write-Host "`n`nEven though the files appear to be on $symlinkPath, they take up no space, and are actually on $actualInstallPath"
+        Write-Host "This is performed so shortcuts still work, easy management, etc."
+        Write-Host "Interactions between the symlink (`"shortcut`") will appear in the actual location they are installed to. New files, changes, etc.`n`n"
 
         Write-Host "Continuing in 5 seconds... Scroll up to continue reading!" -ForegroundColor Yellow
         Start-Sleep -s 5
