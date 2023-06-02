@@ -38,8 +38,8 @@
 Write-Host "--------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's AUTOMATIC1111 installer!" -ForegroundColor Cyan
 Write-Host "AUTOMATIC1111 as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "[Version 2023-04-11]" -ForegroundColor Cyan
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "--------------------------------------------------`n`n" -ForegroundColor Cyan
 
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
@@ -48,11 +48,13 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 }
 
 # 1. Install Chocolatey
-Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
+Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath -Subfolder "stable-diffusion-webui"
 
@@ -64,11 +66,13 @@ Set-Location "$TCHT\"
 
 
 # 2. Install or update Git if not already installed
-Write-Host "`nInstalling Git..." -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Installing Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
 # 3. Install aria2c to make the model downloads MUCH faster
-Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Installing aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
 
 # Import function to reload without needing to re-open Powershell
@@ -86,8 +90,9 @@ if (-not $condaFound) {
 }
 
 # If conda found: create environment
+Clear-ConsoleScreen
 if ($condaFound) {
-    Write-Host "`n`nDo you want to install AUTOMATIC1111 Stable Diffusion WebUI in a Conda environment called 'a11'?`nYou'll need to use 'conda activate a11' before being able to use it?"-ForegroundColor Cyan
+    Write-Host "Do you want to install AUTOMATIC1111 Stable Diffusion WebUI in a Conda environment called 'a11'?`nYou'll need to use 'conda activate a11' before being able to use it?"-ForegroundColor Cyan
 
     do {
         Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda (y/n): "
@@ -171,9 +176,9 @@ if ((Test-Path -Path "$TCHT\stable-diffusion-webui") -and -not $isSymlink) {
 git pull # Update A1 SDUI
 
 # 6. Enable xformers?
-
+Clear-ConsoleScreen
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to enable xformers for extra speed? (Recommended) (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to enable xformers for extra speed? (Recommended) (y/n): "
     $answer = Read-Host
 } while ($answer -notin "Y", "y", "N", "n")
 
@@ -194,7 +199,8 @@ if ((Get-CimInstance Win32_VideoController).Name -like "AMD") {
 }
 
 # 8. Low VRAM
-Write-Host "`n`nImage generation uses a lot of VRAM. There are tons of optimizations to do." -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Image generation uses a lot of VRAM. There are tons of optimizations to do." -ForegroundColor Cyan
 
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you have 8GB or more VRAM? (y/n): "
@@ -226,7 +232,8 @@ if ($answer -eq "y" -or $answer -eq "Y") {
 }
 
 # 9. Share with Gradio?
-Write-Host "`n`nDo you want to share your WebUI over the internet? (--share)" -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Do you want to share your WebUI over the internet? (--share)" -ForegroundColor Cyan
 Write-Host "NOTE: If yes, you will likely need to create an antivirus exception (More info provided if yes)." -ForegroundColor Cyan
 
 do {
@@ -244,7 +251,8 @@ if ($answer -eq "y" -or $answer -eq "Y") {
 }
 
 # 10. Create desktop shortcuts?
-Write-Host "`n`nCreate desktop shortcuts for AUTOMATIC1111?" -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Create desktop shortcuts for AUTOMATIC1111?" -ForegroundColor Cyan
 
 # Create start bat and ps1 files
 if ($condaFound) {
@@ -261,7 +269,8 @@ if ($condaFound) {
 
 
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
+    Clear-ConsoleScreen
+    Write-Host -ForegroundColor Cyan -NoNewline "Do you want desktop shortcuts? (y/n): "
     $shortcuts = Read-Host
 } while ($shortcuts -notin "Y", "y", "N", "n")
 
@@ -285,7 +294,8 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
 }
 
 # 11. Download Stable Diffusion 1.5 model
-Write-Host "`n`nGetting started? Do you have models?" -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Getting started? Do you have models?" -ForegroundColor Cyan
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download the Stable Diffusion 1.5 model? (y/n): "
     $defaultModel = Read-Host

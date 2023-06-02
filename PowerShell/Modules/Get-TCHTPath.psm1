@@ -253,19 +253,6 @@ function Set-TCHTPath() {
 
 }
 
-function Get-TCHTPath() {
-    $path = Get-TCHTPathSaved
-    if ($path -eq "") {
-        $path = Get-TCHTPathFromUser
-    }
-
-    # We'll create $TCHT if it doesn't already exist:
-    if (!(Test-Path -Path $path)) {
-        New-Item -ItemType Directory -Path $path | Out-Null
-    }
-    return $path
-}
-
 # From: https://stackoverflow.com/a/818054
 # Tests to see if path is a symlink
 function Test-ReparsePoint([string]$path) {
@@ -290,7 +277,11 @@ function Get-TCHTPath() {
         }
 
         Clear-ConsoleScreen
-        Write-Host "The program will install to $path." -ForegroundColor Cyan
+        if ($Subfolder -ne "") {
+            Write-Host "$Subfolder will install to $path." -ForegroundColor Cyan
+        } else {
+            Write-Host "The program will install to $path." -ForegroundColor Cyan
+        }
         do {
             Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to install it somewhere else? (y/n): "
             $installElsewhere = Read-Host
