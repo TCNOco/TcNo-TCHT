@@ -417,37 +417,33 @@ function Get-TCHTPath() {
             # Wants to install to default location, but may be moving everything back on update/reinstall
             $returnValue = "$path"
 
+            Write-Host "returnValue: $returnValue"
+
             $existsAsSymlink = Test-ReparsePoint -path $path
+            Write-Host "existsAsSymlink: $existsAsSymlink"
             # If $existsAsSymlink: Expand symlink path to real path
             if ($existsAsSymlink -and $Subfolder -ne "") {
                 $folderPath = Join-Path -Path $path -ChildPath $Subfolder
+                Write-Host "folderPath: $folderPath"
 
                 $existsAsSymlink = Test-ReparsePoint -path $originalFolderPath
+                Write-Host "existsAsSymlink: $existsAsSymlink"
                 # If $existsAsSymlink: Expand symlink path to real path
                 if ($existsAsSymlink) {
-                    $toDelete = $folderPath
+                    $symlinkPath = $folderPath
+                    Write-Host "symlinkPath: $symlinkPath"
                     $folderPath = (Get-Item $folderPath).Target
-                    Remove-Item $toDelete -Recurse -Force
+                    Write-Host "folderPath: $folderPath"
+                    Remove-Item $symlinkPath -Recurse -Force | Out-Null
                 }
 
                 $folderPathChosen = Join-Path -Path $folderPath -ChildPath $path
+                Write-Host "folderPathChosen: $folderPathChosen"
 
-                Write-Host "`nCreating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
-                New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force | Out-Null
-
-
-
-
-                $symlinkPath = $originalPath
-                $originalPath = (Get-Item $originalPath).Target
-
-                # Remove existing, now wrong, symlink:
-                Remove-Item -Path $symlinkPath | Out-Null
+                Write-Host "Moving existing files from $originalPath to $chosenPathSubfolder..." -ForegroundColor Yellow
+                Move-Item -Path $originalPath -Destination $chosenPath -Force
+    
             }
-
-            Write-Host "Moving existing files from $originalPath to $chosenPathSubfolder..." -ForegroundColor Yellow
-            Move-Item -Path $originalPath -Destination $chosenPath -Force
-
         }
     }
 
