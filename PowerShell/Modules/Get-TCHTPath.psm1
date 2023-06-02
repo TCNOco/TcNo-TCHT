@@ -350,7 +350,7 @@ function Get-TCHTPathWIP() {
                 # TODO: Offer to move existing programs from previous path
                 # TODO: or Create Symlinks to existing programs from previous path
 
-                Write-Host "Calculating existing folder size..." -ForegroundColor Cyan
+                Write-Host "`nCalculating existing folder size..."
                 $getTotalFolderSize = Get-Command Get-TotalFolderSize -erroraction silentlycontinue
                 if (!$getTotalFolderSize) {
                     iex (irm Import-RemoteFunction.tc.ht)
@@ -360,7 +360,7 @@ function Get-TCHTPathWIP() {
                 
                 do {
                     Clear-ConsoleScreen
-                    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to move existing programs installed to ($path) to ($chosenPath)? Total size: $existingFolderSize (y/n): "
+                    Write-Host -ForegroundColor Cyan -NoNewline "`nDo you want to move existing programs installed to ($path) to ($chosenPath)? Total size: $existingFolderSize (y/n): "
                     $moveExisting = Read-Host
                 } while ($moveExisting -notin "Y", "y", "N", "n")
                 

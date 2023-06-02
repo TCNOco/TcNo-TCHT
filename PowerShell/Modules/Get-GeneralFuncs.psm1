@@ -79,5 +79,5 @@ function Get-TotalFolderSize {
         $outputSize = [math]::Round(($FolderSize.sum / 1GB),2)
     }
 
-    return "$Foldersize MB"
+    return "$outputSize MB"
 }
