@@ -377,7 +377,7 @@ function Get-TCHTPathWIP() {
                         Move-Item -Path $folderPath -Destination $chosenPath -Force
 
                         Write-Host "Creating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
-                        New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force
+                        New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force | Out-Null
                     }
 
                     Write-Host "Done moving!" -ForegroundColor Green
@@ -398,7 +398,7 @@ function Get-TCHTPathWIP() {
                         $folderPathChosen = Join-Path -Path $chosenPath -ChildPath $folderName
 
                         Write-Host "`nCreating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
-                        New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force
+                        New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force | Out-Null
                     }
                 }
 
