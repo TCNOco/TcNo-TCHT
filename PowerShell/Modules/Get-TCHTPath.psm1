@@ -307,7 +307,7 @@ function Get-TCHTPathWIP() {
             } while ($chosenPath -eq "")
 
             # For some reason POWERSHELL LOVES CHANGING THE TYPE OF THIS TO AN OBJECT
-            $returnValue = $chosenPath
+            $returnValue = "$chosenPath"
 
             # If doesn't exist, create the path
             if (!(Test-Path -Path $chosenPath)) {
@@ -345,8 +345,6 @@ function Get-TCHTPathWIP() {
 
             # Set default if chosen
             if ($changeDefault -in "Y", "y") {
-                Set-TCHTPath -Path $chosenPath
-
                 # TODO: Offer to move existing programs from previous path
                 # TODO: or Create Symlinks to existing programs from previous path
 
@@ -372,6 +370,25 @@ function Get-TCHTPathWIP() {
                         $folderName = $_.Name
                         $folderPath = Join-Path -Path $path -ChildPath $folderName
                         $folderPathChosen = Join-Path -Path $chosenPath -ChildPath $folderName
+
+                        # If $folderPathChosen exists
+                        if (Test-Path -Path $folderPathChosen) {
+                            do {
+                                try {
+                                    Remove-Item $folderPathChosen -Recurse -Force -ErrorAction Stop
+                                }
+                                catch {
+                                    if ($_.Exception.Message.Contains("being used by another process")) {
+                                        Write-Verbose "File locked, trying again in 5 seconds"
+                                        Start-Sleep -Seconds 5
+                                    }
+                                    else {
+                                        Write-Error $_.Exception.Message
+                                        break
+                                    }
+                                }
+                            } until (!(Test-Path -Path $folderPathChosen))
+                        }
 
                         Write-Host "`nMoving $folderPath to $folderPathChosen..." -ForegroundColor Yellow
                         Move-Item -Path $folderPath -Destination $chosenPath -Force
@@ -403,6 +420,7 @@ function Get-TCHTPathWIP() {
                 }
 
                 # TODO: Also, option to check and update shortcuts on desktop, that could take a few moments.
+                Set-TCHTPath -Path $chosenPath
             }
 
             return $returnValue
