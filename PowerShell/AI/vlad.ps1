@@ -52,7 +52,7 @@ Clear-ConsoleScreen
 Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
-$TCHT = Get-TCHTPathWIP -Subfolder "vladmandic"
+$TCHT = Get-TCHTPath -Subfolder "vladmandic"
 
 # If user chose to install this program in another path, create a symlink for easy access and management.
 $isSymlink = Sync-ProgramFolder -ChosenPath $TCHT -Subfolder "vladmandic"

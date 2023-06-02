@@ -54,7 +54,10 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
-$TCHT = Get-TCHTPath
+$TCHT = Get-TCHTPath -Subfolder "stable-diffusion-webui"
+
+# If user chose to install this program in another path, create a symlink for easy access and management.
+$isSymlink = Sync-ProgramFolder -ChosenPath $TCHT -Subfolder "stable-diffusion-webui"
 
 # Then CD into $TCHT\
 Set-Location "$TCHT\"
@@ -150,23 +153,19 @@ if (-not ($condaFound)) {
 
 # 5. Check if has AUTOMATIC1111 directory ($TCHT\stable-diffusion-webui) (Default C:\TCHT\stable-diffusion-webui)
 Clear-ConsoleScreen
-if (Test-Path -Path "$TCHT\stable-diffusion-webui") {
+if ((Test-Path -Path "$TCHT\stable-diffusion-webui") -and -not $isSymlink) {
     Write-Host "The 'stable-diffusion-webui' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\stable-diffusion-webui"
     git pull
 } else {
     Write-Host "I'll start by installing AUTOMATIC1111 Stable Diffusion WebUI first, then we'll get to the models...`n`n"
     
-    if (!(Test-Path -Path "$TCHT")) {
-        New-Item -ItemType Directory -Path "$TCHT" | Out-Null
+    if (!(Test-Path -Path "$TCHT\stable-diffusion-webui")) {
+        New-Item -ItemType Directory -Path "$TCHT\stable-diffusion-webui" | Out-Null
     }
-
-    # Then CD into $TCHT\
-    Set-Location "$TCHT\"
-
-    # - Clone https://github.com/vladmandic/automatic
-    git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
     Set-Location "$TCHT\stable-diffusion-webui"
+
+    git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git .
 }
 
 git pull # Update A1 SDUI

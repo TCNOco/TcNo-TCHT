@@ -273,7 +273,7 @@ function Test-ReparsePoint([string]$path) {
     return [bool]($file.Attributes -band [IO.FileAttributes]::ReparsePoint)
   }
   
-function Get-TCHTPathWIP() {
+function Get-TCHTPath() {
     param (
         [Parameter()]
         [string]$Subfolder = ""
@@ -345,9 +345,6 @@ function Get-TCHTPathWIP() {
 
             # Set default if chosen
             if ($changeDefault -in "Y", "y") {
-                # TODO: Offer to move existing programs from previous path
-                # TODO: or Create Symlinks to existing programs from previous path
-
                 Write-Host "`nCalculating existing folder size..."
                 $getTotalFolderSize = Get-Command Get-FolderSize -erroraction silentlycontinue
                 if (!$getTotalFolderSize) {
@@ -358,7 +355,7 @@ function Get-TCHTPathWIP() {
                 
                 do {
                     Clear-ConsoleScreen
-                    Write-Host -ForegroundColor Cyan -NoNewline "`nDo you want to move existing programs installed to ($path) to ($chosenPath)? Total size: $existingFolderSize (y/n): "
+                    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to move existing programs installed to ($path) to ($chosenPath)? Total size: $existingFolderSize (y/n): "
                     $moveExisting = Read-Host
                 } while ($moveExisting -notin "Y", "y", "N", "n")
                 
@@ -399,6 +396,8 @@ function Get-TCHTPathWIP() {
 
                     Write-Host "Done moving!" -ForegroundColor Green
                     Write-Host "The files have physically moved, but will still 'appear' to exist in the original path - This is so shortcuts still work." -ForegroundColor Cyan
+                    Write-Host "Continuing in 5 seconds... Scroll up to continue reading!" -ForegroundColor Yellow
+                    Start-Sleep -s 5
                 } else {
                     # Else, just symlink all the existing folders in the new folder
                     # And copy any symlinks that may exist in the old folder, so no symlinks are symlinked.
@@ -419,7 +418,6 @@ function Get-TCHTPathWIP() {
                     }
                 }
 
-                # TODO: Also, option to check and update shortcuts on desktop, that could take a few moments.
                 Set-TCHTPath -Path $chosenPath
             }
 
