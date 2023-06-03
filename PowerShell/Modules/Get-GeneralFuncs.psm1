@@ -101,9 +101,14 @@ function Get-Python {
         [string]$PythonRegex = 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])',
         [string]$PythonRegexExplanation = "Python version is not between 3.10.6 and 3.10.11.",
         [string]$PythonInstallVersion = "3.10.11",
-        [string]$ManualInstallGuide = "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs"
+        [string]$ManualInstallGuide = "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs",
+        [switch]$condaFound
     )
     $python = "python"
+
+    if (-not (Get-Command Update-SessionEnvironment -ErrorAction SilentlyContinue)) {
+        iex (irm refreshenv.tc.ht)
+    }
 
     if (-not ($condaFound)) {
         # Try Python instead
@@ -115,19 +120,15 @@ function Get-Python {
                 Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
                 Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
                 choco install python --version=$PythonInstallVersion -y
-                $pythonVersion = python --version 2>&1
-            }
-
-            if ($pythonVersion -match $PythonRegex) {
-                Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
             }
         }
         Catch {
             Write-Host "Python is not installed." -ForegroundColor Yellow
             Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
             choco install python --version=$PythonInstallVersion -y
-            Update-SessionEnvironment
         }
+        
+        Update-SessionEnvironment
     
         # Verify Python install
         Try {

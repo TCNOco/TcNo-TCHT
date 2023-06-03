@@ -266,7 +266,6 @@ function Get-TCHTPath() {
         [string]$Subfolder = ""
     )
     $path = Get-TCHTPathSaved
-    $returnValue = "$path"
 
     if ($path -eq "") {
         $path = Get-TCHTPathFromUser
@@ -440,6 +439,10 @@ function Get-TCHTPath() {
                 }
             }
         }
+    }
+
+    if (!$returnValue) {
+        $returnValue = "$path"
     }
 
     # We'll create $TCHT if it doesn't already exist:
