@@ -266,6 +266,8 @@ function Get-TCHTPath() {
         [string]$Subfolder = ""
     )
     $path = Get-TCHTPathSaved
+    $returnValue = "$path"
+
     if ($path -eq "") {
         $path = Get-TCHTPathFromUser
     } else {
