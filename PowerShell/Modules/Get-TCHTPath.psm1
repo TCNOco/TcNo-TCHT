@@ -85,12 +85,12 @@ function Get-TCHTPathFromUser() {
 
 
     # Ask the user where to install
-    $installLocation = Read-Host @"
+    $installLocation = (Read-Host @"
 Pick where to install:
 1. (default) $path
 2. Current folder: $((Get-Location).Path)
 or Enter a custom path
-"@
+"@).Trim()
 
     $firstLoop = $True
     if ($installLocation -in "1", "", " ") {
@@ -110,11 +110,11 @@ or Enter a custom path
     # Else, a custom path entered. Check the path exists and prompt about spaces.
     do {
         if (-not $firstLoop) {
-            $installLocation = Read-Host "Please enter a custom path"
+            $installLocation = (Read-Host "Please enter a custom path").Trim()
             $firstLoop = $False
         } else {
             if (!(Test-Path $installLocation -PathType Container)) {
-                $createFolder = Read-Host "The folder $installLocation does not exist. Do you want to create it? (Y/N)"
+                $createFolder = (Read-Host "The folder $installLocation does not exist. Do you want to create it? (Y/N)").Trim()
                 if ($createFolder -eq "Y" -or $createFolder -eq "y") {
                     Write-Host "Folder created: $installLocation"
                     New-Item -ItemType Directory -Path $installLocation | Out-Null
@@ -122,7 +122,7 @@ or Enter a custom path
             }            
         }
         if ($installLocation.Contains(" ")) {
-            $proceedAnyway = Read-Host "Using a path with a space can result in things not working properly. Enter another path or type Y to use the current path: $installPath"
+            $proceedAnyway = (Read-Host "Using a path with a space can result in things not working properly. Enter another path or type Y to use the current path: $installPath").Trim()
         }
     } while ($installLocation.Contains(" ") -and $proceedAnyway -notin 'Y', 'y')
 
@@ -286,7 +286,7 @@ function Get-TCHTPath() {
         }
         do {
             Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to install it somewhere else? (y/n): "
-            $installElsewhere = Read-Host
+            $installElsewhere = (Read-Host).Trim()
         } while ($installElsewhere -notin "Y", "y", "N", "n")
         
         if ($installElsewhere -in "Y", "y") {
@@ -296,7 +296,7 @@ function Get-TCHTPath() {
             $chosenPath = ""
             do {
                 Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter a path to install this (and possibly other programs) to: "
-                $chosenPath = Read-Host
+                $chosenPath = (Read-Host).Trim()
             } while ($chosenPath -eq "")
 
             # For some reason POWERSHELL LOVES CHANGING THE TYPE OF THIS TO AN OBJECT
@@ -306,7 +306,7 @@ function Get-TCHTPath() {
             if (!(Test-Path -Path $chosenPath)) {
                 New-Item -ItemType Directory -Path $chosenPath | Out-Null
             }
-
+            
             # If $Subfolder is set
             if ($Subfolder -ne "") {
                 $originalPath = Join-Path -Path $path -ChildPath $Subfolder
@@ -330,88 +330,91 @@ function Get-TCHTPath() {
                 }
             }
 
-            do {
-                Clear-ConsoleScreen
-                Write-Host -ForegroundColor Cyan -NoNewline "Would you like to install all future TCHT programs to this path? ($chosenPath) (y/n): "
-                $changeDefault = Read-Host
-            } while ($changeDefault -notin "Y", "y", "N", "n")
-
-            # Set default if chosen
-            if ($changeDefault -in "Y", "y") {
-                Write-Host "`nCalculating existing folder size..."
-                $getTotalFolderSize = Get-Command Get-FolderSize -erroraction silentlycontinue
-                if (!$getTotalFolderSize) {
-                    iex (irm Import-RemoteFunction.tc.ht)
-                    Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
-                }
-                $existingFolderSize = Get-FolderSize -Path $path
-                
+            # Case insensitive compare paths
+            if (!($path -ieq $chosenPath)) {
                 do {
                     Clear-ConsoleScreen
-                    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to move existing programs installed to ($path) to ($chosenPath)? Total size: $existingFolderSize (y/n): "
-                    $moveExisting = Read-Host
-                } while ($moveExisting -notin "Y", "y", "N", "n")
-                
-                if ($moveExisting -in "Y", "y") {
-                    # Foreach folder in $path
-                    # Move to $chosenPath
-                    # Create symlink in $path to $chosenPath
-                    ForEach-Object -InputObject (Get-ChildItem -Path $path -Directory) -Process {
-                        $folderName = $_.Name
-                        $folderPath = Join-Path -Path $path -ChildPath $folderName
-                        $folderPathChosen = Join-Path -Path $chosenPath -ChildPath $folderName
-
-                        # If $folderPathChosen exists
-                        if (Test-Path -Path $folderPathChosen) {
-                            do {
-                                try {
-                                    Remove-Item $folderPathChosen -Recurse -Force -ErrorAction Stop
-                                }
-                                catch {
-                                    if ($_.Exception.Message.Contains("being used by another process")) {
-                                        Write-Verbose "File locked, trying again in 5 seconds"
-                                        Start-Sleep -Seconds 5
-                                    }
-                                    else {
-                                        Write-Error $_.Exception.Message
-                                        break
-                                    }
-                                }
-                            } until (!(Test-Path -Path $folderPathChosen))
-                        }
-
-                        Write-Host "`nMoving $folderPath to $folderPathChosen..." -ForegroundColor Yellow
-                        Move-Item -Path $folderPath -Destination $chosenPath -Force
-
-                        Write-Host "Creating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
-                        New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force | Out-Null
+                    Write-Host -ForegroundColor Cyan -NoNewline "Would you like to install all future TCHT programs to this path? ($chosenPath) (y/n): "
+                    $changeDefault = (Read-Host).Trim()
+                } while ($changeDefault -notin "Y", "y", "N", "n")
+    
+                # Set default if chosen
+                if ($changeDefault -in "Y", "y") {
+                    Write-Host "`nCalculating existing folder size..."
+                    $getTotalFolderSize = Get-Command Get-FolderSize -erroraction silentlycontinue
+                    if (!$getTotalFolderSize) {
+                        iex (irm Import-RemoteFunction.tc.ht)
+                        Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
                     }
-
-                    Write-Host "Done moving!" -ForegroundColor Green
-                    Write-Host "The files have physically moved, but will still 'appear' to exist in the original path - This is so shortcuts still work." -ForegroundColor Cyan
-                    Write-Host "Continuing in 5 seconds... Scroll up to continue reading!" -ForegroundColor Yellow
-                    Start-Sleep -s 5
-                } else {
-                    # Else, just symlink all the existing folders in the new folder
-                    # And copy any symlinks that may exist in the old folder, so no symlinks are symlinked.
-                    ForEach-Object -InputObject (Get-ChildItem -Path $path -Directory) -Process {
-                        $folderName = $_.Name
-                        $folderPath = Join-Path -Path $path -ChildPath $folderName
-
-                        $existsAsSymlink = Test-ReparsePoint -path $originalPath
-                        # If $existsAsSymlink: Expand symlink path to real path
-                        if ($existsAsSymlink) {
-                            $folderPath = (Get-Item $folderPath).Target
+                    $existingFolderSize = Get-FolderSize -Path $path
+                    
+                    do {
+                        Clear-ConsoleScreen
+                        Write-Host -ForegroundColor Cyan -NoNewline "Do you want to move existing programs installed to ($path) to ($chosenPath)? Total size: $existingFolderSize (y/n): "
+                        $moveExisting = (Read-Host).Trim()
+                    } while ($moveExisting -notin "Y", "y", "N", "n")
+                    
+                    if ($moveExisting -in "Y", "y") {
+                        # Foreach folder in $path
+                        # Move to $chosenPath
+                        # Create symlink in $path to $chosenPath
+                        ForEach-Object -InputObject (Get-ChildItem -Path $path -Directory) -Process {
+                            $folderName = $_.Name
+                            $folderPath = Join-Path -Path $path -ChildPath $folderName
+                            $folderPathChosen = Join-Path -Path $chosenPath -ChildPath $folderName
+    
+                            # If $folderPathChosen exists
+                            if (Test-Path -Path $folderPathChosen) {
+                                do {
+                                    try {
+                                        Remove-Item $folderPathChosen -Recurse -Force -ErrorAction Stop
+                                    }
+                                    catch {
+                                        if ($_.Exception.Message.Contains("being used by another process")) {
+                                            Write-Verbose "File locked, trying again in 5 seconds"
+                                            Start-Sleep -Seconds 5
+                                        }
+                                        else {
+                                            Write-Error $_.Exception.Message
+                                            break
+                                        }
+                                    }
+                                } until (!(Test-Path -Path $folderPathChosen))
+                            }
+    
+                            Write-Host "`nMoving $folderPath to $folderPathChosen..." -ForegroundColor Yellow
+                            Move-Item -Path $folderPath -Destination $chosenPath -Force
+    
+                            Write-Host "Creating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
+                            New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force | Out-Null
                         }
-
-                        $folderPathChosen = Join-Path -Path $chosenPath -ChildPath $folderName
-
-                        Write-Host "`nCreating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
-                        New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force | Out-Null
+    
+                        Write-Host "Done moving!" -ForegroundColor Green
+                        Write-Host "The files have physically moved, but will still 'appear' to exist in the original path - This is so shortcuts still work." -ForegroundColor Cyan
+                        Write-Host "Continuing in 5 seconds... Scroll up to continue reading!" -ForegroundColor Yellow
+                        Start-Sleep -s 5
+                    } else {
+                        # Else, just symlink all the existing folders in the new folder
+                        # And copy any symlinks that may exist in the old folder, so no symlinks are symlinked.
+                        ForEach-Object -InputObject (Get-ChildItem -Path $path -Directory) -Process {
+                            $folderName = $_.Name
+                            $folderPath = Join-Path -Path $path -ChildPath $folderName
+    
+                            $existsAsSymlink = Test-ReparsePoint -path $originalPath
+                            # If $existsAsSymlink: Expand symlink path to real path
+                            if ($existsAsSymlink) {
+                                $folderPath = (Get-Item $folderPath).Target
+                            }
+    
+                            $folderPathChosen = Join-Path -Path $chosenPath -ChildPath $folderName
+    
+                            Write-Host "`nCreating symlink from $folderPath to $folderPathChosen..." -ForegroundColor Yellow
+                            New-Item -ItemType SymbolicLink -Path $folderPath -Target $folderPathChosen -Force | Out-Null
+                        }
                     }
+    
+                    Set-TCHTPath -Path $chosenPath
                 }
-
-                Set-TCHTPath -Path $chosenPath
             }
 
             return $returnValue
