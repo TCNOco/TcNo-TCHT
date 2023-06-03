@@ -110,50 +110,54 @@ function Get-Python {
         iex (irm refreshenv.tc.ht)
     }
 
-    if (-not ($condaFound)) {
-        # Try Python instead
-        # Check if Python returns anything (is installed - also is 3.10.6 - 3.10.11)
-        Try {
-            $pythonVersion = python --version 2>&1
-            
-            if ($pythonVersion -match "Python was not found;") {
-                Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
-                Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
-                choco install python --version=$PythonInstallVersion -y
-            }
-        }
-        Catch {
-            Write-Host "Python is not installed." -ForegroundColor Yellow
+    if ($condaFound) {
+        return $python
+    }
+    
+    Update-SessionEnvironment
+    
+    # Try Python instead
+    # Check if Python returns anything (is installed - also is 3.10.6 - 3.10.11)
+    Try {
+        $pythonVersion = python --version 2>&1
+        
+        if ($pythonVersion -match "Python was not found;") {
+            Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
             Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
             choco install python --version=$PythonInstallVersion -y
         }
+    }
+    Catch {
+        Write-Host "Python is not installed." -ForegroundColor Yellow
+        Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
+        choco install python --version=$PythonInstallVersion -y
+    }
+
+    Update-SessionEnvironment
+
+    # Verify Python install
+    Try {
+        $pythonVersion = &$python --version 2>&1
+        if ($pythonVersion -match $PythonRegex) {
+            Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
+        }
+        else {
+            Write-Host "$PythonRegexExplanation`nAssuming you've installed the correct version, please enter the comand you use to access Python 3.9/3.10." -ForegroundColor Yellow
         
-        Update-SessionEnvironment
-    
-        # Verify Python install
-        Try {
-            $pythonVersion = &$python --version 2>&1
+            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310)"
+            $pythonVersion = &$pythonProgramName --version 2>&1
             if ($pythonVersion -match $PythonRegex) {
-                Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
-            }
-            else {
-                Write-Host "$PythonRegexExplanation`nAssuming you've installed the correct version, please enter the comand you use to access Python 3.9/3.10." -ForegroundColor Yellow
-            
-                $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310)"
-                $pythonVersion = &$pythonProgramName --version 2>&1
-                if ($pythonVersion -match $PythonRegex) {
-                    Write-Host "Python version $($matches[1]) is installed."
-                    $python = $pythonProgramName
-                } else {
-                    Write-Host "$PythonRegexExplanation`nAlternatively, follow this guide for manual installation: $ManualInstallGuide" -ForegroundColor Red
-                    Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
-                }
+                Write-Host "Python version $($matches[1]) is installed."
+                $python = $pythonProgramName
+            } else {
+                Write-Host "$PythonRegexExplanation`nAlternatively, follow this guide for manual installation: $ManualInstallGuide" -ForegroundColor Red
+                Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
             }
         }
-        Catch {
-            Write-Host "$PythonRegexExplanation`nAlternatively, follow this guide for manual installation: $ManualInstallGuide..." -ForegroundColor Red
-            Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
-        }
+    }
+    Catch {
+        Write-Host "$PythonRegexExplanation`nAlternatively, follow this guide for manual installation: $ManualInstallGuide..." -ForegroundColor Red
+        Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
     }
 
     return $python
