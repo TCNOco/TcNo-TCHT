@@ -50,6 +50,7 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+iex (irm Get-CondaAndPython.tc.ht)
 
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath -Subfolder "stable-diffusion-webui"
