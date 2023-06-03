@@ -49,24 +49,28 @@ function Get-Python {
     
     # Try Python instead
     # Check if Python returns anything (is installed - also is 3.10.6 - 3.10.11)
+    $tryInstall = $false
     Try {
         $pythonVersion = python --version 2>&1
         
         if ($pythonVersion -match "Python was not found;") {
-            Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
-            Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
-            choco install python --version=$PythonInstallVersion -y
-            Write-Host "`Installed!" -ForegroundColor Cyan
-            Update-SessionEnvironment
+            # Issue: This only works with Windows...
+            $tryInstall = $true
         }
     }
     Catch {
-        Write-Host "Python is not installed." -ForegroundColor Yellow
+        $tryInstall = $true
+    }
+
+    if ($tryInstall){
+        Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
         Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
         choco install python --version=$PythonInstallVersion -y
         Write-Host "`Installed!" -ForegroundColor Cyan
+        $python = "python"
         Update-SessionEnvironment
     }
+
 
     # Verify Python install
     Try {
