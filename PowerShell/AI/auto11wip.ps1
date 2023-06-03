@@ -85,7 +85,7 @@ Update-SessionEnvironment
 $condaFound = Get-UseConda -Name "AUTOMATIC1111 Stable Diffusion WebUI" -EnvName "a11" -PythonVersion "3.10.6"
 
 # Get Python command (eg. python, python3) & Check for compatible version
-$python = Get-Python -pythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -pythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -pythonInstallVersion "3.10.11" -manualInstallGuide "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs"
+$python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs"
 
 # 5. Check if has AUTOMATIC1111 directory ($TCHT\stable-diffusion-webui) (Default C:\TCHT\stable-diffusion-webui)
 Clear-ConsoleScreen

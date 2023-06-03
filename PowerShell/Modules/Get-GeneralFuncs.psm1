@@ -98,10 +98,10 @@ Python command "python", "python3", etc.
 #>
 function Get-Python {
     param (
-        [string]$pythonRegex = 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])',
-        [string]$pythonRegexExplanation = "Python version is not between 3.10.6 and 3.10.11.",
-        [string]$pythonInstallVersion = "3.10.11",
-        [string]$manualInstallGuide = "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs"
+        [string]$PythonRegex = 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])',
+        [string]$PythonRegexExplanation = "Python version is not between 3.10.6 and 3.10.11.",
+        [string]$PythonInstallVersion = "3.10.11",
+        [string]$ManualInstallGuide = "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs"
     )
     $python = "python"
 
@@ -110,43 +110,43 @@ function Get-Python {
         # Check if Python returns anything (is installed - also is 3.10.6 - 3.10.11)
         Try {
             $pythonVersion = python --version 2>&1
-            if ($pythonVersion -match $pythonRegex) {
+            if ($pythonVersion -match $PythonRegex) {
                 Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
-            } elseif ($pythonVersion -contains "Python was not found;") {
+            } elseif ($pythonVersion -match "Python was not found;") {
                 Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
-                Write-Host "`nInstalling Python $pythonInstallVersion." -ForegroundColor Cyan
-                choco install python --version=$pythonInstallVersion -y
+                Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
+                choco install python --version=$PythonInstallVersion -y
             }
         }
         Catch {
             Write-Host "Python is not installed." -ForegroundColor Yellow
-            Write-Host "`nInstalling Python $pythonInstallVersion." -ForegroundColor Cyan
-            choco install python --version=$pythonInstallVersion -y
+            Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
+            choco install python --version=$PythonInstallVersion -y
             Update-SessionEnvironment
         }
     
         # Verify Python install
         Try {
             $pythonVersion = &$python --version 2>&1
-            if ($pythonVersion -match $pythonRegex) {
+            if ($pythonVersion -match $PythonRegex) {
                 Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
             }
             else {
-                Write-Host "$pythonRegexExplanation`nAssuming you've installed the correct version, please enter the comand you use to access Python 3.9/3.10." -ForegroundColor Yellow
+                Write-Host "$PythonRegexExplanation`nAssuming you've installed the correct version, please enter the comand you use to access Python 3.9/3.10." -ForegroundColor Yellow
             
                 $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310)"
                 $pythonVersion = &$pythonProgramName --version 2>&1
-                if ($pythonVersion -match $pythonRegex) {
+                if ($pythonVersion -match $PythonRegex) {
                     Write-Host "Python version $($matches[1]) is installed."
                     $python = $pythonProgramName
                 } else {
-                    Write-Host "$pythonRegexExplanation`nAlternatively, follow this guide for manual installation: $manualInstallGuide" -ForegroundColor Red
+                    Write-Host "$PythonRegexExplanation`nAlternatively, follow this guide for manual installation: $ManualInstallGuide" -ForegroundColor Red
                     Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
                 }
             }
         }
         Catch {
-            Write-Host "$pythonRegexExplanation`nAlternatively, follow this guide for manual installation: $manualInstallGuide..." -ForegroundColor Red
+            Write-Host "$PythonRegexExplanation`nAlternatively, follow this guide for manual installation: $ManualInstallGuide..." -ForegroundColor Red
             Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
         }
     }
