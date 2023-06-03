@@ -110,12 +110,16 @@ function Get-Python {
         # Check if Python returns anything (is installed - also is 3.10.6 - 3.10.11)
         Try {
             $pythonVersion = python --version 2>&1
-            if ($pythonVersion -match $PythonRegex) {
-                Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
-            } elseif ($pythonVersion -match "Python was not found;") {
+            
+            if ($pythonVersion -match "Python was not found;") {
                 Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
                 Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
                 choco install python --version=$PythonInstallVersion -y
+                $pythonVersion = python --version 2>&1
+            }
+
+            if ($pythonVersion -match $PythonRegex) {
+                Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
             }
         }
         Catch {
