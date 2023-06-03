@@ -44,79 +44,14 @@ iex (irm refreshenv.tc.ht)
 
 # 2. Check if Conda or Python is installed
 # Check if Conda is installed
-$condaFound = Get-Command conda -ErrorAction SilentlyContinue
-iex (irm Get-CondaPath.tc.ht)
-if (-not $condaFound) {
-    # Try checking if conda is installed a little deeper... (May not always be activated for user)
-    $condaFound = Open-Conda # This checks for Conda, returns true if conda is hoooked
-    Update-SessionEnvironment
-}
+iex (irm Get-CondaAndPython.tc.ht)
 
+# Check if Conda is installed
+$condaFound = Get-UseConda -Name "Whisper" -EnvName "whisper" -PythonVersion "3.10.11"
 
-# If conda found: create environment
-if ($condaFound) {
-    Write-Host "`n`nDo you want to install Whisper in a Conda environment called 'whisper'?`nYou'll need to use 'conda activate whisper' before being able to use it?"-ForegroundColor Cyan
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda? (y/n): "
-    $installWhisper = Read-Host
-    if ($installWhisper -eq "y" -or $installWhisper -eq "Y") {
-        conda create -n whisper python=3.10 pip -y
-        conda activate whisper
-    } else {
-        $condaFound = $false
-        Write-Host "Checking for Python instead..."
-    }
-}
+# Get Python command (eg. python, python3) & Check for compatible version
+$python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://hub.tcno.co/ai/whisper/install/" -condaFound $condaFound
 
-$python = "python"
-if (-not ($condaFound)) {
-    # Try Python instead
-    # Check if Python returns anything (is installed - also between 3.9.9 & 3.10.10)
-    Try {
-        $pythonVersion = python --version 2>&1
-        if ($pythonVersion -match 'Python (3.(8|9|10).\d*)') {
-            Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
-        }
-    }
-    Catch {
-        Write-Host "Python is not installed." -ForegroundColor Yellow
-        Write-Host "`nInstalling Python 3.10.10." -ForegroundColor Cyan
-        choco install python --version=3.10.10 -y
-        Update-SessionEnvironment
-    }
-
-    # Verify Python install
-    Try {
-        $pythonVersion = &$python --version 2>&1
-        if ($pythonVersion -match 'Python (3.(8|9|10).\d*)') {
-            Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
-        }
-        else {
-            Write-Host "Python version is not between 3.8 and 3.10." -ForegroundColor Yellow
-            Write-Host "Assuming you've installed the correct version, please enter the comand you use to access Python 3.8/3.10." -ForegroundColor Yellow
-            Write-Host "Otherwise enter python to continue anyway." -ForegroundColor Yellow
-        
-            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python, python3, python310)"
-            $pythonVersion = &$pythonProgramName --version 2>&1
-            if ($pythonVersion -match 'Python (3\.(8|9|10)\.\d*)') {
-                Write-Host "Python version $($matches[1]) is installed."
-                $python = $pythonProgramName
-            } else {
-                if ($pythonProgramName -eq "python") {
-                    Write-Host "`n`"python`" entered. Ignoring version and attempting to continue anyway." -ForegroundColor Yellow
-                } else {
-                    Write-Host "Python version is not between 3.8 and 3.10."
-                    Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-                    Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
-                }
-            }
-        }
-    }
-    Catch {
-        Write-Host "Python version is not between 3.8 and 3.10."
-        Write-Host "Alternatively, follow this guide for manual installation: https://hub.tcno.co/ai/whisper/install/" -ForegroundColor Red
-        Read-Host "Process can try to continue, but will likely fail. Press Enter to continue..."
-    }
-}
 
 # 3. Install FFMPEG with Choco if not already installed.
 if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {

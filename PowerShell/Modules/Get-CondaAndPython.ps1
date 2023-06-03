@@ -256,7 +256,7 @@ function Get-UseConda {
         } while ($useConda -notin "Y", "y", "N", "n")
         
         if ($useConda -eq "y" -or $useConda -eq "Y") {
-            conda create -n $EnvName python=$PythonVersion -y
+            conda create -n $EnvName python=$PythonVersion pip -y
             conda activate $EnvName
         } else {
             $condaFound = $false
