@@ -96,7 +96,7 @@ function Get-Python {
         [string]$PythonRegexExplanation = "Python version is not between 3.10.6 and 3.10.11.",
         [string]$PythonInstallVersion = "3.10.11",
         [string]$ManualInstallGuide = "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs",
-        [switch]$condaFound
+        [bool]$condaFound = $false
     )
     $python = "python"
 
