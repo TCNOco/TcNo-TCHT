@@ -52,12 +52,18 @@ function Get-Python {
     $tryInstall = $false
     Try {
         Write-Host "Checking if Python is installed. This could take a while if it's not..." -ForegroundColor Yellow
-        $pythonVersion = python --version 2>&1
-        
-        if ($pythonVersion -match "Python was not found;") {
-            # Issue: This only works with Windows...
+
+        if (Get-Command python -ErrorAction SilentlyContinue) {
+            $pythonVersion = python --version 2>&1
+            
+            if ($pythonVersion -match "Python was not found;") {
+                # Issue: This only works with Windows...
+                $tryInstall = $true
+            }
+        } else {
             $tryInstall = $true
         }
+
     }
     Catch {
         $tryInstall = $true
