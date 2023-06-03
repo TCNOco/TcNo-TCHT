@@ -56,15 +56,17 @@ function Get-Python {
             Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
             Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
             choco install python --version=$PythonInstallVersion -y
+            Write-Host "`Installed!" -ForegroundColor Cyan
+            Update-SessionEnvironment
         }
     }
     Catch {
         Write-Host "Python is not installed." -ForegroundColor Yellow
         Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
         choco install python --version=$PythonInstallVersion -y
+        Write-Host "`Installed!" -ForegroundColor Cyan
+        Update-SessionEnvironment
     }
-
-    Update-SessionEnvironment
 
     # Verify Python install
     Try {
