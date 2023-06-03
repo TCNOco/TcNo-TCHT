@@ -51,6 +51,7 @@ function Get-Python {
     # Check if Python returns anything (is installed - also is 3.10.6 - 3.10.11)
     $tryInstall = $false
     Try {
+        Write-Host "Checking if Python is installed. This could take a while if it's not..." -ForegroundColor Yellow
         $pythonVersion = python --version 2>&1
         
         if ($pythonVersion -match "Python was not found;") {
@@ -66,8 +67,12 @@ function Get-Python {
         Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
         Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
         choco install python --version=$PythonInstallVersion -y
-        Write-Host "`Installed!" -ForegroundColor Cyan
-        $python = "python"
+        if ($LASTEXITCODE -eq 1) {
+            Write-Host "Installed!" -ForegroundColor Cyan
+            return "python"
+        } else {
+            Write-Host "Choco failed to install Python" -ForegroundColor Red
+        }
         Update-SessionEnvironment
     }
 
