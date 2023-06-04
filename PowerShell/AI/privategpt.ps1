@@ -23,14 +23,15 @@
 # 1. Install Chocolatey
 # 2. Install or update Git if not already installed
 # 3. Install aria2c to make the model downloads MUCH faster
-# 4. Check if Conda or Python is installed
-# 5. Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
+# 4. Install Build Tools
+# 5. Check if Conda or Python is installed
+# 6 Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
 # - Clone https://github.com/imartinez/privateGPT
-# 6. Download a model
-# 7. Set up the models in env:
-# 8. Create Launcher files
-# 9. Create desktop shortcuts?
-# 10. Launch privateGPT
+# 7. Download a model
+# 8. Set up the models in env:
+# 9. Create Launcher files
+# 10. Create desktop shortcuts?
+# 11. Launch privateGPT
 # ----------------------------------------
 
 Write-Host "-----------------------------------------------" -ForegroundColor Cyan
@@ -78,11 +79,16 @@ Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cya
 choco upgrade aria2 -y
 Update-SessionEnvironment
 
+# 4. Install Build Tools
+Clear-ConsoleScreen
+Write-Host "Installing Microsoft Build Tools..." -ForegroundColor Cyan
+iex (irm install-buildtools.tc.ht)
+
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath
 
 
-# 4. Check if Conda or Python is installed
+# 5. Check if Conda or Python is installed
 # Check if Conda is installed
 iex (irm Get-CondaAndPython.tc.ht)
 
@@ -93,7 +99,7 @@ $condaFound = Get-UseConda -Name "privateGPT" -EnvName "pgpt" -PythonVersion "3.
 $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/imartinez/privateGPT#environment-setup" -condaFound $condaFound
 
 
-# 5. Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
+# 6. Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
 Clear-ConsoleScreen
 if ((Test-Path -Path "$TCHT\privateGPT") -and -not $isSymlink) {
     Write-Host "The 'privateGPT' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
@@ -219,7 +225,7 @@ if (Test-Path "example.env") {
     Rename-Item -Path "example.env" -NewName ".env" -Force
 }
 
-# 6. Download a model
+# 7. Download a model
 do {
     Clear-ConsoleScreen
     Write-Host "Which model would you like to download and use:" -ForegroundColor Cyan
@@ -264,7 +270,7 @@ if ($choice -eq "1") {
     $modelFile = "koala-13B.ggmlv3.q4_0.bin"
 }
 
-# 7. Set up the models in env:
+# 8. Set up the models in env:
 Write-Host "Configuring privateGPT" -ForegroundColor Yellow
 $filePath = ".env"
 $content = Get-Content $filePath
@@ -291,7 +297,7 @@ if ($choice -eq "7") {
 }
 Set-Content -Path $filePath -Value $updatedContent
 
-# 8. Create Launcher files
+# 9. Create Launcher files
 Write-Host "Creating launcher files..." -ForegroundColor Yellow
 # - Updater
 $OutputFilePath = "update.bat"
@@ -336,7 +342,7 @@ if ($condaFound) {
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 }
 
-# 9. Create desktop shortcuts?
+# 10. Create desktop shortcuts?
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for privateGPT?" -ForegroundColor Cyan
 do {
@@ -357,7 +363,7 @@ if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
-# 10. Launch privateGPT
+# 11. Launch privateGPT
 Clear-ConsoleScreen
 Write-Host "Launching privateGPT!`n" -ForegroundColor Cyan
 ./run-privategpt.bat
