@@ -22,7 +22,6 @@
 # This script checks if BuildTools is installed or not, and installs it if nessecary.
 # ----------------------------------------
 
-
 function Test-BuildToolsInstalled {
     param (
         [string]$FolderPath,
@@ -70,5 +69,12 @@ function Install-BuildTools {
     
     }
 }
+
+Write-Host "--------------------------------------------" -ForegroundColor Cyan
+Write-Host "Welcome to TroubleChute's BuildTools installer!" -ForegroundColor Cyan
+Write-Host "Chocolatey [package manager] and BuildTools will now be installed..." -ForegroundColor Cyan
+Write-Host "[Version 2023-06-03]" -ForegroundColor Cyan
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
+Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
 
 Install-BuildTools
