@@ -175,7 +175,7 @@ if ($condaFound) {
     &$python -m pip uninstall faiss-cpu
     &$python -m pip install faiss-cpu
     &$python -m pip install ffmpeg-python
-    pip install --upgrade --no-deps --force-reinstall torchcrepe
+    &$python -m pip install --upgrade --no-deps --force-reinstall torchcrepe
     Update-SessionEnvironment
 }
 
@@ -188,7 +188,7 @@ $OutputText = "@echo off`ngit pull"
 Set-Content -Path $OutputFilePath -Value $OutputText
 
 $InstallLocation = "`"$(Get-Location)`""
-$ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt`npip install --upgrade --no-deps --force-reinstall torchcrepe`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu`npython -m pip install ffmpeg-python"
+$ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt`npython -m pip install --upgrade --no-deps --force-reinstall torchcrepe`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu`npython -m pip install ffmpeg-python"
 $ProgramName = "Retrieval-based Voice Conversion WebUI"
 $RunCommand = "python infer-web.py"
 $LauncherName = "run-rvc"
