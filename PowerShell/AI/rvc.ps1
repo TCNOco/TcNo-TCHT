@@ -64,12 +64,12 @@ Set-Location "$TCHT\"
 
 # 1. Install Chocolatey
 Clear-ConsoleScreen
-Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
+Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # 2. Install or update Git if not already installed
 Clear-ConsoleScreen
-Write-Host "`nInstalling Git..." -ForegroundColor Cyan
+Write-Host "Installing Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
 # Import function to reload without needing to re-open Powershell
@@ -85,12 +85,13 @@ if (-not $ffmpegFound) {
 }
 
 # 4. Install VCRedist (if missing any)
-Write-Host "`nInstalling required VCRuntimes..." -ForegroundColor Cyan
+Clear-ConsoleScreen
+Write-Host "Installing required VCRuntimes..." -ForegroundColor Cyan
 choco upgrade vcredist2015 -y
 
 # 5. Install aria2c to make the model downloads MUCH faster
 Clear-ConsoleScreen
-Write-Host "`nInstalling aria2c (Faster model download)..." -ForegroundColor Cyan
+Write-Host "Installing aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
 Update-SessionEnvironment
 

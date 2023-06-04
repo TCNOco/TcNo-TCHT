@@ -33,6 +33,7 @@ function Clear-ConsoleScreen {
     [CmdletBinding()]
     param()
 
+    Write-Host "" # Add an extra newline
     $e = [char]27; Write-Host "$e[2J$e[H" -NoNewline
 }
 

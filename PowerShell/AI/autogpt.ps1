@@ -50,12 +50,12 @@ Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 
 # 1. Install Chocolatey
 Clear-ConsoleScreen
-Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
+Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 # 2. Install or update Git if not already installed
 Clear-ConsoleScreen
-Write-Host "`nInstalling Git..." -ForegroundColor Cyan
+Write-Host "Installing Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
 # Import function to reload without needing to re-open Powershell
@@ -74,7 +74,7 @@ $python = Get-Python -PythonRegex 'Python (3.(8|9|10).\d*)' -PythonRegexExplanat
 
 # 4. Downloads and installs Auto-GPT
 Clear-ConsoleScreen
-Write-Host "`nInstalling or updating Auto-GPT..." -ForegroundColor Cyan
+Write-Host "Installing or updating Auto-GPT..." -ForegroundColor Cyan
 git clone https://github.com/Torantulino/Auto-GPT.git -b stable
 Set-Location Auto-GPT
 
@@ -91,7 +91,7 @@ if ($condaFound) {
 
 # 5. Get API keys from user
 Clear-ConsoleScreen
-Write-Host "`nLet's get some information from you for this to work..." -ForegroundColor Cyan
+Write-Host "Let's get some information from you for this to work..." -ForegroundColor Cyan
 Write-Host "Should you not fill this in here, copy .env.template to .env, and fill in the info there." -ForegroundColor Cyan
 Write-Host "But, let's do this automatically:" -ForegroundColor Cyan
 
@@ -107,7 +107,7 @@ $openAIKey = Read-Host "Enter your OpenAI key"
 
 # Enter ElevenLabs API key
 Clear-ConsoleScreen
-Write-Host "`nIf you want TTS, grab yourself an ElevenLabs key, or enter nothing to skip this: https://elevenlabs.io/`n" -ForegroundColor Cyan
+Write-Host "If you want TTS, grab yourself an ElevenLabs key, or enter nothing to skip this: https://elevenlabs.io/`n" -ForegroundColor Cyan
 
 $elevenLabsKey = ""
 $elevenLabsKey = Read-Host "Enter your ElevenLabs key"
@@ -143,7 +143,7 @@ if (-not [String]::IsNullOrEmpty($elevenLabsKey)) {
 
 # Enter Pinecone API key
 Clear-ConsoleScreen
-Write-Host "`nDo you want to use Pinecone API for memory?" -ForegroundColor Cyan
+Write-Host "Do you want to use Pinecone API for memory?" -ForegroundColor Cyan
 Write-Host "Find information here: https://github.com/Significant-Gravitas/Auto-GPT#-pinecone-api-key-setup`n" -ForegroundColor Cyan
 
 $pineconeApi = Read-Host "Enter Pinecone API key (You can leave this blank)"
@@ -168,7 +168,7 @@ New-Item -Path $FilePath -ItemType File -Value "{}" | Out-Null
 
 # Enter Google Search key
 Clear-ConsoleScreen
-Write-Host "`nToo many Google Searches could end up with error 429. You can get and enter a Google API key to get around this." -ForegroundColor Cyan
+Write-Host "Too many Google Searches could end up with error 429. You can get and enter a Google API key to get around this." -ForegroundColor Cyan
 Write-Host "Remember to set API limits to prevent unexpected charges, as well." -ForegroundColor Cyan
 Write-Host "Find information here: https://github.com/Significant-Gravitas/Auto-GPT#-google-api-keys-configuration`n" -ForegroundColor Cyan
 
@@ -183,7 +183,7 @@ if (-not [String]::IsNullOrEmpty($googleApi)) {
 
 # Enter Hugging Face API key for Stable Diffusion
 Clear-ConsoleScreen
-Write-Host "`nBy default Auto-GPT uses DALL-e from OpenAI for image generation." -ForegroundColor Cyan
+Write-Host "By default Auto-GPT uses DALL-e from OpenAI for image generation." -ForegroundColor Cyan
 Write-Host "`nDo you want to use Hugging Face for Stable Diffusion instead?" -ForegroundColor Cyan
 Write-Host "Find information here: https://github.com/Significant-Gravitas/Auto-GPT#-image-generation`n" -ForegroundColor Cyan
 
@@ -253,7 +253,7 @@ if ($createShortcut -in "Y", "y") {
 }
 
 Clear-ConsoleScreen
-Write-Host "`n`n`nStarting Auto-GPT...`n" -ForegroundColor Cyan
+Write-Host "Starting Auto-GPT...`n" -ForegroundColor Cyan
 
 # 7. Run Auto-GPT
 $Host.UI.RawUI.WindowTitle = 'Auto-GPT'
