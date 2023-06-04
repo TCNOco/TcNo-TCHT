@@ -261,9 +261,9 @@ function Get-UseConda {
         
         if ($useConda -eq "y" -or $useConda -eq "Y") {
             # Initialize conda: it creates the powershell profile script
-            conda init powershell
+            $null = conda init powershell
             # Load the profile for current session: it activates (base) environment
-            invoke-expression -Command "$env:userprofile\Documents\WindowsPowerShell\profile.ps1"
+            $null = invoke-expression -Command "$env:userprofile\Documents\WindowsPowerShell\profile.ps1"
 
             conda create -n $EnvName python=$PythonVersion pip -y | Write-Host
             conda activate $EnvName | Write-Host
