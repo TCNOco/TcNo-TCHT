@@ -70,7 +70,7 @@ iex (irm install-git.tc.ht)
 
 # 3. Install FFMPEG if not already registered with PATH
 Clear-ConsoleScreen
-$ffmpegFound = Get-Command ffmpeg -ErrorAction SilentlyContinue
+$ffmpegFound = [bool](Get-Command ffmpeg -ErrorAction SilentlyContinue)
 if (-not $ffmpegFound) {
     Write-Host "Installing FFMPEG-Full..." -ForegroundColor Cyan
     choco upgrade ffmpeg-full -y

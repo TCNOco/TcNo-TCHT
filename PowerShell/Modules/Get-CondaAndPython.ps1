@@ -238,7 +238,7 @@ function Get-UseConda {
         iex (irm refreshenv.tc.ht)
     }
 
-    $condaFound = Get-Command conda -ErrorAction SilentlyContinue
+    $condaFound = [bool](Get-Command conda -ErrorAction SilentlyContinue)
 
     if (-not $condaFound) {
         # Try checking if conda is installed a little deeper... (May not always be activated for user)

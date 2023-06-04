@@ -77,7 +77,7 @@ iex (irm refreshenv.tc.ht)
 
 # 3. Install FFMPEG if not already registered with PATH
 Clear-ConsoleScreen
-$ffmpegFound = Get-Command ffmpeg -ErrorAction SilentlyContinue
+$ffmpegFound = [bool](Get-Command ffmpeg -ErrorAction SilentlyContinue)
 if (-not $ffmpegFound) {
     Write-Host "Installing FFMPEG-Full..." -ForegroundColor Cyan
     choco upgrade ffmpeg-full -y
@@ -125,7 +125,7 @@ if ((Test-Path -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI") -and -not $
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
 
 # - Install 7zip
-$sevenZipFound = Get-Command 7z -ErrorAction SilentlyContinue
+$sevenZipFound = [bool](Get-Command 7z -ErrorAction SilentlyContinue)
 if (-not $sevenZipFound) {
     Write-Host "Installing 7-Zip..." -ForegroundColor Cyan
     choco upgrade 7zip.install -y

@@ -271,7 +271,7 @@ function Get-TCHTPath() {
         $path = Get-TCHTPathFromUser
     } else {
         # Ask the user if they want to install this software here, or in another location
-        $clearScreenFound = Get-Command Clear-ConsoleScreen -erroraction silentlycontinue
+        $clearScreenFound = [bool](Get-Command Clear-ConsoleScreen -erroraction silentlycontinue)
         if (!$clearScreenFound) {
             iex (irm Import-RemoteFunction.tc.ht)
             Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
@@ -340,7 +340,7 @@ function Get-TCHTPath() {
                 # Set default if chosen
                 if ($changeDefault -in "Y", "y") {
                     Write-Host "`nCalculating existing folder size..."
-                    $getTotalFolderSize = Get-Command Get-FolderSize -erroraction silentlycontinue
+                    $getTotalFolderSize = [bool](Get-Command Get-FolderSize -erroraction silentlycontinue)
                     if (!$getTotalFolderSize) {
                         iex (irm Import-RemoteFunction.tc.ht)
                         Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
@@ -469,7 +469,7 @@ function Sync-ProgramFolder() {
         [parameter(Mandatory=$true)][string]$Subfolder
     )
 
-    $clearScreenFound = Get-Command Clear-ConsoleScreen -erroraction silentlycontinue
+    $clearScreenFound = [bool](Get-Command Clear-ConsoleScreen -erroraction silentlycontinue)
     if (!$clearScreenFound) {
         iex (irm Import-RemoteFunction.tc.ht)
         Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
