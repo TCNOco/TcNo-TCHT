@@ -284,11 +284,11 @@ function Get-TCHTPath() {
             Write-Host "The program will install to $path." -ForegroundColor Cyan
         }
         do {
-            Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to install it somewhere else? (y/n): "
+            Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to install it somewhere else? (y/n) [Default: n]: "
             $installElsewhere = (Read-Host).Trim()
-        } while ($installElsewhere -notin "Y", "y", "N", "n")
+        } while ($installElsewhere -notin "Y", "y", "N", "n", "")
         
-        if ($installElsewhere -in "Y", "y") {
+        if (($installElsewhere -in "Y", "y") -or ("" -eq $installElsewhere)) {
             Clear-ConsoleScreen
             Write-Host "The install script choses a folder, and installs programs inside of it. This is what you're setting." -ForegroundColor Cyan
             Write-Host "The default is C:\TCHT"

@@ -255,11 +255,11 @@ function Get-UseConda {
         Write-Host "Do you want to install $Name in a Conda environment called '$EnvName'?`nYou'll need to use 'conda activate $EnvName' before being able to use it?" -ForegroundColor Cyan
     
         do {
-            Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda (y/n): "
+            Write-Host -ForegroundColor Cyan -NoNewline "`n`nUse Conda (y/n) [Default: y]: "
             $useConda = Read-Host
-        } while ($useConda -notin "Y", "y", "N", "n")
+        } while ($useConda -notin "Y", "y", "N", "n", "")
         
-        if ($useConda -eq "y" -or $useConda -eq "Y") {
+        if ($useConda -eq "y" -or $useConda -eq "Y" -or $useConda -eq "") {
             # Initialize conda: it creates the powershell profile script
             $null = conda init powershell
             # Load the profile for current session: it activates (base) environment
