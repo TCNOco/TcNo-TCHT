@@ -105,6 +105,10 @@ if ((Test-Path -Path "$TCHT\privateGPT") -and -not $isSymlink) {
     Write-Host "The 'privateGPT' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\privateGPT"
     git pull
+    if ($LASTEXITCODE -eq 128) {
+        Write-Host "Could not find existing git repository. Cloning privateGPT...`n`n"
+        git clone https://github.com/imartinez/privateGPT.git .
+    }
 } else {
     Write-Host "I'll start by installing privateGPT first, then we'll get to the model...`n`n"
     
@@ -113,7 +117,7 @@ if ((Test-Path -Path "$TCHT\privateGPT") -and -not $isSymlink) {
     }
     Set-Location "$TCHT\privateGPT"
 
-    git clone https://github.com/imartinez/privateGPT .
+    git clone https://github.com/imartinez/privateGPT.git .
 }
 
 Import-FunctionIfNotExists -Command Get-Aria2Files -ScriptUri "File-DownloadMethods.tc.ht"

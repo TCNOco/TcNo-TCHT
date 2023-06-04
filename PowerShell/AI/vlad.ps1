@@ -91,6 +91,10 @@ if ((Test-Path -Path "$TCHT\vladmandic") -and -not $isSymlink) {
     Write-Host "The 'vladmandic' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\vladmandic"
     git pull
+    if ($LASTEXITCODE -eq 128) {
+        Write-Host "Could not find existing git repository. Cloning Retrieval-based-Voice-Conversion-WebUI...`n`n"
+        git clone https://github.com/vladmandic/automatic.git .
+    }
 } else {
     Write-Host "I'll start by installing Vladmandic SD.Next first, then we'll get to the models...`n`n"
     

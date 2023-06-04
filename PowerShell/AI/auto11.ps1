@@ -95,6 +95,10 @@ if ((Test-Path -Path "$TCHT\stable-diffusion-webui") -and -not $isSymlink) {
     Write-Host "The 'stable-diffusion-webui' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\stable-diffusion-webui"
     git pull
+    if ($LASTEXITCODE -eq 128) {
+        Write-Host "Could not find existing git repository. Cloning AUTOMATIC1111...`n`n"
+        git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git .
+    }
 } else {
     Write-Host "I'll start by installing AUTOMATIC1111 Stable Diffusion WebUI first, then we'll get to the models...`n`n"
     
@@ -105,8 +109,6 @@ if ((Test-Path -Path "$TCHT\stable-diffusion-webui") -and -not $isSymlink) {
 
     git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git .
 }
-
-git pull # Update A1 SDUI
 
 # 6. Enable xformers?
 Clear-ConsoleScreen

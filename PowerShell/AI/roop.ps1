@@ -102,6 +102,10 @@ if ((Test-Path -Path "$TCHT\roop") -and -not $isSymlink) {
     Write-Host "The 'roop' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\roop"
     git pull
+    if ($LASTEXITCODE -eq 128) {
+        Write-Host "Could not find existing git repository. Cloning Roop...`n`n"
+        git clone https://github.com/s0md3v/roop.git .
+    }
 } else {
     Write-Host "Cloning Roop...`n`n"
     
@@ -110,7 +114,7 @@ if ((Test-Path -Path "$TCHT\roop") -and -not $isSymlink) {
     }
     Set-Location "$TCHT\roop"
 
-    git clone https://github.com/s0md3v/roop .
+    git clone https://github.com/s0md3v/roop.git .
 }
 
 # 7. Download model
@@ -132,7 +136,7 @@ if ($condaFound) {
     conda install -c conda-forge -y
     python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     python -m pip install -r requirements.txt
-    conda install cudatoolkit
+    conda install cudatoolkit -y
 } else {
     python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     &$python -m pip install -r requirements.txt
@@ -161,7 +165,7 @@ $RunCommand = "python run.py --gpu"
 $LauncherName = "run-roop"
 
 if ($condaFound) {
-    $ReinstallCommand = "conda install cudatoolkit`npython -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
+    $ReinstallCommand = "conda install cudatoolkit -y`npython -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
 } else {
     $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
@@ -174,7 +178,7 @@ $RunCommand = "python run.py"
 $LauncherName = "run-roop-cpu"
 
 if ($condaFound) {
-    $ReinstallCommand = "conda install cudatoolkit`npython -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
+    $ReinstallCommand = "conda install cudatoolkit -y`npython -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
 } else {
     $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"

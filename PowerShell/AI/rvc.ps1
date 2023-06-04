@@ -110,6 +110,10 @@ if ((Test-Path -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI") -and -not $
     Write-Host "The 'Retrieval-based-Voice-Conversion-WebUI' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\Retrieval-based-Voice-Conversion-WebUI"
     git pull
+    if ($LASTEXITCODE -eq 128) {
+        Write-Host "Could not find existing git repository. Cloning Retrieval-based-Voice-Conversion-WebUI...`n`n"
+        git clone https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI.git .
+    }
 } else {
     Write-Host "I'll start by installing RVC first, then we'll get to the models...`n`n"
     
@@ -118,7 +122,7 @@ if ((Test-Path -Path "$TCHT\Retrieval-based-Voice-Conversion-WebUI") -and -not $
     }
     Set-Location "$TCHT\Retrieval-based-Voice-Conversion-WebUI"
 
-    git clone https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI .
+    git clone https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI.git .
 }
 
 # 8. Download required files/models:
