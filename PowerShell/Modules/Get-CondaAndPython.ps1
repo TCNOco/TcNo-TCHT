@@ -72,7 +72,7 @@ function Get-Python {
     if ($tryInstall){
         Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
         Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
-        choco install python --version=$PythonInstallVersion -y
+        choco install python --version=$PythonInstallVersion -y | Write-Host
         if ($LASTEXITCODE -eq 1) {
             Write-Host "Installed!" -ForegroundColor Cyan
             return "python"
@@ -209,7 +209,7 @@ function Open-Conda {
     $condaPath = Get-CondaPath
     Write-Host $condaPath
     if ($condaPath) {
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; &$condaPath
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; &$condaPath | Write-Host
         Write-Host "Conda found! Hooked."
         return $true
     }
@@ -248,7 +248,6 @@ function Get-UseConda {
     
     # If conda found: create environment
     Clear-ConsoleScreen
-    $returnValue = $condaFound
     if ($condaFound) {
         Write-Host "Do you want to install $Name in a Conda environment called '$EnvName'?`nYou'll need to use 'conda activate $EnvName' before being able to use it?" -ForegroundColor Cyan
     
@@ -258,13 +257,13 @@ function Get-UseConda {
         } while ($useConda -notin "Y", "y", "N", "n")
         
         if ($useConda -eq "y" -or $useConda -eq "Y") {
-            conda create -n $EnvName python=$PythonVersion pip -y
-            conda activate $EnvName
+            conda create -n $EnvName python=$PythonVersion pip -y | Write-Host
+            conda activate $EnvName | Write-Host
         } else {
             Write-Host "Checking for Python instead..."
             return $false
         }
     }
 
-    return $returnValue
+    return $condaFound
 }
