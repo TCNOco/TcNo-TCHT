@@ -29,6 +29,8 @@ Write-Host "[Version 2023-04-28]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "-----------------------------------------------`n`n" -ForegroundColor Cyan
 
+Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
+
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-FunctionIfNotExists -Command Install-Ooba -ScriptUri "Install-Ooba.tc.ht"

@@ -32,6 +32,7 @@ function Install-Ooba {
         [int]$skip_start,
         [int]$skip_model
     )
+    Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
 
     if ($skip_start -eq 1) {
         Write-Host "Not starting Ooba after installation"

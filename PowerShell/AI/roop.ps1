@@ -40,6 +40,8 @@ Write-Host "[Version 2023-06-04]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "---------------------------------------------------------------------------`n`n" -ForegroundColor Cyan
 
+Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
+
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
     Read-Host
@@ -48,7 +50,7 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
-Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Web-Request for this session
+Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
 
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath -Subfolder "roop"
@@ -176,11 +178,11 @@ if ($condaFound) {
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for Roop?" -ForegroundColor Cyan
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n) [Default: y]: "
     $shortcuts = Read-Host
-} while ($shortcuts -notin "Y", "y", "N", "n")
+} while ($shortcuts -notin "Y", "y", "N", "n", "")
 
-if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
+if ($shortcuts -in "Y","y", "") {
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
     Write-Host "Downloading Roop icon (not official)..."

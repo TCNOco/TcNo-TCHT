@@ -47,6 +47,7 @@ function New-LauncherWithErrorHandling {
         [Parameter()] [string]$CondaEnvironmentName,
         [Parameter()] [string]$LauncherName = "Launcher"
     )
+    Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
 
     if ($CondaPath) {
         Invoke-WebRequest -Uri "https://scriptlauncher-conda.tc.ht/" -OutFile "$LauncherName.ps1"

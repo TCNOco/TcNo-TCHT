@@ -38,6 +38,8 @@ Write-Host "[Version 2023-04-16]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "---------------------------------------------`n`n" -ForegroundColor Cyan
 
+Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
+
 Write-Host -NoNewline "Important: " -ForegroundColor Red
 Write-Host "Using OpenAI's API costs money, as well as a lot of others. Remember to set usage limits!" -ForegroundColor Yellow
 

@@ -35,6 +35,8 @@ Write-Host "[Version 2023-04-28]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "---------------------------------------------`n`n" -ForegroundColor Cyan
 
+Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
+
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
     Read-Host
@@ -131,12 +133,12 @@ Remove-Item setup.bat
 
 # 6. Create desktop shortcuts?
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want desktop shortcuts? (y/n) [Default: y]: "
     $shortcuts = Read-Host
-} while ($shortcuts -notin "Y", "y", "N", "n")
+} while ($shortcuts -notin "Y", "y", "N", "n", "")
 
 iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
-if ($shortcuts -in "Y","y") {
+if ($shortcuts -in "Y","y", "") {
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
     Write-Host "Downloading kohya_ss icon (not official)..."

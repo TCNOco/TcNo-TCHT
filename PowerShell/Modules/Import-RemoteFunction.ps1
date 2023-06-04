@@ -40,6 +40,7 @@ This command imports the function defined in the MyFunction.ps1 script from the 
 This function requires an active internet connection and sufficient permissions to download and execute scripts from remote sources.
 #>
 function Import-RemoteFunction ($ScriptUri) {
+    Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
     $functionName = [System.IO.Path]::GetFileNameWithoutExtension($ScriptUri)
     if (-not (Get-Command $functionName -ErrorAction SilentlyContinue)) {
         $tempModulePath = Join-Path ([System.IO.Path]::GetTempPath()) ($functionName + ".psm1")

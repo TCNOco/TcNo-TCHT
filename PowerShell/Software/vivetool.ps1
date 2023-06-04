@@ -35,6 +35,7 @@ Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" 
 Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
 
 
+Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
 iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 
@@ -146,11 +147,11 @@ if ($vivetool -eq "1") {
     Clear-ConsoleScreen
     Write-Host "Create desktop shortcuts for ViVeTool-GUI?" -ForegroundColor Cyan
     do {
-        Write-Host -ForegroundColor Cyan -NoNewline "Do you want desktop shortcuts? (y/n): "
+        Write-Host -ForegroundColor Cyan -NoNewline "Do you want desktop shortcuts? (y/n) [Default: y]: "
         $shortcuts = Read-Host
-    } while ($shortcuts -notin "Y", "y", "N", "n")
+    } while ($shortcuts -notin "Y", "y", "N", "n", "")
 
-    if ($shortcuts -eq "Y" -or $shortcuts -eq "y") {
+    if ($shortcuts -in "Y","y", "") {
         Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
 
         Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
