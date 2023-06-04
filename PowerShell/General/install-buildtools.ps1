@@ -29,19 +29,19 @@ function Test-BuildToolsInstalled {
         [int]$minVersion = 2015
     )
 
-    if ($minVersion -ge 2022 -and (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC#" -or Test-Path -Path "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\VC#")) {
+    if ($minVersion -ge 2022 -and (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC#") -or (Test-Path -Path "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\VC#")) {
         return $true
     }
 
-    if ($minVersion -ge 2019 -and (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC#" -or Test-Path -Path "C:\Program Files\Microsoft Visual Studio\2019\BuildTools\VC#")) {
+    if ($minVersion -ge 2019 -and (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC#") -or (Test-Path -Path "C:\Program Files\Microsoft Visual Studio\2019\BuildTools\VC#")) {
         return $true
     }
 
-    if ($minVersion -ge 2017 -and (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC" -or Test-Path -Path "C:\Program Files\Microsoft Visual Studio\2017\BuildTools\VC")) {
+    if ($minVersion -ge 2017 -and (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC") -or (Test-Path -Path "C:\Program Files\Microsoft Visual Studio\2017\BuildTools\VC")) {
         return $true
     }
 
-    if ($minVersion -ge 2015 -and (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC" -or Test-Path -Path "C:\Program Files\Microsoft Visual Studio\2017\BuildTools\VC")) {
+    if ($minVersion -ge 2015 -and (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC") -or (Test-Path -Path "C:\Program Files\Microsoft Visual Studio\2017\BuildTools\VC")) {
         return $true
     }
 
@@ -53,11 +53,11 @@ function Install-BuildTools {
         Write-Host "Microsoft BuildTools is already installed."
     } else {
         # Install Chocolatey if not already installed
-        if (!Get-Command choco -ErrorAction SilentlyContinue) {
+        if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
             Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
         }
-        
+
         choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --quiet" -y
         
         if (Test-BuildToolsInstalled) {
