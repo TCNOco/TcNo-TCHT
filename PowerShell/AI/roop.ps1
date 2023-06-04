@@ -25,7 +25,7 @@
 # 3. Install FFMPEG if not already registered with PATH
 # 4. Install aria2c to make the model downloads MUCH faster
 # 5. Check if Conda or Python is installed
-# 6. Check if has roop directory ($TCHT\roop) (Default C:\TCHT\roop)
+# 6. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
 # 7. Download model
 # 8. Install PyTorch and requirements:
 # 9. Create launcher files
@@ -99,55 +99,9 @@ if ($condaFound) {
 # Get Python command (eg. python, python3) & Check for compatible version
 $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/s0md3v/roop/wiki/1.-Installation" -condaFound $condaFound
 
-# 6. Check if has roop directory ($TCHT\roop) (Default C:\TCHT\roop)
+# 6. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
 Clear-ConsoleScreen
-if ((Test-Path -Path "$TCHT\roop") -and -not $isSymlink) {
-    Write-Host "The 'roop' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
-    Set-Location "$TCHT\roop"
-    git pull
-    Write-Host "LASTEXITCODE $($LASTEXITCODE)"
-    if ($LASTEXITCODE -eq 128) {
-        $projectFolder = "$TCHT\roop"
-        $renameTo = "$TCHT\roop.old"
-        Write-Host "Could not find existing git repository. Renaming folder to $renameTo and cloning Roop...`n`n"
-        Set-Location "$TCHT\"
-
-        # Delete folder if exists
-        if (Test-Path $renameTo) {
-            Do {
-                if (!(Remove-Item -Path $renameTo -Recurse -Force)) {
-                    Write-Host "Failed to delete folder $renameTo (there may be a process using the folder)." -ForegroundColor Yellow
-                    Write-Host "Press any key to try again..."
-                    Read-Host
-                }
-            }
-            Until (!(Test-Path $renameTo))
-        }
-
-        # Wait for folder rename
-        Do {
-            if (!(Rename-Item -Path "$projectFolder" -NewName $renameTo)) {
-                Write-Host "Failed to rename folder. Please try do it manually (there may be a process using the folder)." -ForegroundColor Yellow
-                Write-Host "Move '$projectFolder' to '$renameTo'." -ForegroundColor Yellow
-                Write-Host "Press any key to try again..."
-                Read-Host
-            }
-        }
-        Until (Test-Path $renameTo)
-
-        git clone https://github.com/s0md3v/roop.git roop
-        Set-Location "$projectFolder"
-    }
-} else {
-    Write-Host "Cloning Roop...`n`n"
-    
-    if (!(Test-Path -Path "$TCHT\roop")) {
-        New-Item -ItemType Directory -Path "$TCHT\roop" | Out-Null
-    }
-    Set-Location "$TCHT\roop"
-
-    git clone https://github.com/s0md3v/roop.git .
-}
+Sync-GitRepo -ProjectFolder "$TCHT\roop" -ProjectName "Roop" -IsSymlink $isSymlink -GitUrl "https://github.com/s0md3v/roop.git"
 
 # 7. Download model
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"

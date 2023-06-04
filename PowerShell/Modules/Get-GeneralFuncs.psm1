@@ -89,3 +89,74 @@ function Get-FolderSize {
 
     return "$outputSize MB"
 }
+
+<#
+.SYNOPSIS
+Tries to sync a git repository. If the folder already exists, it will pull the latest updates. If the folder does not exist, it will clone the repository.
+If the repo fails to pull, but the folder exists, it renames it and recreates the repo. This way even if there are files in the folder it will clone the repo anyway.
+#>
+function Sync-GitRepo {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ProjectFolder,
+        [Parameter(Mandatory = $true)]
+        [string]$ProjectName,
+        [Parameter(Mandatory = $true)]
+        [bool]$IsSymlink,
+        [Parameter(Mandatory = $true)]
+        [string]$GitUrl
+    )
+
+    $renameTo = "$ProjectFolder.old"
+    if ((Test-Path -Path $ProjectFolder) -and -not $IsSymlink) {
+        Write-Host "The folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
+        Set-Location $ProjectFolder
+    
+        git pull
+        if ($LASTEXITCODE -eq 128) {
+            Write-Host "Could not find existing git repository. Renaming folder to $renameTo and cloning $ProjectName...`n`n"
+            Set-Location "$TCHT\"
+    
+            # Delete folder if exists
+            if (Test-Path $renameTo) {
+                Do {
+                    if (!(Remove-Item -Path $renameTo -Recurse -Force)) {
+                        Write-Host "Failed to delete folder $renameTo (there may be a process using the folder)." -ForegroundColor Yellow
+                        Write-Host "Press any key to try again..."
+                        Read-Host
+                    }
+                }
+                Until (!(Test-Path $renameTo))
+            }
+    
+            # Wait for folder rename
+            Do {
+                if (!(Rename-Item -Path "$ProjectFolder" -NewName $renameTo)) {
+                    Write-Host "Failed to rename folder. Please try do it manually (there may be a process using the folder)." -ForegroundColor Yellow
+                    Write-Host "Move '$ProjectFolder' to '$renameTo'." -ForegroundColor Yellow
+                    Write-Host "Press any key to try again..."
+                    Read-Host
+                }
+            }
+            Until (Test-Path $renameTo)
+    
+            if (!(Test-Path -Path $ProjectFolder)) {
+                New-Item -ItemType Directory -Path $ProjectFolder | Out-Null
+            }
+    
+            Set-Location "$ProjectFolder"
+    
+            git clone $GitUrl .
+        }
+    } else {
+        Write-Host "Cloning $ProjectName...`n`n"
+        
+        if (!(Test-Path -Path $ProjectFolder)) {
+            New-Item -ItemType Directory -Path $ProjectFolder | Out-Null
+        }
+    
+        Set-Location $ProjectFolder
+    
+        git clone $GitUrl .
+    }
+}
