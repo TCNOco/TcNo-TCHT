@@ -65,7 +65,7 @@ function Install-BuildTools {
             Write-Host "Microsoft BuildTools was succesfully installed."
         } else {
             Write-Host "Microsoft BuildTools was not installed..." -ForegroundColor Red
-            Write-Host "Please manually install BuildTools. Guide: https://hub.tcno.co/software/vs/buildtools/"
+            Write-Host "Please manually install BuildTools. Guide: https://hub.tcno.co/software/vs/buildtools/" -ForegroundColor Cyan
         }
     
     }
