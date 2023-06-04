@@ -288,7 +288,7 @@ function Get-TCHTPath() {
             $installElsewhere = (Read-Host).Trim()
         } while ($installElsewhere -notin "Y", "y", "N", "n", "")
         
-        if (($installElsewhere -in "Y", "y") -or ("" -eq $installElsewhere)) {
+        if (($installElsewhere -in "Y", "y") -and !("" -eq $installElsewhere)) {
             Clear-ConsoleScreen
             Write-Host "The install script choses a folder, and installs programs inside of it. This is what you're setting." -ForegroundColor Cyan
             Write-Host "The default is C:\TCHT"
