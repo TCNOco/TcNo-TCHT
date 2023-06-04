@@ -48,6 +48,7 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
+Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Web-Request for this session
 
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath -Subfolder "roop"
@@ -118,9 +119,7 @@ if ($condaFound) {
     conda deactivate
     Update-SessionEnvironment
     #Open-Conda
-    conda info
     conda activate roop
-    conda info
     conda install mamba -c conda-forge -y
     python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     python -m pip install -r requirements.txt
