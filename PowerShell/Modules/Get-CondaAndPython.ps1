@@ -239,6 +239,7 @@ function Get-UseConda {
     }
 
     $condaFound = Get-Command conda -ErrorAction SilentlyContinue
+
     if (-not $condaFound) {
         # Try checking if conda is installed a little deeper... (May not always be activated for user)
         $condaFound = Open-Conda # This checks for Conda, returns true if conda is hoooked
@@ -247,6 +248,7 @@ function Get-UseConda {
     
     # If conda found: create environment
     Clear-ConsoleScreen
+    $returnValue = $condaFound
     if ($condaFound) {
         Write-Host "Do you want to install $Name in a Conda environment called '$EnvName'?`nYou'll need to use 'conda activate $EnvName' before being able to use it?" -ForegroundColor Cyan
     
@@ -259,10 +261,10 @@ function Get-UseConda {
             conda create -n $EnvName python=$PythonVersion pip -y
             conda activate $EnvName
         } else {
-            $condaFound = $false
             Write-Host "Checking for Python instead..."
+            return $false
         }
     }
 
-    return $condaFound
+    return $returnValue
 }
