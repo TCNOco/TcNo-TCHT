@@ -102,9 +102,38 @@ if ((Test-Path -Path "$TCHT\roop") -and -not $isSymlink) {
     Write-Host "The 'roop' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\roop"
     git pull
+    Write-Host "LASTEXITCODE $($LASTEXITCODE)"
     if ($LASTEXITCODE -eq 128) {
-        Write-Host "Could not find existing git repository. Cloning Roop...`n`n"
-        git clone https://github.com/s0md3v/roop.git .
+        $projectFolder = "$TCHT\roop"
+        $renameTo = "$TCHT\roop.old"
+        Write-Host "Could not find existing git repository. Renaming folder to $renameTo and cloning Roop...`n`n"
+        Set-Location "$TCHT\"
+
+        # Delete folder if exists
+        if (Test-Path $renameTo) {
+            Do {
+                if (!(Remove-Item -Path $renameTo -Recurse -Force)) {
+                    Write-Host "Failed to delete folder $renameTo (there may be a process using the folder)." -ForegroundColor Yellow
+                    Write-Host "Press any key to try again..."
+                    Read-Host
+                }
+            }
+            Until (!(Test-Path $renameTo))
+        }
+
+        # Wait for folder rename
+        Do {
+            if (!(Rename-Item -Path "$projectFolder" -NewName $renameTo)) {
+                Write-Host "Failed to rename folder. Please try do it manually (there may be a process using the folder)." -ForegroundColor Yellow
+                Write-Host "Move '$projectFolder' to '$renameTo'." -ForegroundColor Yellow
+                Write-Host "Press any key to try again..."
+                Read-Host
+            }
+        }
+        Until (Test-Path $renameTo)
+
+        git clone https://github.com/s0md3v/roop.git roop
+        Set-Location "$projectFolder"
     }
 } else {
     Write-Host "Cloning Roop...`n`n"

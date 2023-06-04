@@ -95,7 +95,6 @@ if ((Test-Path -Path "$TCHT\stable-diffusion-webui") -and -not $isSymlink) {
     Write-Host "The 'stable-diffusion-webui' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
     Set-Location "$TCHT\stable-diffusion-webui"
     git pull
-    Write-Host "LASTEXITCODE $($LASTEXITCODE)"
     if ($LASTEXITCODE -eq 128) {
         Write-Host "Could not find existing git repository. Cloning AUTOMATIC1111...`n`n"
         git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git .
