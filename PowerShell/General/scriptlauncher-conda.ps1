@@ -43,7 +43,7 @@ if (!(Test-Path -Path $condaPath -PathType Leaf)) {
     Write-Host "Please note: If packages aren't installed, or the environment was deleted please run the one-line installer again." -ForegroundColor Yellow
 
     # Try and find updated Conda path
-    iex (irm Get-CondaPath.tc.ht)
+    iex (irm Get-CondaAndPython.tc.ht)
     $condaPath = Get-CondaPath
 
     if (!(Test-Path -Path $condaPath -PathType Leaf)) {

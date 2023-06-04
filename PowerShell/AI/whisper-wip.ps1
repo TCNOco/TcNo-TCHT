@@ -50,7 +50,7 @@ iex (irm refreshenv.tc.ht)
 # 2. Check if Conda or Python is installed
 # Check if Conda is installed
 $condaFound = Get-Command conda -ErrorAction SilentlyContinue
-iex (irm Get-CondaPath.tc.ht)
+iex (irm Get-CondaAndPython.tc.ht)
 if (-not $condaFound) {
     # Try checking if conda is installed a little deeper... (May not always be activated for user)
     $condaFound = Open-Conda # This checks for Conda, returns true if conda is hoooked
