@@ -234,6 +234,9 @@ function Get-UseConda {
         [string]$PythonVersion = "3.10.6"
     )
 
+    # Allow Conda to run properly
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+
     if (-not (Get-Command Update-SessionEnvironment -ErrorAction SilentlyContinue)) {
         iex (irm refreshenv.tc.ht)
     }
@@ -257,6 +260,11 @@ function Get-UseConda {
         } while ($useConda -notin "Y", "y", "N", "n")
         
         if ($useConda -eq "y" -or $useConda -eq "Y") {
+            # Initialize conda: it creates the powershell profile script
+            conda init powershell
+            # Load the profile for current session: it activates (base) environment
+            invoke-expression -Command "$env:userprofile\Documents\WindowsPowerShell\profile.ps1"
+
             conda create -n $EnvName python=$PythonVersion pip -y | Write-Host
             conda activate $EnvName | Write-Host
         } else {
