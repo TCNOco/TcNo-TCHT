@@ -82,7 +82,7 @@ Update-SessionEnvironment
 # 4. Install Build Tools
 Clear-ConsoleScreen
 Write-Host "Installing Microsoft Build Tools..." -ForegroundColor Cyan
-iex (irm install-buildtools.tc.ht)
+iex (irm buildtools.tc.ht)
 
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath

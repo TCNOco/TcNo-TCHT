@@ -26,9 +26,12 @@
 # 2. Install FFMPEG
 # ----------------------------------------
 
+Write-Host "--------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's FFMPEG installer!" -ForegroundColor Cyan
 Write-Host "Chocolatey [package manager] and FFMPEG will now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-05-19]`n`n" -ForegroundColor Cyan
+Write-Host "[Version 2023-05-19]" -ForegroundColor Cyan
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
+Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
 
 iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
@@ -39,17 +42,21 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 # 2. Install FFMPEG using Chocolatey
 Clear-ConsoleScreen
-Write-Host "Which FFMPEG would you like to install?" -ForegroundColor Cyan
-Write-Host -NoNewline "- FFMPEG: " -ForegroundColor Red
-Write-Host "1" -ForegroundColor Green
-Write-Host -NoNewline "- FFMPEG-Shared: " -ForegroundColor Red
-Write-Host "2" -ForegroundColor Green
-Write-Host -NoNewline "- FFMPEG-Full [This has the most codecs]: " -ForegroundColor Red
-Write-Host "3" -ForegroundColor Green
+$wasntPreset = !($null -ne $ffmpegSelection)
+if ($wasntPreset){
+    # Ask user what to install, if not already defined.
+    Write-Host "Which FFMPEG would you like to install?" -ForegroundColor Cyan
+    Write-Host -NoNewline "- FFMPEG: " -ForegroundColor Red
+    Write-Host "1" -ForegroundColor Green
+    Write-Host -NoNewline "- FFMPEG-Shared: " -ForegroundColor Red
+    Write-Host "2" -ForegroundColor Green
+    Write-Host -NoNewline "- FFMPEG-Full [This has the most codecs]: " -ForegroundColor Red
+    Write-Host "3" -ForegroundColor Green
 
-$selection = Read-Host "Enter a number"
+    $ffmpegSelection = (Read-Host "Enter a number").Trim()
+}
 
-switch ($selection) {
+switch ($ffmpegSelection) {
     1 {
         Clear-ConsoleScreen
         Write-Host "Installing FFMPEG..." -ForegroundColor Cyan
@@ -76,8 +83,12 @@ switch ($selection) {
     }
 }
 
-ffmpeg -version
-
-Write-Host "`nThe above was returned after running 'ffmpeg -version'" -ForegroundColor Green
-Write-Host "You should now be able to use 'ffmpeg' anywhere on your computer." -ForegroundColor Green
-Write-Host "To update in the future, run 'choco upgrade all -y'" -ForegroundColor Cyan
+# Show success, only if the FFMPEG installation wasn't automated.
+$ffmpegSelection = $null
+of ($wasntPreset){
+    ffmpeg -version
+    
+    Write-Host "`nThe above was returned after running 'ffmpeg -version'" -ForegroundColor Green
+    Write-Host "You should now be able to use 'ffmpeg' anywhere on your computer." -ForegroundColor Green
+    Write-Host "To update in the future, run 'choco upgrade all -y'" -ForegroundColor Cyan
+}

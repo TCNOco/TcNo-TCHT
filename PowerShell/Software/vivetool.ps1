@@ -27,9 +27,13 @@
 # 4. Launch ViveTool-GUI (For ViveTool-GUI only)
 # ----------------------------------------
 
+Write-Host "--------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's ViveTool installer!" -ForegroundColor Cyan
 Write-Host "ViveTool will now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-05-31]`n`n" -ForegroundColor Cyan
+Write-Host "[Version 2023-05-31]" -ForegroundColor Cyan
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
+Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
+
 
 iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
