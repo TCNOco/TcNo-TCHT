@@ -58,6 +58,7 @@ function Install-BuildTools {
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
         }
 
+        Write-Host "`n`nThe process may get stuck on `"Installing visualstudio2022buildtools...`" while downloading and installing. Please do wait for it to complete..."
         choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --quiet" -y
         
         if (Test-BuildToolsInstalled) {
