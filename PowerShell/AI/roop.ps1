@@ -24,13 +24,14 @@
 # 2. Install or update Git if not already installed
 # 3. Install FFMPEG if not already registered with PATH
 # 4. Install aria2c to make the model downloads MUCH faster
-# 5. Check if Conda or Python is installed
-# 6. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
-# 7. Download model
-# 8. Install PyTorch and requirements:
-# 9. Create launcher files
-# 10. Create shortcuts
-# 11. Launch
+# 5. Install Build Tools
+# 6. Check if Conda or Python is installed
+# 7. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
+# 8. Download model
+# 9. Install PyTorch and requirements:
+# 10. Create launcher files
+# 11. Create shortcuts
+# 12. Launch
 # ----------------------------------------
 
 Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
@@ -86,10 +87,15 @@ Write-Host "Installing aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
 Update-SessionEnvironment
 
+# 5. Install Build Tools
+Clear-ConsoleScreen
+Write-Host "Installing Microsoft Build Tools..." -ForegroundColor Cyan
+iex (irm buildtools.tc.ht)
+
 # Import function to reload without needing to re-open Powershell
 iex (irm refreshenv.tc.ht)
 
-# 5. Check if Conda or Python is installed
+# 6. Check if Conda or Python is installed
 # Check if Conda is installed
 iex (irm Get-CondaAndPython.tc.ht)
 
@@ -102,11 +108,11 @@ if ($condaFound) {
 # Get Python command (eg. python, python3) & Check for compatible version
 $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/s0md3v/roop/wiki/1.-Installation" -condaFound $condaFound
 
-# 6. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
+# 7. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
 Clear-ConsoleScreen
 Sync-GitRepo -ProjectFolder "$TCHT\roop" -ProjectName "Roop" -IsSymlink $isSymlink -GitUrl "https://github.com/s0md3v/roop.git"
 
-# 7. Download model
+# 8. Download model
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
 
 Clear-ConsoleScreen
@@ -115,7 +121,7 @@ $url = "https://civitai.com/api/download/models/85159"
 $outputPath = "inswapper_128.onnx"
 Get-Aria2File -Url $url -OutputPath $outputPath
 
-# 8. Install PyTorch and requirements:
+# 9. Install PyTorch and requirements:
 if ($condaFound) {
     # For some reason conda NEEDS to be deactivated and reactivated to use pip reliably... Otherwise python and pip are not found.
     conda deactivate
@@ -137,7 +143,7 @@ if ($condaFound) {
     Update-SessionEnvironment
 }
 
-# 9. Create launcher files
+# 10. Create launcher files
 Write-Host "Creating launcher files..." -ForegroundColor Yellow
 # - Updater
 $OutputFilePath = "update.bat"
@@ -174,7 +180,7 @@ if ($condaFound) {
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 }
 
-# 10. Create shortcuts
+# 11. Create shortcuts
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for Roop?" -ForegroundColor Cyan
 do {
@@ -200,7 +206,7 @@ if ($shortcuts -in "Y","y", "") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
-# 11. Launch
+# 12. Launch
 Clear-ConsoleScreen
 Write-Host "There are more launch options you can add, such as max memory. Add these to the start powershell files. See here: https://github.com/s0md3v/roop#how-do-i-use-it"
 
