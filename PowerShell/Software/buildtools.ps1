@@ -52,7 +52,7 @@ function Install-BuildTools {
         Write-Host "The Visual Studio Installer is already available on your system." -ForegroundColor Red
         Write-Host "The automated installer for BuildTools is unable to continue." -ForegroundColor Yellow
         Write-Host "`nPlease manually install BuildTools. Guide: https://hub.tcno.co/software/vs/buildtools/" -ForegroundColor Cyan
-        Write-HOst "Open the VS Installer > Select Modify > Choose Desktop development with C++ > Install" -ForegroundColor Cyan
+        Write-Host "Open the VS Installer > Select Modify > Choose Desktop development with C++ > Install" -ForegroundColor Cyan
         Write-Host "`nWhen you have installed Desktop development with C++`nPress enter to continue, or type 1 and enter to install anyway"
         $response = Read-Host
         if ($response -eq "1") {
