@@ -48,6 +48,20 @@ function Test-BuildToolsInstalled {
 }
 
 function Install-BuildTools {
+    if (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\Installer") {
+        Write-Host "The Visual Studio Installer is already available on your system." -ForegroundColor Red
+        Write-Host "The automated installer for BuildTools is unable to continue." -ForegroundColor Yellow
+        Write-Host "`nPlease manually install BuildTools. Guide: https://hub.tcno.co/software/vs/buildtools/" -ForegroundColor Cyan
+        Write-HOst "Open the VS Installer > Select Modify > Choose Desktop development with C++ > Install" -ForegroundColor Cyan
+        Write-Host "`nWhen you have installed Desktop development with C++`nPress enter to continue, or type 1 and enter to install anyway"
+        $response = Read-Host
+        if ($response -eq "1") {
+            Write-Host "Continuing with installation..."
+        } else {
+            return
+        }
+    }
+    
     if (Test-BuildToolsInstalled) {
         Write-Host "Microsoft BuildTools is already installed."
     } else {
@@ -57,8 +71,8 @@ function Install-BuildTools {
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
         }
 
-        Write-Host "`n`nThe process may get stuck on `"Installing visualstudio2022buildtools...`" while downloading and installing. Please do wait for it to complete..." -ForegroundColor Yellow
-        choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --quiet" -y | Write-Host
+        Write-Host "`n`nThe process may get stuck on `"Installing visualstudio2022buildtools...`" while downloading and installing. Please do wait for it to complete..." -ForegroundColor Cyan
+        choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended" -y | Write-Host
         
         if (Test-BuildToolsInstalled) {
             Write-Host "Microsoft BuildTools was succesfully installed."
