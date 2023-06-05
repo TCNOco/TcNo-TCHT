@@ -58,7 +58,7 @@ function Install-BuildTools {
         }
 
         Write-Host "`n`nThe process may get stuck on `"Installing visualstudio2022buildtools...`" while downloading and installing. Please do wait for it to complete..." -ForegroundColor Yellow
-        choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --quiet" -y
+        choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.MSBuildTools;includeRecommended --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended --quiet" -y | Write-Host
         
         if (Test-BuildToolsInstalled) {
             Write-Host "Microsoft BuildTools was succesfully installed."
