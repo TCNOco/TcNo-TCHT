@@ -65,13 +65,22 @@ iex (irm refreshenv.tc.ht)
 
 
 # 3. Installs Python should Python not be installed and > 3.8, or Conda
-iex (irm Get-CondaAndPython.tc.ht)
+Import-FunctionIfNotExists -Command Get-UseConda -ScriptUri "Get-Python.tc.ht"
 
 # Check if Conda is installed
 $condaFound = Get-UseConda -Name "Auto-GPT" -EnvName "autogpt" -PythonVersion "3.10.11"
 
 # Get Python command (eg. python, python3) & Check for compatible version
-$python = Get-Python -PythonRegex 'Python (3.(8|9|10).\d*)' -PythonRegexExplanation "Python version is not between 3.8 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/Significant-Gravitas/Auto-GPT#-installation" -condaFound $condaFound
+if ($condaFound) {
+    conda activate "autogpt"
+    $python = "python"
+} else {
+    $python = Get-Python -PythonRegex 'Python (3.(8|9|10).\d*)' -PythonRegexExplanation "Python version is not between 3.8 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/Significant-Gravitas/Auto-GPT#-installation"
+    if ($python -eq "miniconda") {
+        $python = "python"
+        $condaFound = $true
+    }
+}
 
 
 # 4. Downloads and installs Auto-GPT

@@ -85,13 +85,22 @@ Update-SessionEnvironment
 
 # 5. Check if Conda or Python is installed
 # Check if Conda is installed
-iex (irm Get-CondaAndPython.tc.ht)
+Import-FunctionIfNotExists -Command Get-UseConda -ScriptUri "Get-Python.tc.ht"
 
 # Check if Conda is installed
 $condaFound = Get-UseConda -Name "Vladmandic SD.Next" -EnvName "vlad" -PythonVersion "3.10.11"
 
 # Get Python command (eg. python, python3) & Check for compatible version
-$python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/vladmandic/automatic#install" -condaFound $condaFound
+if ($condaFound) {
+    conda activate "vlad"
+    $python = "python"
+} else {
+    $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/vladmandic/automatic#install" 
+    if ($python -eq "miniconda") {
+        $python = "python"
+        $condaFound = $true
+    }
+}
 
 
 # 6. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)

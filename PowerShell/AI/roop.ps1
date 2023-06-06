@@ -104,7 +104,7 @@ iex (irm refreshenv.tc.ht)
 
 # 7. Check if Conda or Python is installed
 # Check if Conda is installed
-iex (irm Get-CondaAndPython.tc.ht)
+Import-FunctionIfNotExists -Command Get-UseConda -ScriptUri "Get-Python.tc.ht"
 
 # Check if Conda is installed
 $condaFound = Get-UseConda -Name "Roop" -EnvName "roop" -PythonVersion "3.10.11"
@@ -130,6 +130,7 @@ Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMetho
 
 Clear-ConsoleScreen
 Write-Host "Downloading the latest required model (inswapper_128.onnx)" -ForegroundColor Yellow
+Write-Host "--> If this fails, manually download it: https://civitai.com/api/download/models/85159, and place it in '$TCHT\roop'" -ForegroundColor Yellow
 $url = "https://civitai.com/api/download/models/85159"
 $outputPath = "inswapper_128.onnx"
 Get-Aria2File -Url $url -OutputPath $outputPath
@@ -227,6 +228,11 @@ Clear-ConsoleScreen
 Write-Host "There are more launch options you can add, such as max memory. Add these to the start powershell files. See here: https://github.com/s0md3v/roop#how-do-i-use-it"
 
 Write-Host "Launching Roop!" -ForegroundColor Cyan
+
+if (-not (Test-Path "$TCHT\roop\inswapper_128.onnx")) {
+    Write-Host "ERRPR: The inswapper model was not found!`n--> Manually download it: https://civitai.com/api/download/models/85159, and place it in '$TCHT\roop'" -ForegroundColor Red
+}
+
 if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
     ./run-roop.bat
 } else {

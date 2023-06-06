@@ -79,13 +79,22 @@ iex (irm refreshenv.tc.ht)
 
 # 5. Check if Conda or Python is installed
 # Check if Conda is installed
-iex (irm Get-CondaAndPython.tc.ht)
+Import-FunctionIfNotExists -Command Get-UseConda -ScriptUri "Get-Python.tc.ht"
 
 # Check if Conda is installed
 $condaFound = Get-UseConda -Name "Kohya_ss" -EnvName "kss" -PythonVersion "3.10.11"
 
 # Get Python command (eg. python, python3) & Check for compatible version
-$python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs" -condaFound $condaFound
+if ($condaFound) {
+    conda activate "kss"
+    $python = "python"
+} else {
+    $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs"
+    if ($python -eq "miniconda") {
+        $python = "python"
+        $condaFound = $true
+    }
+}
 
 # Continue with installation
 ./setup.bat
