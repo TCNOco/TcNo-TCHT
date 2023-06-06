@@ -285,11 +285,12 @@ function Get-UseConda {
 
             conda create -n $EnvName python=$PythonVersion pip -y | Write-Host
             conda activate $EnvName | Write-Host
+            return $true
         } else {
             Write-Host "Checking for Python instead..."
             return $false
         }
     }
 
-    return $condaFound
+    return $false
 }
