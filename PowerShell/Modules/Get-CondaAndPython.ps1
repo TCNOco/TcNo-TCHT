@@ -73,7 +73,7 @@ function Get-Python {
         Write-Host "Python is not installed (according to Windows)." -ForegroundColor Yellow
         Write-Host "`nInstalling Python $PythonInstallVersion." -ForegroundColor Cyan
         choco install python --version=$PythonInstallVersion -y | Write-Host
-        if ($LASTEXITCODE -eq 1) {
+        if ($LASTEXITCODE -eq 0) {
             Write-Host "Installed!" -ForegroundColor Cyan
             return "python"
         } else {
