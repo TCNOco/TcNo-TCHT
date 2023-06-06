@@ -192,7 +192,7 @@ if ($condaFound) {
 } else {
     &$python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     &$python -m pip install -r requirements.txt
-    &$python -m pip uninstall faiss-cpu
+    &$python -m pip uninstall -y faiss-cpu
     &$python -m pip install faiss-cpu
     &$python -m pip install ffmpeg-python
     &$python -m pip install --upgrade --no-deps --force-reinstall torchcrepe

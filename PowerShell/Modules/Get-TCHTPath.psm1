@@ -277,7 +277,6 @@ function Get-TCHTPath() {
             Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
         }
 
-        Clear-ConsoleScreen
         if ($Subfolder -ne "") {
             Write-Host "$Subfolder will install to $path." -ForegroundColor Cyan
         } else {

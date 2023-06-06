@@ -46,24 +46,24 @@ function Test-BuildToolsInstalled {
     return $false
 }
 
-function Install-BuildTools {
-    if (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\Installer") {
-        Write-Host "The Visual Studio Installer is already available on your system." -ForegroundColor Red
-        Write-Host "The automated installer for BuildTools is unable to continue." -ForegroundColor Yellow
-        Write-Host "`nPlease manually install BuildTools. Guide: https://hub.tcno.co/software/vs/buildtools/" -ForegroundColor Cyan
-        Write-Host "Open the VS Installer > Select Modify > Choose Desktop development with C++ > Install" -ForegroundColor Cyan
-        Write-Host "`nWhen you have installed Desktop development with C++`nPress enter to continue, or type 1 and enter to install anyway"
-        $response = Read-Host
-        if ($response -eq "1") {
-            Write-Host "Continuing with installation..."
-        } else {
-            return
-        }
-    }
-    
+function Install-BuildTools {    
     if (Test-BuildToolsInstalled) {
         Write-Host "Microsoft BuildTools is already installed."
     } else {
+        if (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\Installer") {
+            Write-Host "The Visual Studio Installer is already available on your system." -ForegroundColor Red
+            Write-Host "The automated installer for BuildTools is unable to continue." -ForegroundColor Yellow
+            Write-Host "`nPlease manually install BuildTools. Guide: https://hub.tcno.co/software/vs/buildtools/" -ForegroundColor Cyan
+            Write-Host "Open the VS Installer > Select Modify > Choose Desktop development with C++ > Install" -ForegroundColor Cyan
+            Write-Host "`nWhen you have installed Desktop development with C++`nPress enter to continue, or type 1 and enter to install anyway"
+            $response = Read-Host
+            if ($response -eq "1") {
+                Write-Host "Continuing with installation..."
+            } else {
+                return
+            }
+        }
+        
         # Install Chocolatey if not already installed
         if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
             Write-Host "`nInstalling Chocolatey..." -ForegroundColor Cyan

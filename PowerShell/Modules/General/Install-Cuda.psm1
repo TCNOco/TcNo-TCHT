@@ -27,8 +27,8 @@ function Install-Cuda {
     )
 
     if (Test-Path -Path "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$CudaVersion" -PathType Container) {
-        Write-Host "CUDA $CudaVersion is already installed" -ForegroundColor Cyan
-        Write-Host "Do you want to reinstall? (y/n) [Default: n]: "
+        Write-Host "CUDA $CudaVersion is already installed" -ForegroundColor Green
+        Write-Host "Do you want to reinstall? (y/n) [Default: n]: " -ForegroundColor Cyan
         $response = Read-Host
         if ($response -eq "y") {
             Write-Host "Reinstalling CUDA $CudaVersion..." -ForegroundColor Cyan
@@ -70,21 +70,11 @@ function Install-Cudnn {
     )
 
     if (Test-Path -Path "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$CudaVersion\bin\cudnn64_8.dll") {
-        Write-Host "cuDNN for CUDA $CudaVersion is already installed" -ForegroundColor Cyan
+        Write-Host "cuDNN for CUDA $CudaVersion is already installed" -ForegroundColor Green
         
-        if ($CudnnOptional) {
-            Write-Host "cuDNN is optional for this. Do you want to reinstall cuDNN? (y/n) [Default: n]:" -ForegroundColor Cyan
-        } else {
-            Write-Host "cuDNN is required. Do you want to reinstall cuDNN? (y/n) [Default: n]:"
-        }
-
-        $response = Read-Host
-        if ($response -eq "y") {
-            Write-Host "Reinstalling CUDA $CudaVersion..." -ForegroundColor Cyan
-        } else {
-            Write-Host "Skipping CUDA $CudaVersion installation..." -ForegroundColor Cyan
-            return
-        }
+        Write-Host "cuDNN is already installed for CUDA $CudaVersion. Skipping this step." -ForegroundColor Cyan
+        Write-Host "Should you need to reinstall, delete: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$CudaVersion\bin\cudnn64_8.dll"
+        return
     }
 
     if ($CudnnOptional) {
