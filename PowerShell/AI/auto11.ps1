@@ -127,7 +127,7 @@ if ($answer -eq "y" -or $answer -eq "Y") {
 }
 
 # 7. Fix for AMD GPUs (untested)
-if ((Get-CimInstance Win32_VideoController).Name -like "AMD") {
+if ((Get-CimInstance Win32_VideoController).Name -like "*AMD*") {
     Write-Host "`n`nAMD GPU is installed. Applying fix (https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-AMD-GPUs#automatic-installation)" -ForegroundColor Cyan
     (Get-Content webui-user.bat) | Foreach-Object {
         $_ -replace 'set COMMANDLINE_ARGS=', 'set COMMANDLINE_ARGS=--precision full --no-half '

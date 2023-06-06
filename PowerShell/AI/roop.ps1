@@ -25,13 +25,14 @@
 # 3. Install FFMPEG if not already registered with PATH
 # 4. Install aria2c to make the model downloads MUCH faster
 # 5. Install Build Tools
-# 6. Check if Conda or Python is installed
-# 7. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
-# 8. Download model
-# 9. Install PyTorch and requirements:
-# 10. Create launcher files
-# 11. Create shortcuts
-# 12. Launch
+# 6. Install CUDA and cuDNN
+# 7. Check if Conda or Python is installed
+# 8. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
+# 9. Download model
+# 10. Install PyTorch and requirements:
+# 11. Create launcher files
+# 12. Create shortcuts
+# 13. Launch
 # ----------------------------------------
 
 Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
@@ -92,10 +93,16 @@ Clear-ConsoleScreen
 Write-Host "Installing Microsoft Build Tools..." -ForegroundColor Cyan
 iex (irm buildtools.tc.ht)
 
+# 6. Install CUDA and cuDNN
+if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+    Import-FunctionIfNotExists -Command Install-CudaAndcuDNN -ScriptUri "Install-Cuda.tc.ht"
+    Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
+}
+
 # Import function to reload without needing to re-open Powershell
 iex (irm refreshenv.tc.ht)
 
-# 6. Check if Conda or Python is installed
+# 7. Check if Conda or Python is installed
 # Check if Conda is installed
 iex (irm Get-CondaAndPython.tc.ht)
 
@@ -108,11 +115,11 @@ if ($condaFound) {
 # Get Python command (eg. python, python3) & Check for compatible version
 $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/s0md3v/roop/wiki/1.-Installation" -condaFound $condaFound
 
-# 7. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
+# 8. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)
 Clear-ConsoleScreen
 Sync-GitRepo -ProjectFolder "$TCHT\roop" -ProjectName "Roop" -IsSymlink $isSymlink -GitUrl "https://github.com/s0md3v/roop.git"
 
-# 8. Download model
+# 9. Download model
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
 
 Clear-ConsoleScreen
@@ -121,7 +128,7 @@ $url = "https://civitai.com/api/download/models/85159"
 $outputPath = "inswapper_128.onnx"
 Get-Aria2File -Url $url -OutputPath $outputPath
 
-# 9. Install PyTorch and requirements:
+# 10. Install PyTorch and requirements:
 if ($condaFound) {
     # For some reason conda NEEDS to be deactivated and reactivated to use pip reliably... Otherwise python and pip are not found.
     conda deactivate
@@ -129,21 +136,19 @@ if ($condaFound) {
     #Open-Conda
     conda activate roop
     conda install mamba -c conda-forge -y
-    python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    python -m pip install -r requirements.txt
-    conda install cudatoolkit -y
-} else {
-    python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    &$python -m pip install -r requirements.txt
 
-    Write-Host "If you don't have the NVIDIA CUDA Toolkit installed, then install it here: https://developer.nvidia.com/cuda-11-8-0-download-archive" -ForegroundColor Cyan
-    Write-Host "After installing, press any key to continue..." -ForegroundColor Cyan
-    Read-Host
-
-    Update-SessionEnvironment
+    if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+        conda install cudatoolkit -y
+    }
 }
 
-# 10. Create launcher files
+&$python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+&$python -m pip install -r requirements.txt
+
+Update-SessionEnvironment
+
+# 11. Create launcher files
 Write-Host "Creating launcher files..." -ForegroundColor Yellow
 # - Updater
 $OutputFilePath = "update.bat"
@@ -159,11 +164,19 @@ $ProgramName = "Roop"
 $RunCommand = "python run.py --gpu"
 $LauncherName = "run-roop"
 
+$ReinstallCommand = ""
+if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+    if ($condaFound) {
+        $ReinstallCommand += "conda install cudatoolkit -y`n"
+    }
+
+}
+
+$ReinstallCommand += "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
+
 if ($condaFound) {
-    $ReinstallCommand = "conda install cudatoolkit -y`npython -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
 } else {
-    $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 }
 
@@ -173,14 +186,12 @@ $RunCommand = "python run.py"
 $LauncherName = "run-roop-cpu"
 
 if ($condaFound) {
-    $ReinstallCommand = "conda install cudatoolkit -y`npython -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
 } else {
-    $ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 }
 
-# 11. Create shortcuts
+# 12. Create shortcuts
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for Roop?" -ForegroundColor Cyan
 do {
@@ -206,7 +217,7 @@ if ($shortcuts -in "Y","y", "") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
-# 12. Launch
+# 13. Launch
 Clear-ConsoleScreen
 Write-Host "There are more launch options you can add, such as max memory. Add these to the start powershell files. See here: https://github.com/s0md3v/roop#how-do-i-use-it"
 

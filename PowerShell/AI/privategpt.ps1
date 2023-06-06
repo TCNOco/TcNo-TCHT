@@ -24,14 +24,15 @@
 # 2. Install or update Git if not already installed
 # 3. Install aria2c to make the model downloads MUCH faster
 # 4. Install Build Tools
-# 5. Check if Conda or Python is installed
-# 6 Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
+# 5. Install CUDA and cuDNN
+# 6. Check if Conda or Python is installed
+# 7 Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
 # - Clone https://github.com/imartinez/privateGPT
-# 7. Download a model
-# 8. Set up the models in env:
-# 9. Create Launcher files
-# 10. Create desktop shortcuts?
-# 11. Launch privateGPT
+# 8. Download a model
+# 9. Set up the models in env:
+# 10. Create Launcher files
+# 11. Create desktop shortcuts?
+# 12. Launch privateGPT
 # ----------------------------------------
 
 Write-Host "-----------------------------------------------" -ForegroundColor Cyan
@@ -89,8 +90,14 @@ iex (irm buildtools.tc.ht)
 Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
 $TCHT = Get-TCHTPath
 
+# 5. Install CUDA and cuDNN
+if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+    Import-FunctionIfNotExists -Command Install-CudaAndcuDNN -ScriptUri "Install-Cuda.tc.ht"
+    Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
+}
 
-# 5. Check if Conda or Python is installed
+
+# 6. Check if Conda or Python is installed
 # Check if Conda is installed
 iex (irm Get-CondaAndPython.tc.ht)
 
@@ -101,7 +108,7 @@ $condaFound = Get-UseConda -Name "privateGPT" -EnvName "pgpt" -PythonVersion "3.
 $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/imartinez/privateGPT#environment-setup" -condaFound $condaFound
 
 
-# 6. Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
+# 7. Check if has privateGPT directory ($TCHT\privateGPT) (Default C:\TCHT\privateGPT)
 Clear-ConsoleScreen
 if ((Test-Path -Path "$TCHT\privateGPT") -and -not $isSymlink) {
     Write-Host "The 'privateGPT' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
@@ -217,6 +224,10 @@ function Get-Gpt4All {
 }
 
 # - Install requirements.txt
+if ($condaFound -and ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*")) {
+    conda install cudatoolkit -y
+}
+
 &$python -m pip install -r requirements.txt
 &$python -m pip install requests "urllib3<2"
 
@@ -231,7 +242,7 @@ if (Test-Path "example.env") {
     Rename-Item -Path "example.env" -NewName ".env" -Force
 }
 
-# 7. Download a model
+# 8. Download a model
 do {
     Clear-ConsoleScreen
     Write-Host "Which model would you like to download and use:" -ForegroundColor Cyan
@@ -276,7 +287,7 @@ if ($choice -eq "1") {
     $modelFile = "koala-13B.ggmlv3.q4_0.bin"
 }
 
-# 8. Set up the models in env:
+# 9. Set up the models in env:
 Write-Host "Configuring privateGPT" -ForegroundColor Yellow
 $filePath = ".env"
 $content = Get-Content $filePath
@@ -303,19 +314,25 @@ if ($choice -eq "7") {
 }
 Set-Content -Path $filePath -Value $updatedContent
 
-# 9. Create Launcher files
+# 10. Create Launcher files
 Write-Host "Creating launcher files..." -ForegroundColor Yellow
 # - Updater
 $OutputFilePath = "update.bat"
 $OutputText = "@echo off`ngit pull"
 Set-Content -Path $OutputFilePath -Value $OutputText
 
+$ReinstallCommand = ""
+if ($condaFound -and ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*")) {
+    $ReinstallCommand += "conda install cudatoolkit -y`n"
+}
+
+$ReinstallCommand += "python -m pip install -r requirements.txt`npython -m pip install requests `"urllib3<2`""
+
 if ($condaFound) {
     # As the Windows Target path can only have 260 chars, we easily hit that limit... (Shortcuts) and some users don't know about running ps1 files.
     $condaPath = "`"$(Get-CondaPath)`""
     $CondaEnvironmentName = "pgpt"
     $InstallLocation = "`"$TCHT\privateGPT`""
-    $ReinstallCommand = "python -m pip install -r requirements.txt`npython -m pip install requests 'urllib3<2'"
 
     # - Ingest
     $ProgramName = "privateGPT Ingest"
@@ -333,7 +350,6 @@ if ($condaFound) {
 
 } else {
     $InstallLocation = "`"$TCHT\privateGPT`""
-    $ReinstallCommand = "python -m pip install -r requirements.txt`npython -m pip install requests `"urllib3<2`""
 
     # - Ingest
     $ProgramName = "privateGPT Ingest"
@@ -348,7 +364,7 @@ if ($condaFound) {
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 }
 
-# 10. Create desktop shortcuts?
+# 11. Create desktop shortcuts?
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for privateGPT?" -ForegroundColor Cyan
 do {
@@ -369,7 +385,7 @@ if ($shortcuts -in "Y","y", "") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
-# 11. Launch privateGPT
+# 12. Launch privateGPT
 Clear-ConsoleScreen
 Write-Host "Launching privateGPT!`n" -ForegroundColor Cyan
 ./run-privategpt.bat
