@@ -24,8 +24,7 @@
 
 function Test-BuildToolsInstalled {
     param (
-        [string]$FolderPath,
-        [int]$minVersion = 2015
+        [int]$minVersion = 2022
     )
 
     if ($minVersion -ge 2022 -and (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC#") -or (Test-Path -Path "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\VC#")) {

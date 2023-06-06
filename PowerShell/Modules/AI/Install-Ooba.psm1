@@ -144,3 +144,14 @@ function Install-Ooba {
         New-Shortcut -ShortcutName "Oobabooga WebUI" -TargetPath "start_windows.bat" -IconLocation 'ooba.ico'
     }
 }
+
+function Install-OobaCuda {
+    if (-not (Get-Command Import-RemoteFunction -ErrorAction SilentlyContinue)){
+        iex (irm Import-RemoteFunction.tc.ht)
+    }
+
+    if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+        Import-FunctionIfNotExists -Command Install-CudaAndcuDNN -ScriptUri "Install-Cuda.tc.ht"
+        Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
+    }
+}

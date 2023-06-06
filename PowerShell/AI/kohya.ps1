@@ -21,9 +21,9 @@
 # ----------------------------------------
 # 1. Install Chocolatey
 # 2. Install or update Git if not already installed
-# 3. Download kohya_ss
-# 4. Check if Conda or Python is installed
-# 5. Optional: CUDNN
+# 3. Install CUDA and cuDNN
+# 4. Download kohya_ss
+# 5. Check if Conda or Python is installed
 # 6. Create desktop shortcuts?
 # 7. Launch!
 # ----------------------------------------
@@ -31,7 +31,7 @@
 Write-Host "---------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's kohya_ss installer!" -ForegroundColor Cyan
 Write-Host "kohya_ss as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-28]" -ForegroundColor Cyan
+Write-Host "[Version 2023-06-06]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "---------------------------------------------`n`n" -ForegroundColor Cyan
 
@@ -63,7 +63,13 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 Write-Host "`nInstalling Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
-# 3. Download kohya_ss
+# 3. Install CUDA and cuDNN
+if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+    Import-FunctionIfNotExists -Command Install-CudaAndcuDNN -ScriptUri "Install-Cuda.tc.ht"
+    Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
+}
+
+# 4. Download kohya_ss
 git clone https://github.com/bmaltais/kohya_ss.git
 cd kohya_ss
 
@@ -71,7 +77,7 @@ cd kohya_ss
 iex (irm refreshenv.tc.ht)
 
 
-# 4. Check if Conda or Python is installed
+# 5. Check if Conda or Python is installed
 # Check if Conda is installed
 iex (irm Get-CondaAndPython.tc.ht)
 
@@ -80,50 +86,6 @@ $condaFound = Get-UseConda -Name "Kohya_ss" -EnvName "kss" -PythonVersion "3.10.
 
 # Get Python command (eg. python, python3) & Check for compatible version
 $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs" -condaFound $condaFound
-
-
-# 5. Optional: CUDNN
-do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download CUDNN (~700MB)? You will need an Nvidia account. (y/n): "
-    $cudnn = Read-Host
-} while ($cudnn -notin "Y", "y", "N", "n")
-
-if ($cudnn -in "Y","y") {
-    Write-Host "Please:`n1. Open: https://developer.nvidia.com/rdp/cudnn-download`n2. Log in.`n3. Expand the latest cuDNN (matching your CUDA version)`n4. Click 'Local Installer for Windows (Zip)'`n5. Rename the zip to 'cudnn.zip'`n6. Move to $TCHT\kohya_ss (This folder should auto-open in Explorer)`nYou can do nothing and continue to cancel this operation." -ForegroundColor Cyan
-    explorer $TCHT\kohya_ss
-    Read-Host "Press Enter to continue..."
-
-
-    $zipFilePath = "cudnn.zip"
-    if (Test-Path $zipFilePath) {
-        Write-Host "Extracting..." -ForegroundColor Green
-        # Set the path to the ZIP file and the destination folder
-        $destinationFolder = "cudnn_windows"
-
-        # Create the destination folder if it does not exist
-        if (-not (Test-Path -Path $destinationFolder -PathType Container)) {
-            New-Item -ItemType Directory -Path $destinationFolder | Out-Null
-        }
-
-        $destinationFolder = (Resolve-Path "cudnn_windows").Path
-        $zipFilePath = (Resolve-Path "cudnn.zip").Path
-
-        # Extract every .dll file from the ZIP file and copy it to the destination folder
-        Add-Type -AssemblyName System.IO.Compression.FileSystem
-        [System.IO.Compression.ZipFile]::OpenRead($zipFilePath).Entries `
-            | Where-Object { $_.Name -like '*.dll' } `
-            | ForEach-Object {
-                [System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, "$destinationFolder\$($_.Name)", $true)
-            }
-
-        Write-Host "Done!`n`nYou can now delete cudnn.zip (You may want to use it elsewhere so I won't auto-delete)`n`n"
-
-        ./activate.ps1
-        python .\tools\cudann_1.8_install.py
-    } else {
-        Write-Host "CUDNN download cancelled."
-    }
-}
 
 # Continue with installation
 ./setup.bat

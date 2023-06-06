@@ -23,18 +23,19 @@
 # 1. Install Chocolatey
 # 2. Install or update Git if not already installed
 # 3. Install aria2c to make the download models MUCH faster
-# 4. Check if Conda or Python is installed (is installed - also is 3.10.6 - 3.10.11)
-# 5. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)
-# 6. Enable auto-update?
-# 7. Create desktop shortcuts?
-# 8. Download Stable Diffusion 1.5 model
-# 9. Launch SD.Next
+# 4. Install CUDA and cuDNN
+# 5. Check if Conda or Python is installed (is installed - also is 3.10.6 - 3.10.11)
+# 6. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)
+# 7. Enable auto-update?
+# 8. Create desktop shortcuts?
+# 9. Download Stable Diffusion 1.5 model
+# 10. Launch SD.Next
 # ----------------------------------------
 
 Write-Host "-------------------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's Vladmandic SD.Next (Automatic) installer!" -ForegroundColor Cyan
 Write-Host "Vladmandic SD.Next (Automatic) as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-06-01]" -ForegroundColor Cyan
+Write-Host "[Version 2023-06-06]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "-------------------------------------------------------------------`n`n" -ForegroundColor Cyan
 
@@ -72,11 +73,17 @@ Clear-ConsoleScreen
 Write-Host "Installing aria2c (Faster model download)..." -ForegroundColor Cyan
 choco upgrade aria2 -y
 
+# 4. Install CUDA and cuDNN
+if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+    Import-FunctionIfNotExists -Command Install-CudaAndcuDNN -ScriptUri "Install-Cuda.tc.ht"
+    Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
+}
+
 # Import function to reload without needing to re-open Powershell
 iex (irm refreshenv.tc.ht)
 Update-SessionEnvironment
 
-# 4. Check if Conda or Python is installed
+# 5. Check if Conda or Python is installed
 # Check if Conda is installed
 iex (irm Get-CondaAndPython.tc.ht)
 
@@ -87,7 +94,7 @@ $condaFound = Get-UseConda -Name "Vladmandic SD.Next" -EnvName "vlad" -PythonVer
 $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/vladmandic/automatic#install" -condaFound $condaFound
 
 
-# 5. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)
+# 6. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)
 Clear-ConsoleScreen
 if ((Test-Path -Path "$TCHT\vladmandic") -and -not $isSymlink) {
     Write-Host "The 'vladmandic' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
@@ -109,7 +116,7 @@ if ((Test-Path -Path "$TCHT\vladmandic") -and -not $isSymlink) {
 }
 
 
-# 6. Enable auto-update?
+# 7. Enable auto-update?
 Clear-ConsoleScreen
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "Do you want to enable auto-update? (You can always update manually. This is a Vladmandic SD.Next launch option) (y/n): "
@@ -126,7 +133,7 @@ Set-Content -Path "webui-user.sh" -Value "@echo off`n./webui.sh $extraArgs`nread
 
 # 7. Share with Gradio?
 
-# 7. Create desktop shortcuts?
+# 8. Create desktop shortcuts?
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for SD.Next?" -ForegroundColor Cyan
 do {
@@ -148,7 +155,7 @@ if ($shortcuts -in "Y","y", "") {
     
 }
 
-# 8. Download Stable Diffusion 1.5 model
+# 9. Download Stable Diffusion 1.5 model
 Clear-ConsoleScreen
 Write-Host "Getting started? Do you have models?" -ForegroundColor Cyan
 do {
@@ -161,6 +168,6 @@ if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
     Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
 }
 
-# 9. Launch SD.Next
+# 10. Launch SD.Next
 Write-Host "`n`nLaunching Vladmandic SD.Next!" -ForegroundColor Cyan
 ./webui-user.bat

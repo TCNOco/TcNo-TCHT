@@ -35,4 +35,5 @@ Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progre
 iex (irm Import-RemoteFunction.tc.ht)
 Import-FunctionIfNotExists -Command Install-Ooba -ScriptUri "Install-Ooba.tc.ht"
 
+Install-OobaCuda
 Install-Ooba

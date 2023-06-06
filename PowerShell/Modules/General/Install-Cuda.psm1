@@ -160,12 +160,12 @@ function Install-CudaAndcuDNN {
     switch ($CudaVersion) {
         "12.0" {
             Install-Cuda -CudaVersion "12.0" -CudaVersionChoco "12.0.1.52833"
-            Install-Cudnn -DownloadUrl "https://developer.nvidia.com/downloads/compute/cudnn/secure/8.9.2/local_installers/12.x/cudnn-windows-x86_64-8.9.2.26_cuda12-archive.zip" -CudnnVersion "8.9.2" -CudaVersion "12.x" -CudnnOptional CudnnOptional
+            Install-Cudnn -DownloadUrl "https://developer.nvidia.com/downloads/compute/cudnn/secure/8.9.2/local_installers/12.x/cudnn-windows-x86_64-8.9.2.26_cuda12-archive.zip" -CudnnVersion "8.9.2" -CudaVersion "12.x" -CudnnOptional $CudnnOptional
             Break
         }
         "11.8" { 
             Install-Cuda -CudaVersion "11.8" -CudaVersionChoco "11.8.0.52206"
-            Install-Cudnn -DownloadUrl "https://developer.nvidia.com/downloads/compute/cudnn/secure/8.9.1/local_installers/11.8/cudnn-windows-x86_64-8.9.1.23_cuda11-archive.zip" -CudnnVersion "8.9.1" -CudaVersion "11.8" -CudnnOptional CudnnOptional
+            Install-Cudnn -DownloadUrl "https://developer.nvidia.com/downloads/compute/cudnn/secure/8.9.1/local_installers/11.8/cudnn-windows-x86_64-8.9.1.23_cuda11-archive.zip" -CudnnVersion "8.9.1" -CudaVersion "11.8" -CudnnOptional $CudnnOptional
             Break
          }
         Default {

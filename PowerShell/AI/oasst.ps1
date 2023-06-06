@@ -30,7 +30,7 @@
 Write-Host "--------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's OpenAssist (Pythia) installer!" -ForegroundColor Cyan
 Write-Host "OpenAssist (Pythia) as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-28]" -ForegroundColor Cyan
+Write-Host "[Version 2023-06-06]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "--------------------------------------------------------`n`n" -ForegroundColor Cyan
 
@@ -63,18 +63,14 @@ if (Test-Path -Path "$TCHT\oobabooga_windows") {
     }
 }
 
+Import-FunctionIfNotExists -Command Install-Ooba -ScriptUri "Install-Ooba.tc.ht"
+Install-OobaCuda
 if ($toDownload) {
     Write-Host "I'll start by installing Oobabooga first, then we'll get to the model...`n`n"
     
-    Import-FunctionIfNotExists -Command Install-Ooba -ScriptUri "Install-Ooba.tc.ht"
-
     Install-Ooba -skip_model 1 -skip_start 1
-    Set-Location "$TCHT\oobabooga_windows"
-
-} else {
-    # CD into folder anyway
-    Set-Location "$TCHT\oobabooga_windows"
 }
+Set-Location "$TCHT\oobabooga_windows"
 
 # Run the oobabooga updater
 if (Test-Path -Path ./update_windows.bat) {

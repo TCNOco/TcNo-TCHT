@@ -38,7 +38,7 @@
 Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's Roop installer!" -ForegroundColor Cyan
 Write-Host "Roop as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-06-04]" -ForegroundColor Cyan
+Write-Host "[Version 2023-06-06]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "---------------------------------------------------------------------------`n`n" -ForegroundColor Cyan
 
@@ -169,7 +169,6 @@ if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
     if ($condaFound) {
         $ReinstallCommand += "conda install cudatoolkit -y`n"
     }
-
 }
 
 $ReinstallCommand += "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
@@ -222,4 +221,9 @@ Clear-ConsoleScreen
 Write-Host "There are more launch options you can add, such as max memory. Add these to the start powershell files. See here: https://github.com/s0md3v/roop#how-do-i-use-it"
 
 Write-Host "Launching Roop!" -ForegroundColor Cyan
-./run-roop.bat
+if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+    ./run-roop.bat
+} else {
+    Write-Host "An Nvidia Graphics Card was not detected. Launching in CPU-only mode..."
+    ./run-roop-cpu.bat
+}

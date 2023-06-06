@@ -24,21 +24,22 @@
 # 2. Install or update Git if not already installed
 # 3. Install aria2c to make the download models MUCH faster
 # 4. Check if Conda or Python is installed (is installed - also is 3.10.6 - 3.10.11)
-# 5. Check if has AUTOMATIC1111 directory ($TCHT\stable-diffusion-webui) (Default C:\TCHT\stable-diffusion-webui)
-# 6. Enable xformers?
-# 7. Fix for AMD GPUs (untested)
-# 8. Low VRAM
-# 9. Share with Gradio?
-# 10. Create desktop shortcuts?
-# 11. Download Stable Diffusion 1.5 model
-# 12. Launch AUTOMATIC1111 Stable Diffusion WebUI
+# 5. Install CUDA and cuDNN
+# 6. Check if has AUTOMATIC1111 directory ($TCHT\stable-diffusion-webui) (Default C:\TCHT\stable-diffusion-webui)
+# 7. Enable xformers?
+# 8. Fix for AMD GPUs (untested)
+# 9. Low VRAM
+# 10. Share with Gradio?
+# 11. Create desktop shortcuts?
+# 12. Download Stable Diffusion 1.5 model
+# 13. Launch AUTOMATIC1111 Stable Diffusion WebUI
 # ----------------------------------------
 
 
 Write-Host "--------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's AUTOMATIC1111 installer!" -ForegroundColor Cyan
 Write-Host "AUTOMATIC1111 as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-11]" -ForegroundColor Cyan
+Write-Host "[Version 2023-06-06]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "--------------------------------------------------`n`n" -ForegroundColor Cyan
 
@@ -85,13 +86,19 @@ Update-SessionEnvironment
 # 4. Check if Conda or Python is installed
 iex (irm Get-CondaAndPython.tc.ht)
 
+# 5. Install CUDA and cuDNN
+if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+    Import-FunctionIfNotExists -Command Install-CudaAndcuDNN -ScriptUri "Install-Cuda.tc.ht"
+    Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
+}
+
 # Check if Conda is installed
 $condaFound = Get-UseConda -Name "AUTOMATIC1111 Stable Diffusion WebUI" -EnvName "a11" -PythonVersion "3.10.6"
 
 # Get Python command (eg. python, python3) & Check for compatible version
 $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs" -condaFound $condaFound
 
-# 5. Check if has AUTOMATIC1111 directory ($TCHT\stable-diffusion-webui) (Default C:\TCHT\stable-diffusion-webui)
+# 6. Check if has AUTOMATIC1111 directory ($TCHT\stable-diffusion-webui) (Default C:\TCHT\stable-diffusion-webui)
 Clear-ConsoleScreen
 if ((Test-Path -Path "$TCHT\stable-diffusion-webui") -and -not $isSymlink) {
     Write-Host "The 'stable-diffusion-webui' folder already exists. We'll pull the latest updates (git pull)" -ForegroundColor Green
@@ -112,7 +119,7 @@ if ((Test-Path -Path "$TCHT\stable-diffusion-webui") -and -not $isSymlink) {
     git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git .
 }
 
-# 6. Enable xformers?
+# 7. Enable xformers?
 Clear-ConsoleScreen
 do {
     Write-Host -ForegroundColor Cyan -NoNewline "Do you want to enable xformers for extra speed? (Recommended) (y/n): "
@@ -126,7 +133,7 @@ if ($answer -eq "y" -or $answer -eq "Y") {
 } else {
 }
 
-# 7. Fix for AMD GPUs (untested)
+# 8. Fix for AMD GPUs (untested)
 if ((Get-CimInstance Win32_VideoController).Name -like "*AMD*") {
     Write-Host "`n`nAMD GPU is installed. Applying fix (https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-AMD-GPUs#automatic-installation)" -ForegroundColor Cyan
     (Get-Content webui-user.bat) | Foreach-Object {
@@ -135,7 +142,7 @@ if ((Get-CimInstance Win32_VideoController).Name -like "*AMD*") {
     Write-Host "Please check the link above. You may not need '--precision full --no-half' in webui-user.bat, but other AMD GPUs will not work with SDUI without this. Having this will slow your image generations a LOT." -ForegroundColor Cyan
 }
 
-# 8. Low VRAM
+# 9. Low VRAM
 Clear-ConsoleScreen
 Write-Host "Image generation uses a lot of VRAM. There are tons of optimizations to do." -ForegroundColor Cyan
 
@@ -168,7 +175,7 @@ if ($answer -eq "y" -or $answer -eq "Y") {
     }
 }
 
-# 9. Share with Gradio?
+# 10. Share with Gradio?
 Clear-ConsoleScreen
 Write-Host "Do you want to share your WebUI over the internet? (--share)" -ForegroundColor Cyan
 Write-Host "NOTE: If yes, you will likely need to create an antivirus exception (More info provided if yes)." -ForegroundColor Cyan
@@ -187,12 +194,16 @@ if ($answer -eq "y" -or $answer -eq "Y") {
     } | Set-Content webui-user.bat
 }
 
-# 10. Create desktop shortcuts?
+# 11. Create desktop shortcuts?
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for AUTOMATIC1111?" -ForegroundColor Cyan
 
 # Create start bat and ps1 files
 if ($condaFound) {
+    if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+        conda install cudatoolkit -y
+    }
+    
     # As the Windows Target path can only have 260 chars, we easily hit that limit...
     $condaPath = Get-CondaPath
     $OutputFilePath = "start-conda.ps1"
@@ -230,7 +241,7 @@ if ($shortcuts -in "Y","y", "") {
     
 }
 
-# 11. Download Stable Diffusion 1.5 model
+# 12. Download Stable Diffusion 1.5 model
 Clear-ConsoleScreen
 Write-Host "Getting started? Do you have models?" -ForegroundColor Cyan
 do {
@@ -243,7 +254,7 @@ if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
     Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
 }
 
-# 12. Launch AUTOMATIC1111 Stable Diffusion WebUI
+# 13. Launch AUTOMATIC1111 Stable Diffusion WebUI
 Clear-ConsoleScreen
 Write-Host "Launching AUTOMATIC1111 Stable Diffusion WebUI!" -ForegroundColor Cyan
 ./webui-user.bat

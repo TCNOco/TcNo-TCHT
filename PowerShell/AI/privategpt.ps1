@@ -96,7 +96,6 @@ if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
     Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
 }
 
-
 # 6. Check if Conda or Python is installed
 # Check if Conda is installed
 iex (irm Get-CondaAndPython.tc.ht)

@@ -31,7 +31,7 @@
 Write-Host "--------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's Whisper installer!" -ForegroundColor Cyan
 Write-Host "Whisper as well as all of its other dependencies should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-04-14]" -ForegroundColor Cyan
+Write-Host "[Version 2023-06-06]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
 
@@ -73,30 +73,12 @@ else {
     Exit
 }
 
+iex (irm Import-RemoteFunction.tc.ht)
 # 4. Install CUDA using Choco if not already installed.
-try {
-    $nvidiaSmiOutput = & nvidia-smi
-    if ($LASTEXITCODE -eq 0) {
-        if ($nvidiaSmiOutput -match "NVIDIA-SMI") {
-            # Nvidia CUDA can be installed.
-
-            # Check if CUDA is already installed
-            if (-not (Get-Command nvcc -ErrorAction SilentlyContinue)) {
-                Write-Host "`nCUDA is not installed. Installing..." -ForegroundColor Cyan
-            
-                choco upgrade cuda -y
-                Update-SessionEnvironment
-            }
-        }
-    }
-}
-catch {
-    Write-Host "An error occurred while checking for NVIDIA graphics card." -ForegroundColor Red
-}
-
-if (Get-Command nvcc -ErrorAction SilentlyContinue) {
-    Write-Host "Nvidia CUDA installed." -ForegroundColor Green
-
+if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+    Import-FunctionIfNotExists -Command Install-CudaAndcuDNN -ScriptUri "Install-Cuda.tc.ht"
+    Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
+    
     # 5. Install Pytorch if not already installed, or update.
     Write-Host "`nInstalling or updating PyTorch (With GPU support)..." -ForegroundColor Cyan
     if ($condaFound){
@@ -104,8 +86,7 @@ if (Get-Command nvcc -ErrorAction SilentlyContinue) {
     } else {
         &$python -m pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
     }
-}
-else {
+} else {
     Write-Host "Nvidia CUDA is not installed. Please install the latest Nvidia CUDA Toolkit and run this script again." -ForegroundColor Red
     Write-Host "For now the script will proceed with installing CPU-only PyTorch. Whisper will still run when it's done." -ForegroundColor Red
     
