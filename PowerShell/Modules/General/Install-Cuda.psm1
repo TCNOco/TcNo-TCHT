@@ -28,7 +28,7 @@ function Install-Cuda {
 
     if (Test-Path -Path "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$CudaVersion" -PathType Container) {
         Write-Host "CUDA $CudaVersion is already installed" -ForegroundColor Cyan
-        Write-Host "Do you want to reinstall? (y/n0 [Default: n]: )"
+        Write-Host "Do you want to reinstall? (y/n) [Default: n]: "
         $response = Read-Host
         if ($response -eq "y") {
             Write-Host "Reinstalling CUDA $CudaVersion..." -ForegroundColor Cyan
@@ -73,9 +73,9 @@ function Install-Cudnn {
         Write-Host "CUDA $CudaVersion is already installed" -ForegroundColor Cyan
         
         if ($CudnnOptional) {
-            Write-Host "cuDNN is optional for this. Do you want to reinstall cuDNN? (y/n [Default: n]: )"
+            Write-Host "cuDNN is optional for this. Do you want to reinstall cuDNN? (y/n) [Default: n]:" -ForegroundColor Cyan
         } else {
-            Write-Host "cuDNN is required. Do you want to reinstall cuDNN? (y/n [Default: n]: )"
+            Write-Host "cuDNN is required. Do you want to reinstall cuDNN? (y/n) [Default: n]:"
         }
 
         $response = Read-Host
@@ -88,7 +88,7 @@ function Install-Cudnn {
     }
 
     if ($CudnnOptional) {
-        Write-Host "cuDNN may not be required but may help solve issues later.`nYou will need an Nvidia account.`nDo you want to install cuDNN? (y/n [Default: n]: "
+        Write-Host "cuDNN may not be required but may help solve issues later.`nYou will need an Nvidia account.`nDo you want to install cuDNN? (y/n) [Default: n]: "
         $response = Read-Host
         if ($response -eq "y") {
             Write-Host "Installing cuDNN..." -ForegroundColor Cyan

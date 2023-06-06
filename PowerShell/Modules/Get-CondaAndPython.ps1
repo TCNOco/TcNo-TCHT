@@ -90,9 +90,19 @@ function Get-Python {
             Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
         }
         else {
+            Write-Host "Python version $($matches[1]) is installed." -ForegroundColor Green
             Write-Host "$PythonRegexExplanation`nAssuming you've installed the correct version, please enter the comand you use to access Python 3.9/3.10." -ForegroundColor Yellow
+            
+            Write-Host "The easiest fix is using Conda for managing Python versions. Enter 'conda' without quotes below to install and use Conda instead (RECOMMENDED)" -ForegroundColor Green
         
-            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310)"
+            $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310, conda)"
+
+            if ($pythonProgramName.ToLower() -eq "conda") {
+                choco install miniconda3 --params="'/AddToPath:1'" --force -y | Write-Host # --force is so it can handle an existing miniconda install that isn't added to path, hence the command conda won't work.
+                Update-SessionEnvironment
+                return "miniconda"
+            }
+
             $pythonVersion = &$pythonProgramName --version 2>&1
             if ($pythonVersion -match $PythonRegex) {
                 Write-Host "Python version $($matches[1]) is installed."
@@ -145,6 +155,8 @@ This function currently checks the following locations for the Conda PowerShell 
 function Get-CondaPath {
     # Define the file paths to check
     $filePaths1 = @(
+        "C:\tools\anaconda3\shell\condabin\conda-hook.ps1",
+        "C:\tools\miniconda3\shell\condabin\conda-hook.ps1",
         "C:\ProgramData\anaconda3\shell\condabin\conda-hook.ps1",
         "C:\ProgramData\miniconda3\shell\condabin\conda-hook.ps1",
         "$env:USERPROFILE\anaconda3\shell\condabin\conda-hook.ps1"
@@ -156,6 +168,12 @@ function Get-CondaPath {
         "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3\Anaconda Powershell Prompt.lnk",
         "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt.lnk",
         "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Anaconda3\Anaconda Powershell Prompt.lnk",
+        
+        "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt (miniconda3).lnk",
+        "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Anaconda3\Anaconda Powershell Prompt (miniconda3).lnk",
+        "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Anaconda3 (64-bit)\Anaconda Powershell Prompt (miniconda3).lnk",
+        "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Anaconda3\Anaconda Powershell Prompt (miniconda3).lnk",
+
         "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Miniconda3 (64-bit)\Anaconda Powershell Prompt (miniconda3).lnk",
         "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Miniconda3\Anaconda Powershell Prompt (miniconda3).lnk"
         "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Miniconda3 (64-bit)\Anaconda Powershell Prompt (miniconda3).lnk",
