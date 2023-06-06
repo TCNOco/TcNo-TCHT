@@ -69,8 +69,8 @@ function Install-Cudnn {
         [bool]$CudnnOptional
     )
 
-    if (Test-Path -Path "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$CudaVersion" -PathType Container) {
-        Write-Host "CUDA $CudaVersion is already installed" -ForegroundColor Cyan
+    if (Test-Path -Path "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$CudaVersion\bin\cudnn64_8.dll") {
+        Write-Host "cuDNN for CUDA $CudaVersion is already installed" -ForegroundColor Cyan
         
         if ($CudnnOptional) {
             Write-Host "cuDNN is optional for this. Do you want to reinstall cuDNN? (y/n) [Default: n]:" -ForegroundColor Cyan
