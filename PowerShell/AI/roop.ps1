@@ -110,14 +110,15 @@ iex (irm Get-CondaAndPython.tc.ht)
 $condaFound = Get-UseConda -Name "Roop" -EnvName "roop" -PythonVersion "3.10.11"
 
 # Get Python command (eg. python, python3) & Check for compatible version
-$python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/s0md3v/roop/wiki/1.-Installation" -condaFound $condaFound
-if ($python -eq "miniconda") {
-    $python = "python"
-    $condaFound = $true
-}
-
 if ($condaFound) {
     conda activate "roop"
+    $python = "python"
+} else {
+    $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/s0md3v/roop/wiki/1.-Installation"
+    if ($python -eq "miniconda") {
+        $python = "python"
+        $condaFound = $true
+    }
 }
 
 # 8. Clone Roop ($TCHT\roop) (Default C:\TCHT\roop)

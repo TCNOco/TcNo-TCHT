@@ -32,20 +32,14 @@ function Get-Python {
         [string]$PythonRegex = 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])',
         [string]$PythonRegexExplanation = "Python version is not between 3.10.6 and 3.10.11.",
         [string]$PythonInstallVersion = "3.10.11",
-        [string]$ManualInstallGuide = "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs",
-        [bool]$condaFound = $false
+        [string]$ManualInstallGuide = "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs"
     )
 
-    Write-Host "condaFound: '$condaFound'"
 
     $python = "python"
 
     if (-not (Get-Command Update-SessionEnvironment -ErrorAction SilentlyContinue)) {
         iex (irm refreshenv.tc.ht)
-    }
-
-    if ($condaFound) {
-        return $python
     }
     
     Update-SessionEnvironment
@@ -98,7 +92,6 @@ function Get-Python {
             
             Write-Host "The easiest fix is using Conda for managing Python versions. Enter 'conda' without quotes below to install and use Conda instead (RECOMMENDED)" -ForegroundColor Green
         
-    Write-Host "condaFound: '$condaFound'"
             $pythonProgramName = Read-Host "Enter the Python program name (e.g. python3, python310, conda)"
 
             if ($pythonProgramName.ToLower() -eq "conda") {
