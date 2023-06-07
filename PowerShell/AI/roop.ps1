@@ -166,20 +166,43 @@ $condaPath = "`"$(Get-CondaPath)`""
 $CondaEnvironmentName = "roop"
 $InstallLocation = "`"$(Get-Location)`""
 
-# Create Roop launchers (GPU):
+# Create Roop launchers (GPU - Nvidia):
 $ProgramName = "Roop"
-$RunCommand = "python run.py --gpu"
-$LauncherName = "run-roop"
+$RunCommand = "python run.py --gpu-vendor nvidia"
+$LauncherName = "run-roop-nvidia"
 
 $ReinstallCommand = ""
-if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
-    if ($condaFound) {
-        $ReinstallCommand += "conda install cudatoolkit -y`n"
-    }
+if ($condaFound -and (Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+    $ReinstallCommand += "conda install cudatoolkit -y`n"
 }
 
 $ReinstallCommand += "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
 
+if ($condaFound) {
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
+} else {
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
+}
+
+# Now for AMD, Intel and Apple graphics cards
+$ReinstallCommand = "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt"
+
+$RunCommand = "python run.py --gpu-vendor amd"
+$LauncherName = "run-roop-amd"
+if ($condaFound) {
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
+} else {
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
+}
+$RunCommand = "python run.py --gpu-vendor intel"
+$LauncherName = "run-roop-intel"
+if ($condaFound) {
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
+} else {
+    New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
+}
+$RunCommand = "python run.py --gpu-vendor apple"
+$LauncherName = "run-roop-apple"
 if ($condaFound) {
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -CondaPath $condaPath -CondaEnvironmentName $CondaEnvironmentName -LauncherName $LauncherName
 } else {
@@ -212,12 +235,31 @@ if ($shortcuts -in "Y","y", "") {
     Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/roop.ico' -OutFile 'roop.ico'
 
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
-    $shortcutName = "Roop"
-    $targetPath = "run-roop.bat"
     $IconLocation = 'roop.ico'
-    New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
-
+    if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
+        $shortcutName = "Roop (Nvidia)"
+        $targetPath = "run-roop-nvidia.bat"
+        New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
+    } 
     
+    if ((Get-CimInstance Win32_VideoController).Name -like "*Intel*") {
+        $shortcutName = "Roop (Intel)"
+        $targetPath = "run-roop-intel.bat"
+        New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
+    }
+    
+    if ((Get-CimInstance Win32_VideoController).Name -like "*AMD*") {
+        $shortcutName = "Roop (AMD)"
+        $targetPath = "run-roop-amd.bat"
+        New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
+    }
+    
+    if ((Get-CimInstance Win32_VideoController).Name -like "*Apple*") {
+        $shortcutName = "Roop (Apple)"
+        $targetPath = "run-roop-apple.bat"
+        New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
+    }
+
     $shortcutName = "Roop CPU-Only"
     $targetPath = "run-roop-cpu.bat"
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
@@ -234,7 +276,13 @@ if (-not (Test-Path "$TCHT\roop\inswapper_128.onnx")) {
 }
 
 if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
-    ./run-roop.bat
+    ./run-roop-nvidia.bat
+} elseif ((Get-CimInstance Win32_VideoController).Name -like "*Intel*") {
+    ./run-roop-intel.bat
+} elseif ((Get-CimInstance Win32_VideoController).Name -like "*AMD*") {
+    ./run-roop-amd.bat
+} elseif ((Get-CimInstance Win32_VideoController).Name -like "*Apple*") {
+    ./run-roop-apple.bat
 } else {
     Write-Host "An Nvidia Graphics Card was not detected. Launching in CPU-only mode..."
     ./run-roop-cpu.bat
