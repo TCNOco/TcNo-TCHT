@@ -27,9 +27,10 @@
 # 5. Check if Conda or Python is installed (is installed - also is 3.10.6 - 3.10.11)
 # 6. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)
 # 7. Enable auto-update?
-# 8. Create desktop shortcuts?
-# 9. Download Stable Diffusion 1.5 model
-# 10. Launch SD.Next
+# 8. Enable API?
+# 9. Create desktop shortcuts?
+# 10. Download Stable Diffusion 1.5 model
+# 11. Launch SD.Next
 # ----------------------------------------
 
 Write-Host "-------------------------------------------------------------------" -ForegroundColor Cyan
@@ -135,15 +136,43 @@ do {
 
 $extraArgs = ""
 if ($answer -eq "y" -or $answer -eq "Y") {
-    $extraArgs = $extraArgs + "--upgrade"
+    $extraArgs += " --upgrade"
 }
 
-Set-Content -Path "webui-user.bat" -Value "@echo off`nwebui.bat $extraArgs`npause"
-Set-Content -Path "webui-user.sh" -Value "@echo off`n./webui.sh $extraArgs`nread -p `"Press enter to continue`""
-
 # 7. Share with Gradio?
+Clear-ConsoleScreen
+Write-Host "Do you want to share your WebUI over the internet? (--share)" -ForegroundColor Cyan
+Write-Host "NOTE: If yes, you will likely need to create an antivirus exception (More info provided if yes)." -ForegroundColor Cyan
 
-# 8. Create desktop shortcuts?
+do {
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n): "
+    $answer = Read-Host
+} while ($answer -notin "Y", "y", "N", "n")
+
+if ($answer -eq "y" -or $answer -eq "Y") {
+    Write-Host "To fix the AntiVirus warning see: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Troubleshooting#--share-non-functional-after-gradio-322-update" -ForegroundColor Cyan
+    Write-Host "You may need to restore the file, and run the WebUI again for it to work" -ForegroundColor Yellow
+
+    $extraArgs += " --share"
+}
+
+# 8. Enable API?
+Clear-ConsoleScreen
+Write-Host "Do you want to enable the API? (Let other programs interact with SD.Next (--api)" -ForegroundColor Cyan
+
+do {
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n): "
+    $answer = Read-Host
+} while ($answer -notin "Y", "y", "N", "n")
+
+if ($answer -eq "y" -or $answer -eq "Y") {
+    $extraArgs += " --api"
+}
+
+Set-Content -Path "webui-user.bat" -Value "@echo off`nwebui.bat$extraArgs`npause"
+Set-Content -Path "webui-user.sh" -Value "@echo off`n./webui.sh$extraArgs`nread -p `"Press enter to continue`""
+
+# 9. Create desktop shortcuts?
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for SD.Next?" -ForegroundColor Cyan
 do {
@@ -165,7 +194,7 @@ if ($shortcuts -in "Y","y", "") {
     
 }
 
-# 9. Download Stable Diffusion 1.5 model
+# 10. Download Stable Diffusion 1.5 model
 Clear-ConsoleScreen
 Write-Host "Getting started? Do you have models?" -ForegroundColor Cyan
 do {
@@ -178,6 +207,6 @@ if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
     Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
 }
 
-# 10. Launch SD.Next
+# 11. Launch SD.Next
 Write-Host "`n`nLaunching Vladmandic SD.Next!" -ForegroundColor Cyan
 ./webui-user.bat

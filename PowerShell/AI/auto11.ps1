@@ -30,9 +30,10 @@
 # 8. Fix for AMD GPUs (untested)
 # 9. Low VRAM
 # 10. Share with Gradio?
-# 11. Create desktop shortcuts?
-# 12. Download Stable Diffusion 1.5 model
-# 13. Launch AUTOMATIC1111 Stable Diffusion WebUI
+# 11. Enable API?
+# 12. Create desktop shortcuts?
+# 13. Download Stable Diffusion 1.5 model
+# 14. Launch AUTOMATIC1111 Stable Diffusion WebUI
 # ----------------------------------------
 
 
@@ -204,7 +205,22 @@ if ($answer -eq "y" -or $answer -eq "Y") {
     } | Set-Content webui-user.bat
 }
 
-# 11. Create desktop shortcuts?
+# 11. Enable API?
+Clear-ConsoleScreen
+Write-Host "Do you want to enable the API? (Let other programs interact with AUTOMATIC1111 (--api)" -ForegroundColor Cyan
+
+do {
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n): "
+    $answer = Read-Host
+} while ($answer -notin "Y", "y", "N", "n")
+
+if ($answer -eq "y" -or $answer -eq "Y") {
+    (Get-Content webui-user.bat) | Foreach-Object {
+        $_ -replace 'set COMMANDLINE_ARGS=', 'set COMMANDLINE_ARGS=--api '
+    } | Set-Content webui-user.bat
+}
+
+# 12. Create desktop shortcuts?
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for AUTOMATIC1111?" -ForegroundColor Cyan
 
@@ -251,7 +267,7 @@ if ($shortcuts -in "Y","y", "") {
     
 }
 
-# 12. Download Stable Diffusion 1.5 model
+# 13. Download Stable Diffusion 1.5 model
 Clear-ConsoleScreen
 Write-Host "Getting started? Do you have models?" -ForegroundColor Cyan
 do {
@@ -264,7 +280,7 @@ if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
     Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
 }
 
-# 13. Launch AUTOMATIC1111 Stable Diffusion WebUI
+# 14. Launch AUTOMATIC1111 Stable Diffusion WebUI
 Clear-ConsoleScreen
 Write-Host "Launching AUTOMATIC1111 Stable Diffusion WebUI!" -ForegroundColor Cyan
 ./webui-user.bat
