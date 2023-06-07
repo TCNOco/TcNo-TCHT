@@ -87,7 +87,8 @@ Write-Host "--------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's BuildTools installer!" -ForegroundColor Cyan
 Write-Host "Chocolatey [package manager] and BuildTools will now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-06-03]" -ForegroundColor Cyan
-Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
+Write-Host "`nThis script is provided AS-IS without warranty of any kind. See https://tc.ht/privacy & https://tc.ht/terms."
+Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Green
 Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
 
 Install-BuildTools
