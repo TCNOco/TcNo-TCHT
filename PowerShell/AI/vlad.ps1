@@ -129,7 +129,7 @@ if ((Test-Path -Path "$TCHT\vladmandic") -and -not $isSymlink) {
 # 7. Enable auto-update?
 Clear-ConsoleScreen
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to enable auto-update? (You can always update manually. This is a Vladmandic SD.Next launch option) (y/n) [Default: y]: "
+    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to enable auto-update?`n(You can always update manually. This is a Vladmandic SD.Next launch option)`nAnswer: (y/n) [Default: y]: "
     $answer = Read-Host
 } while ($answer -notin "Y", "y", "N", "n", "")
 
