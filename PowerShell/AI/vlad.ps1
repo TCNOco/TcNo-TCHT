@@ -95,6 +95,12 @@ $condaFound = Get-UseConda -Name "Vladmandic SD.Next" -EnvName "vlad" -PythonVer
 if ($condaFound) {
     conda activate "vlad"
     $python = "python"
+
+    python -m venv ./venv
+    ./venv/Scripts/python.exe -m pip install --upgrade pip
+    ./venv/Scripts/python.exe -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    ./venv/Scripts/python.exe -m pip install -r requirements.txt
+    ./venv/Scripts/python.exe -m pip install clip_interrogator sqlalchemy rembg timm transformers==4.26.1
 } else {
     $python = Get-Python -PythonRegex 'Python ([3].[1][0-1].[6-9]|3.10.1[0-1])' -PythonRegexExplanation "Python version is not between 3.10.6 and 3.10.11." -PythonInstallVersion "3.10.11" -ManualInstallGuide "https://github.com/vladmandic/automatic#install" 
     if ($python -eq "miniconda") {
