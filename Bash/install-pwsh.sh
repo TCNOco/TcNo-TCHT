@@ -1,6 +1,12 @@
 #!/bin/bash
 
-echo -e "\033[36mI will try installing PowerShell now...\033[0m"
+echo -e "\033[33m--------------------------------------------------"
+echo -e "Welcome to TroubleChute's PowerShell installer!"
+echo -e "PowerShell should now be installed..."
+echo -e "[Version 2023-06-06]\033[0m"
+echo -e"This script is provided AS-IS without warranty of any kind. See https://tc.ht/privacy & https://tc.ht/terms."
+echo -e "\033[32m\nConsider supporting these install scripts: https://tc.ht/support"
+echo -e "\033[33m--------------------------------------------------\n\n\033[0m"
 
 # IF LINUX:
 if [[ "$(uname -s)" == "Linux" ]]; then

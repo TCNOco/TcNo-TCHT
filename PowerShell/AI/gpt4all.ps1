@@ -34,7 +34,7 @@ Write-Host "Welcome to TroubleChute's GPT4All installer!" -ForegroundColor Cyan
 Write-Host "GPT4All as well as all of its other dependencies should now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-04-06 (version 2)]" -ForegroundColor Cyan
 Write-Host "`nThis script is provided AS-IS without warranty of any kind. See https://tc.ht/privacy & https://tc.ht/terms."
-Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Green
+Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Green
 Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
 
 Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session

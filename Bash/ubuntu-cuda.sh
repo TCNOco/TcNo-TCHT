@@ -9,7 +9,14 @@
 
 # Note: Keep the latest version of a major release with a simplified version (ie: 12.1.0 and 12.1.1, only 12.1.1 should have 12.1 as an option - So asking for 12.1 installs the latest)
 
-echo "TroubleChute Nvidia CUDA installer for Ubuntu WSL & Ubuntu (https://tc.ht)"
+echo -e "\033[33m--------------------------------------------------"
+echo -e "Welcome to TroubleChute's Nvidia CUDA installer for Ubuntu WSL & Ubuntu installer!"
+echo -e "PowerShell should now be installed..."
+echo -e "[Version 2023-06-06]\033[0m"
+echo -e"This script is provided AS-IS without warranty of any kind. See https://tc.ht/privacy & https://tc.ht/terms."
+echo -e "\033[32m\nConsider supporting these install scripts: https://tc.ht/support"
+echo -e "\033[33m--------------------------------------------------\n\n\033[0m"
+
 echo "Supported versions <=12.1, >=4.1"
 echo "FULL LIST: 12.1 [12.1.0], 12.0 [12.0.1, 12.0.0], 11.8 [11.8.0], 11.7 [11.7.1, 11.7.0], 11.6 [11.6.2, 11.6.1, 11.6.0], 11.5 [11.5.2, 11.5.1, 11.5.0], 11.4 [11.4.4, 11.4.3, 11.4.2, 11.4.1, 11.4.0], 11.3 [11.3.1, 11.3.0], 11.2 [11.2.2, 11.2.1, 11.2.0], 11.1 [11.1.1, 11.1.0], 11.0 [11.0.3, 11.0.2, 11.0.1], 10.1 [10.1.2, 10.1.1, 10.1.0], 10.0 [10.0.0], 9.2, 9.1, 9.0, 8.0 [8.0-ga2, 8.0-ga1], 7.5, 7.0, 6.5 [6.5-64, 6.5-32], 6.0 [6.0-64, 6.0-32], 5.5 [5.5-64, 5.5-32], 5.0 [5.0-64, 5.0-32], 4.2 [4.2-64, 4.2-32], 4.1 [4.1-64, 4.1-32]. Everything <=4.0 is missing downloads on Nvidia's website (https://developer.nvidia.com/cuda-toolkit-archive)"
 echo "-----"

@@ -36,7 +36,7 @@ Write-Host "Welcome to TroubleChute's Auto-GPT installer!" -ForegroundColor Cyan
 Write-Host "Auto-GPT as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-04-16]" -ForegroundColor Cyan
 Write-Host "`nThis script is provided AS-IS without warranty of any kind. See https://tc.ht/privacy & https://tc.ht/terms."
-Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Green
+Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Green
 Write-Host "---------------------------------------------`n`n" -ForegroundColor Cyan
 
 Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session

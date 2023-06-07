@@ -31,7 +31,7 @@ Write-Host "Welcome to TroubleChute's FFMPEG installer!" -ForegroundColor Cyan
 Write-Host "Chocolatey [package manager] and FFMPEG will now be installed..." -ForegroundColor Cyan
 Write-Host "[Version 2023-05-19]" -ForegroundColor Cyan
 Write-Host "`nThis script is provided AS-IS without warranty of any kind. See https://tc.ht/privacy & https://tc.ht/terms."
-Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Green
+Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Green
 Write-Host "--------------------------------------------`n`n" -ForegroundColor Cyan
 
 iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
