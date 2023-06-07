@@ -283,4 +283,5 @@ if ($defaultModel -in "Y", "y") {
 # 14. Launch AUTOMATIC1111 Stable Diffusion WebUI
 Clear-ConsoleScreen
 Write-Host "Launching AUTOMATIC1111 Stable Diffusion WebUI!" -ForegroundColor Cyan
-./webui-user.bat
+Write-Host "Note: This launch MUST complete, otherwise errors may occur next launch." -ForegroundColor Cyan
+./webui.bat
