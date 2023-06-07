@@ -162,7 +162,7 @@ do {
     $answer = Read-Host
 } while ($answer -notin "Y", "y", "N", "n")
 
-if ($answer -eq "y" -or $answer -eq "Y") {
+if ($answer -in "Y", "y") {
     Write-Host "Great! You should have enough VRAM. You should check the following pages anyway for more:" -ForegroundColor Cyan
     Write-Host "Optimizations: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Optimizations" -ForegroundColor Yellow
     Write-Host "Troubleshooting: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Troubleshooting" -ForegroundColor Yellow
@@ -173,7 +173,7 @@ if ($answer -eq "y" -or $answer -eq "Y") {
         $answer = Read-Host
     } while ($answer -notin "Y", "y", "N", "n")
 
-    if ($answer -eq "y" -or $answer -eq "Y") {
+    if ($answer -in "Y", "y") {
         Write-Host "Applying --medvram optimization" -ForegroundColor Cyan
         (Get-Content webui-user.bat) | Foreach-Object {
             $_ -replace 'set COMMANDLINE_ARGS=', 'set COMMANDLINE_ARGS=--medvram '
@@ -192,11 +192,11 @@ Write-Host "Do you want to share your WebUI over the internet? (--share)" -Foreg
 Write-Host "NOTE: If yes, you will likely need to create an antivirus exception (More info provided if yes)." -ForegroundColor Cyan
 
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n) [Default: n]: "
     $answer = Read-Host
-} while ($answer -notin "Y", "y", "N", "n")
+} while ($answer -notin "Y", "y", "N", "n", "")
 
-if ($answer -eq "y" -or $answer -eq "Y") {
+if ($answer -in "Y", "y") {
     Write-Host "To fix the AntiVirus warning see: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Troubleshooting#--share-non-functional-after-gradio-322-update" -ForegroundColor Cyan
     Write-Host "You may need to restore the file, and run the WebUI again for it to work" -ForegroundColor Yellow
 
@@ -210,11 +210,11 @@ Clear-ConsoleScreen
 Write-Host "Do you want to enable the API? (Let other programs interact with AUTOMATIC1111 (--api)" -ForegroundColor Cyan
 
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n) [Default: y]: "
     $answer = Read-Host
-} while ($answer -notin "Y", "y", "N", "n")
+} while ($answer -notin "Y", "y", "N", "n", "")
 
-if ($answer -eq "y" -or $answer -eq "Y") {
+if ($answer -in "Y", "y", "") {
     (Get-Content webui-user.bat) | Foreach-Object {
         $_ -replace 'set COMMANDLINE_ARGS=', 'set COMMANDLINE_ARGS=--api '
     } | Set-Content webui-user.bat
@@ -275,7 +275,7 @@ do {
     $defaultModel = Read-Host
 } while ($defaultModel -notin "Y", "y", "N", "n")
 
-if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
+if ($defaultModel -in "Y", "y") {
     Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
     Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
 }

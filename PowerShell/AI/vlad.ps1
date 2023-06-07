@@ -129,12 +129,12 @@ if ((Test-Path -Path "$TCHT\vladmandic") -and -not $isSymlink) {
 # 7. Enable auto-update?
 Clear-ConsoleScreen
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to enable auto-update? (You can always update manually. This is a Vladmandic SD.Next launch option) (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "Do you want to enable auto-update? (You can always update manually. This is a Vladmandic SD.Next launch option) (y/n) [Default: y]: "
     $answer = Read-Host
-} while ($answer -notin "Y", "y", "N", "n")
+} while ($answer -notin "Y", "y", "N", "n", "")
 
 $extraArgs = ""
-if ($answer -eq "y" -or $answer -eq "Y") {
+if ($answer -in "Y", "y", "") {
     $extraArgs += " --upgrade"
 }
 
@@ -144,11 +144,11 @@ Write-Host "Do you want to share your WebUI over the internet? (--share)" -Foreg
 Write-Host "NOTE: If yes, you will likely need to create an antivirus exception (More info provided if yes)." -ForegroundColor Cyan
 
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n) [Default: n]: "
     $answer = Read-Host
-} while ($answer -notin "Y", "y", "N", "n")
+} while ($answer -notin "Y", "y", "N", "n", "")
 
-if ($answer -eq "y" -or $answer -eq "Y") {
+if ($answer  -in "Y", "y") {
     Write-Host "To fix the AntiVirus warning see: https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Troubleshooting#--share-non-functional-after-gradio-322-update" -ForegroundColor Cyan
     Write-Host "You may need to restore the file, and run the WebUI again for it to work" -ForegroundColor Yellow
 
@@ -184,9 +184,9 @@ if ($shortcuts -in "Y","y", "") {
 Clear-ConsoleScreen
 Write-Host "Getting started? Do you have models?" -ForegroundColor Cyan
 do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download the Stable Diffusion 1.5 model? (y/n): "
+    Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download the Stable Diffusion 1.5 model? (y/n) [Default: n]: "
     $defaultModel = Read-Host
-} while ($defaultModel -notin "Y", "y", "N", "n")
+} while ($defaultModel -notin "Y", "y", "N", "n", "")
 
 if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
     Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
