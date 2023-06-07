@@ -38,7 +38,7 @@
 Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's Roop installer!" -ForegroundColor Cyan
 Write-Host "Roop as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2023-06-06]" -ForegroundColor Cyan
+Write-Host "[Version 2023-06-07]" -ForegroundColor Cyan
 Write-Host "`nConsider supporting these install scripts: https://tc.ht/support" -ForegroundColor Cyan
 Write-Host "---------------------------------------------------------------------------`n`n" -ForegroundColor Cyan
 
