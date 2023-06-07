@@ -203,4 +203,4 @@ if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
 
 # 10. Launch SD.Next
 Write-Host "`n`nLaunching Vladmandic SD.Next!" -ForegroundColor Cyan
-./webui-user.bat
+./webui.bat
