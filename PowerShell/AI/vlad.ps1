@@ -27,10 +27,9 @@
 # 5. Check if Conda or Python is installed (is installed - also is 3.10.6 - 3.10.11)
 # 6. Check if has Vladmandic SD.Next directory ($TCHT\vladmandic) (Default C:\TCHT\vladmandic)
 # 7. Enable auto-update?
-# 8. Enable API?
-# 9. Create desktop shortcuts?
-# 10. Download Stable Diffusion 1.5 model
-# 11. Launch SD.Next
+# 8. Create desktop shortcuts?
+# 9. Download Stable Diffusion 1.5 model
+# 10. Launch SD.Next
 # ----------------------------------------
 
 Write-Host "-------------------------------------------------------------------" -ForegroundColor Cyan
@@ -156,23 +155,10 @@ if ($answer -eq "y" -or $answer -eq "Y") {
     $extraArgs += " --share"
 }
 
-# 8. Enable API?
-Clear-ConsoleScreen
-Write-Host "Do you want to enable the API? (Let other programs interact with SD.Next (--api)" -ForegroundColor Cyan
-
-do {
-    Write-Host -ForegroundColor Cyan -NoNewline "`n`nEnter an answer (y/n): "
-    $answer = Read-Host
-} while ($answer -notin "Y", "y", "N", "n")
-
-if ($answer -eq "y" -or $answer -eq "Y") {
-    $extraArgs += " --api"
-}
-
 Set-Content -Path "webui-user.bat" -Value "@echo off`nwebui.bat$extraArgs`npause"
 Set-Content -Path "webui-user.sh" -Value "@echo off`n./webui.sh$extraArgs`nread -p `"Press enter to continue`""
 
-# 9. Create desktop shortcuts?
+# 8. Create desktop shortcuts?
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for SD.Next?" -ForegroundColor Cyan
 do {
@@ -194,7 +180,7 @@ if ($shortcuts -in "Y","y", "") {
     
 }
 
-# 10. Download Stable Diffusion 1.5 model
+# 9. Download Stable Diffusion 1.5 model
 Clear-ConsoleScreen
 Write-Host "Getting started? Do you have models?" -ForegroundColor Cyan
 do {
@@ -207,6 +193,6 @@ if ($defaultModel -eq "Y" -or $defaultModel -eq "y") {
     Get-Aria2File -Url "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors" -OutputPath "models\Stable-diffusion\v1-5-pruned-emaonly.safetensors"
 }
 
-# 11. Launch SD.Next
+# 10. Launch SD.Next
 Write-Host "`n`nLaunching Vladmandic SD.Next!" -ForegroundColor Cyan
 ./webui-user.bat
