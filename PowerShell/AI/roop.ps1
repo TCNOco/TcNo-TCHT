@@ -277,10 +277,10 @@ if (-not (Test-Path "$TCHT\roop\inswapper_128.onnx")) {
 
 if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
     ./run-roop-nvidia.bat
-} elseif ((Get-CimInstance Win32_VideoController).Name -like "*Intel*") {
-    ./run-roop-intel.bat
 } elseif ((Get-CimInstance Win32_VideoController).Name -like "*AMD*") {
     ./run-roop-amd.bat
+} elseif ((Get-CimInstance Win32_VideoController).Name -like "*Intel*") {
+    ./run-roop-intel.bat
 } elseif ((Get-CimInstance Win32_VideoController).Name -like "*Apple*") {
     ./run-roop-apple.bat
 } else {
