@@ -42,14 +42,16 @@ Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 
 # 1. Go to the users' requested folder
 Write-Host "The Spigot and Bukkit build process creates a few extra files. These can be deleted afterwards." -ForegroundColor Cyan
-Write-Host "Hit Enter to proceed in the current folder ($(Get-Location)), or type a folder path?" -ForegroundColor Cyan
+Write-Host "Hit Enter to proceed in the current folder ($(Get-Location)\spigot), or type a folder path?" -ForegroundColor Cyan
 $answer = Read-Host "Enter, or type a path and press Enter"
-if (-not ($answer -eq "")) {
-    if (-not (Test-Path $answer)) {
-        New-Item -ItemType Directory -Force -Path $answer
-    }
-    Set-Location $answer
+if ($answer -eq "") {
+    $answer = Join-Path Get-Location "spigot\"
 }
+
+if (-not (Test-Path $answer)) {
+    New-Item -ItemType Directory -Force -Path $answer
+}
+Set-Location $answer
 
 # 1. Download the Minecraft BuildTools
 Invoke-WebRequest -Uri "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar" -OutFile "./buildtools.jar"
