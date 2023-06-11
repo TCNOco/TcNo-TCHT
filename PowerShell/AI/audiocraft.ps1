@@ -26,11 +26,10 @@
 # 4. Install CUDA and cuDNN
 # 5. Check if Conda or Python is installed
 # 6. Clone AudioCraft ($TCHT\AudioCraft) (Default C:\TCHT\AudioCraft)
-# 7. Download model
-# 8. Install PyTorch and requirements:
-# 9. Create launcher files
-# 10. Create shortcuts
-# 11. Launch
+# 7. Install PyTorch and requirements:
+# 8. Create launcher files
+# 9. Create shortcuts
+# 10. Launch
 # ----------------------------------------
 
 Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
@@ -113,17 +112,7 @@ if ($condaFound) {
 Clear-ConsoleScreen
 Sync-GitRepo -ProjectFolder "$TCHT\AudioCraft" -ProjectName "AudioCraft" -IsSymlink $isSymlink -GitUrl "https://github.com/facebookresearch/audiocraft.git"
 
-# 7. Download model
-Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
-
-Clear-ConsoleScreen
-Write-Host "Downloading the latest required model (inswapper_128.onnx)" -ForegroundColor Yellow
-Write-Host "--> If this fails, manually download it: https://civitai.com/api/download/models/85159, and place it in '$TCHT\AudioCraft'" -ForegroundColor Yellow
-$url = "https://civitai.com/api/download/models/85159"
-$outputPath = "inswapper_128.onnx"
-Get-Aria2File -Url $url -OutputPath $outputPath
-
-# 8. Install PyTorch and requirements:
+# 7. Install PyTorch and requirements:
 if ($condaFound) {
     # For some reason conda NEEDS to be deactivated and reactivated to use pip reliably... Otherwise python and pip are not found.
     conda deactivate
@@ -144,7 +133,7 @@ if ($condaFound) {
 
 Update-SessionEnvironment
 
-# 9. Create launcher files
+# 8. Create launcher files
 Write-Host "Creating launcher files..." -ForegroundColor Yellow
 # - Updater
 $OutputFilePath = "update.bat"
@@ -173,7 +162,7 @@ if ($condaFound) {
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 }
 
-# 10. Create shortcuts
+# 9. Create shortcuts
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for AudioCraft?" -ForegroundColor Cyan
 do {
@@ -194,7 +183,7 @@ if ($shortcuts -in "Y","y", "") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
-# 11. Launch
+# 10. Launch
 Clear-ConsoleScreen
 Write-Host "Launching AudioCraft!" -ForegroundColor Cyan
 
