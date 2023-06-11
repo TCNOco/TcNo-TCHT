@@ -22,14 +22,15 @@
 # This script:
 # 1. Install Chocolatey
 # 2. Install or update Git if not already installed
-# 3. Install CUDA and cuDNN
-# 4. Check if Conda or Python is installed
-# 5. Clone AudioCraft ($TCHT\AudioCraft) (Default C:\TCHT\AudioCraft)
-# 6. Download model
-# 7. Install PyTorch and requirements:
-# 8. Create launcher files
-# 9. Create shortcuts
-# 10. Launch
+# 3. Install FFMPEG if not already registered with PATH
+# 4. Install CUDA and cuDNN
+# 5. Check if Conda or Python is installed
+# 6. Clone AudioCraft ($TCHT\AudioCraft) (Default C:\TCHT\AudioCraft)
+# 7. Download model
+# 8. Install PyTorch and requirements:
+# 9. Create launcher files
+# 10. Create shortcuts
+# 11. Launch
 # ----------------------------------------
 
 Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
@@ -71,7 +72,16 @@ Clear-ConsoleScreen
 Write-Host "Installing Git..." -ForegroundColor Cyan
 iex (irm install-git.tc.ht)
 
-# 3. Install CUDA and cuDNN
+# 3. Install FFMPEG if not already registered with PATH
+Clear-ConsoleScreen
+$ffmpegFound = [bool](Get-Command ffmpeg -ErrorAction SilentlyContinue)
+if (-not $ffmpegFound) {
+    Write-Host "Installing FFMPEG-Full..." -ForegroundColor Cyan
+    choco upgrade ffmpeg-full -y
+    Write-Host "Done." -ForegroundColor Green
+}
+
+# 4. Install CUDA and cuDNN
 if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
     Import-FunctionIfNotExists -Command Install-CudaAndcuDNN -ScriptUri "Install-Cuda.tc.ht"
     Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
@@ -80,7 +90,7 @@ if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
 # Import function to reload without needing to re-open Powershell
 iex (irm refreshenv.tc.ht)
 
-# 4. Check if Conda or Python is installed
+# 5. Check if Conda or Python is installed
 # Check if Conda is installed
 Import-FunctionIfNotExists -Command Get-UseConda -ScriptUri "Get-Python.tc.ht"
 
@@ -99,11 +109,11 @@ if ($condaFound) {
     }
 }
 
-# 5. Clone AudioCraft ($TCHT\AudioCraft) (Default C:\TCHT\AudioCraft)
+# 6. Clone AudioCraft ($TCHT\AudioCraft) (Default C:\TCHT\AudioCraft)
 Clear-ConsoleScreen
 Sync-GitRepo -ProjectFolder "$TCHT\AudioCraft" -ProjectName "AudioCraft" -IsSymlink $isSymlink -GitUrl "https://github.com/facebookresearch/audiocraft.git"
 
-# 6. Download model
+# 7. Download model
 Import-FunctionIfNotExists -Command Get-Aria2File -ScriptUri "File-DownloadMethods.tc.ht"
 
 Clear-ConsoleScreen
@@ -113,7 +123,7 @@ $url = "https://civitai.com/api/download/models/85159"
 $outputPath = "inswapper_128.onnx"
 Get-Aria2File -Url $url -OutputPath $outputPath
 
-# 7. Install PyTorch and requirements:
+# 8. Install PyTorch and requirements:
 if ($condaFound) {
     # For some reason conda NEEDS to be deactivated and reactivated to use pip reliably... Otherwise python and pip are not found.
     conda deactivate
@@ -134,7 +144,7 @@ if ($condaFound) {
 
 Update-SessionEnvironment
 
-# 8. Create launcher files
+# 9. Create launcher files
 Write-Host "Creating launcher files..." -ForegroundColor Yellow
 # - Updater
 $OutputFilePath = "update.bat"
@@ -163,7 +173,7 @@ if ($condaFound) {
     New-LauncherWithErrorHandling -ProgramName $ProgramName -InstallLocation $InstallLocation -RunCommand $RunCommand -ReinstallCommand $ReinstallCommand -LauncherName $LauncherName
 }
 
-# 9. Create shortcuts
+# 10. Create shortcuts
 Clear-ConsoleScreen
 Write-Host "Create desktop shortcuts for AudioCraft?" -ForegroundColor Cyan
 do {
@@ -184,7 +194,7 @@ if ($shortcuts -in "Y","y", "") {
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
 }
 
-# 10. Launch
+# 11. Launch
 Clear-ConsoleScreen
 Write-Host "Launching AudioCraft!" -ForegroundColor Cyan
 
