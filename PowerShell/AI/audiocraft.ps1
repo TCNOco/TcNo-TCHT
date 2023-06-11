@@ -174,10 +174,10 @@ if ($shortcuts -in "Y","y", "") {
     Import-RemoteFunction -ScriptUri "https://New-Shortcut.tc.ht" # Import function to create a shortcut
     
     Write-Host "Downloading AudioCraft icon (not official)..."
-    Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/AudioCraft.ico' -OutFile 'AudioCraft.ico'
+    Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/audiocraft.ico' -OutFile 'audiocraft.ico'
 
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
-    $IconLocation = 'AudioCraft.ico'
+    $IconLocation = 'audiocraft.ico'
     $shortcutName = "AudioCraft"
     $targetPath = "run-audiocraft.bat"
     New-Shortcut -ShortcutName $shortcutName -TargetPath $targetPath -IconLocation $IconLocation
