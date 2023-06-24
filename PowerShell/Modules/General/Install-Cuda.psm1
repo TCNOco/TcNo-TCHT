@@ -38,6 +38,13 @@ function Install-Cuda {
         }
     }
 
+    # Install choco if not already installed
+    if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
+        Clear-ConsoleScreen
+        Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    }
+
     Write-Host "Downloading & Installing CUDA $CudaVersion" -ForegroundColor Cyan
     choco install cuda --version=$CudaVersionChoco -y | Write-Host
 
