@@ -30,7 +30,7 @@ function Install-Cuda {
         Write-Host "CUDA $CudaVersion is already installed" -ForegroundColor Green
         Write-Host "Do you want to reinstall? (y/n) [Default: n]: " -ForegroundColor Cyan
         $response = Read-Host
-        if ($response -eq "y") {
+        if ($response -in "Y", "y") {
             Write-Host "Reinstalling CUDA $CudaVersion..." -ForegroundColor Cyan
         } else {
             Write-Host "Skipping CUDA $CudaVersion installation..." -ForegroundColor Cyan
@@ -80,7 +80,7 @@ function Install-Cudnn {
     if ($CudnnOptional) {
         Write-Host "cuDNN may not be required but may help solve issues later.`nYou will need an Nvidia account.`nDo you want to install cuDNN? (y/n) [Default: n]: "
         $response = Read-Host
-        if ($response -eq "y") {
+        if ($response -in "Y", "y") {
             Write-Host "Installing cuDNN..." -ForegroundColor Cyan
         } else {
             Write-Host "Skipping cuDNN installation..." -ForegroundColor Cyan

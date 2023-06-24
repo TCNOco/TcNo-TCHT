@@ -53,11 +53,11 @@ $toDownload = $True
 if (Test-Path -Path "$TCHT\oobabooga_windows") {
     Write-Host "The 'oobabooga_windows' folder already exists." -ForegroundColor Green
     do {
-        Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again [NEW: Choose yes to move]? (y/n): "
+        Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again [NEW: Choose yes to move]? (y/n) [Default: n]: "
         $downloadAgain = Read-Host
-    } while ($downloadAgain -notin "Y", "y", "N", "n")
+    } while ($downloadAgain -notin "Y", "y", "N", "n", "")
 
-    if ($downloadAgain -eq "Y" -or $downloadAgain -eq "y") {
+    if ($downloadAgain -in "Y", "y") {
         # Perform the download again
         $toDownload = $True
     } else {
@@ -96,15 +96,6 @@ $models = @{
         "ShortcutName" = "WizardCoder 15B (GPU) - Oobabooga"
         "Args" = "--chat --model_type llama --wbits 4 --groupsize 128"
     }
-    "2" = @{
-        "Name" = "WizardCoder-15B-1.0-GGML (CPU-Only)"
-        "Size" = "~10.7GB"
-        "Repo" = "TheBloke/WizardCoder-15B-1.0-GGML"
-        "BatName" = "start_wizardCoder-15B-1.0-GGML.bat"
-        "ShortcutName" = "WizardCoder 15B (CPU) - Oobabooga"
-        "Args" = "--chat"
-        "IncludeFiles" = @("config.json", "WizardCoder-15B-1.0.ggmlv3.q4_0.bin")
-    }
 }
 
 $selectedModels = @()
@@ -112,19 +103,8 @@ $selectedModels = @()
 # 2. Ask user what model they want
 do {
     Clear-ConsoleScreen
-    Write-Host "What model do you want to download?" -ForegroundColor Cyan
-    foreach ($key in ($models.Keys | Sort-Object)) {
-        if ($key -in $selectedModels) { Write-Host -NoNewline "[DONE] " -ForegroundColor Green }
-        Write-Host -NoNewline "- $($models.$key.Name) $($models.$key.Size): " -ForegroundColor Red
-        Write-Host $key -ForegroundColor Green
-    }
-
-    do {
-        $num = Read-Host "Enter a number"
-    } while ($num -notin $models.Keys)
-    $selectedModels += $num
-    Write-Host "Downloading $($models.$num.Name)" -ForegroundColor Yellow
-    Get-HuggingFaceRepo -Model $models.$num.Repo -OutputPath "text-generation-webui\models\$($models.$num.Repo -replace '/','_')" -SkipFiles $($models.$num.SkipFiles) -IncludeFiles $($models.$num.IncludeFiles)    
+    Write-Host "Downloading WizardCodser 15B 1.0 GPTQ" -ForegroundColor Yellow
+    Get-HuggingFaceRepo -Model $models."1".Repo -OutputPath "text-generation-webui\models\$($models."1".Repo -replace '/','_')" -SkipFiles $($models."1".SkipFiles) -IncludeFiles $($models."1".IncludeFiles)    
 
     if ($selectedModels.Count -lt $models.Count) {
        Clear-ConsoleScreen

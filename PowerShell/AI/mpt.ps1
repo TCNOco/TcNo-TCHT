@@ -54,11 +54,11 @@ $toDownload = $True
 if (Test-Path -Path "$TCHT\oobabooga_windows") {
     Write-Host "The 'oobabooga_windows' folder already exists." -ForegroundColor Green
     do {
-        Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again [NEW: Choose yes to move]? (y/n): "
+        Write-Host -ForegroundColor Cyan -NoNewline "`n`nDo you want to download it again [NEW: Choose yes to move]? (y/n) [Default: n]: "
         $downloadAgain = Read-Host
-    } while ($downloadAgain -notin "Y", "y", "N", "n")
+    } while ($downloadAgain -notin "Y", "y", "N", "n", "")
 
-    if ($downloadAgain -eq "Y" -or $downloadAgain -eq "y") {
+    if ($downloadAgain -in "Y", "y") {
         # Perform the download again
         $toDownload = $True
     } else {
@@ -72,6 +72,7 @@ if ($toDownload) {
     Write-Host "I'll start by installing Oobabooga first, then we'll get to the model...`n`n"
 
     Install-Ooba -skip_model 1 -skip_start 1
+    
 }
 Set-Location "$TCHT\oobabooga_windows"
 
