@@ -101,19 +101,9 @@ $models = @{
 $selectedModels = @()
 
 # 2. Ask user what model they want
-do {
-    Clear-ConsoleScreen
-    Write-Host "Downloading WizardCodser 15B 1.0 GPTQ" -ForegroundColor Yellow
-    Get-HuggingFaceRepo -Model $models."1".Repo -OutputPath "text-generation-webui\models\$($models."1".Repo -replace '/','_')" -SkipFiles $($models."1".SkipFiles) -IncludeFiles $($models."1".IncludeFiles)    
-
-    if ($selectedModels.Count -lt $models.Count) {
-       Clear-ConsoleScreen
-        Write-Host "Done downloading model`n`n" -ForegroundColor Yellow
-        $again = Read-Host "Do you want to download another model? (y/n)"
-    } else {
-        $again = "N"
-    }
-} while ($again -notin "N", "n")
+Clear-ConsoleScreen
+Write-Host "Downloading WizardCoder 15B 1.0 GPTQ" -ForegroundColor Yellow
+Get-HuggingFaceRepo -Model $models."1".Repo -OutputPath "text-generation-webui\models\$($models."1".Repo -replace '/','_')" -SkipFiles $($models."1".SkipFiles) -IncludeFiles $($models."1".IncludeFiles)    
 
 Write-Host "NOTE: Should you need less memory usage, see: https://github.com/oobabooga/text-generation-webui/wiki/Low-VRAM-guide" -ForegroundColor Green
 Write-Host "(These will be added to the .bat you're trying to run in the oobabooga_windows folder)" -ForegroundColor Green
@@ -133,12 +123,10 @@ function New-WebUIBat {
 }
 
 # 3. Replace commands in the start-webui.bat file
-foreach ($num in ($selectedModels | Sort-Object)) {
-    Write-Host "Creating launcher: $num"
+Write-Host "Creating launcher..."
 
-    $modelArgs = $models.$num.Args
-    New-WebUIBat -model ($models.$num.Repo -replace '/','_') -newBatchFile $models.$num.BatName -otherArgs "$modelArgs"
-}
+$modelArgs = $models."1".Args
+New-WebUIBat -model ($models."1".Repo -replace '/','_') -newBatchFile $models."1".BatName -otherArgs "$modelArgs"
 
 # 4. Create desktop shortcuts
 function Deploy-Shortcut {
@@ -164,30 +152,12 @@ if ($shortcuts -in "Y","y", "") {
     Invoke-WebRequest -Uri 'https://tc.ht/PowerShell/AI/wizardlm.ico' -OutFile 'wizardlm.ico'
     Write-Host "`nCreating shortcuts on desktop..." -ForegroundColor Cyan
 
-    foreach ($num in ($selectedModels | Sort-Object)) {
-        Write-Host "Creating shortcut: $num"
-        Deploy-Shortcut -name $models.$num.ShortcutName -batFile $models.$num.BatName
-    }
+    Write-Host "Creating shortcut..."
+    Deploy-Shortcut -name $models."1".ShortcutName -batFile $models."1".BatName
 }
 
 # 5. Run the webui
 Clear-ConsoleScreen
-if (@($selectedModels).Count -eq 1) {
-    # Run the only model by running the ".BatName"
-    $batFilePath = $models.($selectedModels[0]).BatName
-    Start-Process -FilePath cmd.exe -ArgumentList "/C $batFilePath"
-} else {
-    Write-Host "Which model would you like to launch?" -ForegroundColor Cyan
-    foreach ($num in ($selectedModels | Sort-Object)) {
-        Write-Host -NoNewline "$num - " -ForegroundColor Green
-        Write-Host "$($models.$num.Name)" -ForegroundColor Yellow
-    }
-    
-    do {
-        $num = Read-Host "Enter a number"
-    } while ($num -notin $selectedModels)
-
-    # Run the selected model by running the ".BatName"
-    $batFilePath = $models.$num.BatName
-    Start-Process -FilePath cmd.exe -ArgumentList "/C $batFilePath"
-}
+# Run the selected model by running the ".BatName"
+$batFilePath = $models."1".BatName
+Start-Process -FilePath cmd.exe -ArgumentList "/C $batFilePath"
