@@ -112,7 +112,7 @@ function Install-Ooba {
 
     
     if ($skip_start -eq 1) {
-        (Get-Content $filePath) -replace "def run_model\(\):", "def run_model():`n    return" | Set-Content $filePath
+        ((Get-Content $filePath) -replace "def run_model\(\):", "def run_model():`n    return") -replace "def launch_webui\(\):", "def launch_webui():`n    return" | Set-Content $filePath
         (Get-Content start_windows-modified.bat) -replace "pause", "" | Set-Content start_windows-modified.bat
     }
     
