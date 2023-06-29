@@ -86,7 +86,7 @@ switch ($ffmpegSelection) {
 
 # Show success, only if the FFMPEG installation wasn't automated.
 $ffmpegSelection = $null
-of ($wasntPreset){
+if ($wasntPreset){
     ffmpeg -version
     
     Write-Host "`nThe above was returned after running 'ffmpeg -version'" -ForegroundColor Green
