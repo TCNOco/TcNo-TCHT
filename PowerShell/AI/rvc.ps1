@@ -193,11 +193,11 @@ if ($condaFound) {
         conda install cudatoolkit -y
     }
 
-    python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    python -m pip install torch==2.0.0+cu117 torchvision==0.15.1+cu117 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu117
     python -m pip install -r requirements.txt
     pip install --upgrade --no-deps --force-reinstall torchcrepe
 } else {
-    &$python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    &$python -m pip install pip install torch==2.0.0+cu117 torchvision==0.15.1+cu117 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu117
     &$python -m pip install -r requirements.txt
     &$python -m pip uninstall -y faiss-cpu
     &$python -m pip install faiss-cpu
@@ -219,7 +219,7 @@ $ReinstallCommand = ""
 if ($condaFound -and ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*")) {
     $ReinstallCommand += "conda install cudatoolkit -y`n"
 }
-$ReinstallCommand += "python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`npython -m pip install -r requirements.txt`npython -m pip install --upgrade --no-deps --force-reinstall torchcrepe`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu`npython -m pip install ffmpeg-python"
+$ReinstallCommand += "python -m pip install torch==2.0.0+cu117 torchvision==0.15.1+cu117 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu117`npython -m pip install -r requirements.txt`npython -m pip install --upgrade --no-deps --force-reinstall torchcrepe`npython -m pip uninstall faiss-cpu`npython -m pip install faiss-cpu`npython -m pip install ffmpeg-python"
 $ProgramName = "Retrieval-based Voice Conversion WebUI"
 $RunCommand = "python infer-web.py"
 $LauncherName = "run-rvc"
