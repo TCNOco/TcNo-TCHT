@@ -138,4 +138,3 @@ if ($num -eq "1") {
 
 Write-Host -NoNewline "`nPress any key to exit..."
 Read-Host
-exit
