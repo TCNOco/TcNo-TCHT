@@ -45,7 +45,7 @@ Write-Host "The Spigot and Bukkit build process creates a few extra files. These
 Write-Host "Hit Enter to proceed in the current folder ($(Get-Location)\spigot), or type a folder path?" -ForegroundColor Cyan
 $answer = Read-Host "Enter, or type a path and press Enter"
 if ($answer -eq "") {
-    $answer = Join-Path Get-Location "spigot\"
+    $answer = Join-Path $(Get-Location) "spigot\"
 }
 
 if (-not (Test-Path $answer)) {
