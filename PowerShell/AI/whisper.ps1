@@ -90,14 +90,14 @@ iex (irm Import-RemoteFunction.tc.ht)
 # 4. Install CUDA using Choco if not already installed.
 if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
     Import-FunctionIfNotExists -Command Install-CudaAndcuDNN -ScriptUri "Install-Cuda.tc.ht"
-    Install-CudaAndcuDNN -CudaVersion "11.8" -CudnnOptional $true
+    Install-CudaAndcuDNN -CudaVersion "12.3" -CudnnOptional $true
     
     # 5. Install Pytorch if not already installed, or update.
     Write-Host "`nInstalling or updating PyTorch (With GPU support)..." -ForegroundColor Cyan
     if ($condaFound){
-        conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y
+        conda install pytorch torchvision torchaudio pytorch-cuda=12.3 -c pytorch -c nvidia -y
     } else {
-        &$python -m pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+        &$python -m pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
     }
 } else {
     Write-Host "Nvidia CUDA is not installed. Please install the latest Nvidia CUDA Toolkit and run this script again." -ForegroundColor Red
