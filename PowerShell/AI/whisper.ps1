@@ -44,6 +44,9 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 # Import function to reload without needing to re-open Powershell
 iex (irm refreshenv.tc.ht)
+# Allow importing remote functions
+iex (irm Import-RemoteFunction.tc.ht)
+Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 
 # 2. Check if Conda or Python is installed
 # Check if Conda is installed
