@@ -95,7 +95,7 @@ if ((Get-CimInstance Win32_VideoController).Name -like "*Nvidia*") {
     # 5. Install Pytorch if not already installed, or update.
     Write-Host "`nInstalling or updating PyTorch (With GPU support)..." -ForegroundColor Cyan
     if ($condaFound){
-        conda install pytorch torchvision torchaudio pytorch-cuda=12.3 -c pytorch -c nvidia -y
+        conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia -y
     } else {
         &$python -m pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
     }
