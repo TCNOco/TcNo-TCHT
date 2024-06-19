@@ -197,7 +197,7 @@ if ($condaFound) {
     python -m pip install -r requirements.txt
     pip install --upgrade --no-deps --force-reinstall torchcrepe
 } else {
-    &$python -m pip install pip install torch==2.0.0+cu117 torchvision==0.15.1+cu117 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu117
+    &$python -m pip install torch==2.0.0+cu117 torchvision==0.15.1+cu117 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu117
     &$python -m pip install -r requirements.txt
     &$python -m pip uninstall -y faiss-cpu
     &$python -m pip install faiss-cpu
