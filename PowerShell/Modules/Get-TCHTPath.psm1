@@ -215,7 +215,7 @@ function Set-TCHTPath() {
 <schemalist>
   <schema id="tc.ht" path="/org/gnome/tc/ht/">
     <key name="path" type="s">
-      <default>'/Users/mish/Documents/TCHT'</default>
+      <default>'$HOME/Documents/TCHT'</default>
       <summary>Path for TCHT</summary>
       <description>Path where TCHT files are located.</description>
     </key>
@@ -232,7 +232,7 @@ function Set-TCHTPath() {
                 $Env:GSETTINGS_SCHEMA_DIR="$HOME/.local/share/glib-2.0/schemas"
                 
                 Write-Host "Saving gsettings path as /tc.ht/path, $path"
-                gsettings set tc.ht path "/Users/mish/Documents/TCHT"
+                gsettings set tc.ht path "$HOME/Documents/TCHT"
             } else {
                 # If not gsettings installed:
                 if (! $(command -v gsettings)) {
