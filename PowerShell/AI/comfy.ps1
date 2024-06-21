@@ -34,7 +34,7 @@
 Write-Host "--------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's ComfyUI installer!" -ForegroundColor Cyan
 Write-Host "ComfyUI as well as all of its other dependencies and a model should now be installed..." -ForegroundColor Cyan
-Write-Host "[Version 2024-06-20]" -ForegroundColor Cyan
+Write-Host "[Version 2024-06-21]" -ForegroundColor Cyan
 Write-Host "`nThis script is provided AS-IS without warranty of any kind. See https://tc.ht/privacy & https://tc.ht/terms."
 Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Green
 Write-Host "--------------------------------------------------`n`n" -ForegroundColor Cyan
@@ -131,14 +131,13 @@ Get-Aria2File -Url $url -OutputPath $outputPath
 
 # - Extract file
 Write-Host "Extracting the latest ComfyUI" -ForegroundColor Yellow
-7z x "$outputPath" "ComfyUI_windows_portable" -o"../temp"
-$source = (Get-ChildItem -Directory -Filter "../temp/ComfyUI_windows_portable*" | Select-Object -Last 1).FullName
+7z x "$outputPath" "ComfyUI_windows_portable" -o"temp"
 $destination = (Get-Location)
 # Recursively move files and folders
 Write-Host "Moving files..." -ForegroundColor Yellow
-Move-Item -Path $source/* -Destination $destination -Force
+Move-Item -Path temp/ComfyUI_windows_portable/* -Destination $destination -Force
 # Delete temp folder
-Remove-Item -Path "../temp" -Recurse -Force
+Remove-Item -Path "temp" -Recurse -Force
 # Delete 7z  file
 Remove-Item -Path $outputPath -Force
 
@@ -194,7 +193,7 @@ if ($shortcuts -in "Y","y", "") {
 Clear-ConsoleScreen
 Write-Host "Launching ComfyUI!" -ForegroundColor Cyan
 
-if ($nvidia) {
+if ($isNvidia) {
     ./run_nvidia_gpu.bat
 } else {
     ./run_cpu.bat
