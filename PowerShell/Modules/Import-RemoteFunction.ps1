@@ -67,7 +67,7 @@ The name of the PowerShell command to check.
 The URI of the script that defines the function to import.
 
 .EXAMPLE
-Import-FunctionIfNotExists -Command "Get-FileFromWeb" -ScriptUri "https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1"
+Import-FunctionIfNotExists -Command "Get-FileFromWeb" -ScriptUri "https://tc.ht/PowerShell/Modules/Get-FileFromWeb.psm1"
 
 This example checks if the Get-FileFromWeb function exists, and runs the Import-RemoteFunction function to import the function if it does not exist.
 #>

@@ -73,7 +73,7 @@ function Initialize-Aria2 {
     if (-not ($importedOtherDownloadFunc) -and ($null -eq (Get-Command aria2c -ErrorAction SilentlyContinue)) -and ($null -eq (Get-Command $global:aria2Path -ErrorAction SilentlyContinue))) {
         $importedOtherDownloadFunc = $true
         # Import download command if not already available
-        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1"
+        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://tc.ht/PowerShell/Modules/Get-FileFromWeb.psm1"
     }
 }
 
@@ -116,7 +116,7 @@ function Get-Aria2File {
         & $aria2Path --disable-ipv6 -x 8 -s 8 --continue --out="$OutputPath" "$Url" --console-log-level=error --download-result=hide
     } else {
         # Import download command if not already available
-        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1"
+        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://tc.ht/PowerShell/Modules/Get-FileFromWeb.psm1"
        
         # Use Get-FileFromWeb to download the files
         Get-FileFromWeb -URL $url -File $outputPath
@@ -171,7 +171,7 @@ function Get-Aria2Files {
         }
     } else {
         # Import download command if not already available
-        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://gist.githubusercontent.com/ChrisStro/37444dd012f79592080bd46223e27adc/raw/5ba566bd030b89358ba5295c04b8ef1062ddd0ce/Get-FileFromWeb.ps1"
+        Import-FunctionIfNotExists -Command Get-FileFromWeb -ScriptUri "https://tc.ht/PowerShell/Modules/Get-FileFromWeb.psm1"
 
         # Use Get-FileFromWeb to download the files
         $files | ForEach-Object {
