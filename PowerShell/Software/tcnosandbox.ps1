@@ -64,3 +64,20 @@ Write-Host "- Sublime Text..." -ForegroundColor Cyan
 Write-Host "- HxD (Hex Editor)..." -ForegroundColor Cyan
 choco install procmon winmerge registrychangesview sublimetext3 hxd -y
 
+Write-Host "Creating shortcuts..."
+
+function CreateShortcut {
+    param (
+        [string]$title,
+        [string]$targetPath
+    )
+    $desktop = [System.Environment]::GetFolderPath('Desktop')
+    $wshShell = New-Object -ComObject WScript.Shell
+    $shortcut = $wshShell.CreateShortcut("$desktop\$title.lnk")
+    $shortcut.TargetPath = $targetPath
+    $shortcut.Save()
+}
+
+"C:\ProgramData\chocolatey\lib\registrychangesview\tools"
+
+CreateShortcut "RegistryChangesView" "C:\ProgramData\chocolatey\lib\registrychangesview\tools\RegistryChangesView.exe"
