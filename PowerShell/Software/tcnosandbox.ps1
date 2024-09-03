@@ -21,11 +21,9 @@
 # ----------------------------------------
 # This script:
 # 1. Install Chocolatey
-# 2. Installs Process Monitor from SysInternals (Microsoft)
-# 3. Installs WinMerge
-# 4. Installs RegistryChangesView
-# 5. Installs Sublime Text
-# 6. Installs HxD
+# 2. Installs Process Monitor from SysInternals (Microsoft), WinMerge, RegistryChangesView, Sublime Text, HxD
+# 3. Windows settings tweaks (Show hidden files & Extensions)
+# 4. Associate .json files with Sublime Text
 # ----------------------------------------
 
 Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
@@ -80,4 +78,38 @@ function CreateShortcut {
 
 "C:\ProgramData\chocolatey\lib\registrychangesview\tools"
 
+CreateShortcut "Process Monitor" "C:\ProgramData\chocolatey\lib\procmon\tools\Procmon64.exe"
+CreateShortcut "WinMerge" "C:\Program Files\WinMerge\WinMergeU.exe"
 CreateShortcut "RegistryChangesView" "C:\ProgramData\chocolatey\lib\registrychangesview\tools\RegistryChangesView.exe"
+CreateShortcut "Sublime Text" "C:\Program Files\Sublime Text 3\sublime_text.exe"
+CreateShortcut "HxD" "C:\Program Files\HxD\HxD.exe"
+
+
+# 3. Windows settings tweaks (Show hidden files & Extensions)
+Write-Host "Showing Hidden Files & File Extensions"
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowSuperHidden" -Value 1
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0
+Stop-Process -Name explorer -Force
+Start-Process explorer.exe
+
+
+# 4. Associate .json files with Sublime Text
+Write-Host "Linking .JSON with Sublime Text"
+$sublimePath = "C:\Program Files\Sublime Text 3\sublime_text.exe"
+
+$extension = ".json"
+$command = "`"$sublimePath`" `"%1`""
+
+New-Item -Path "HKCU:\Software\Classes\$extension" -Force
+Set-ItemProperty -Path "HKCU:\Software\Classes\$extension" -Name "(Default)" -Value "SublimeText.json"
+
+New-Item -Path "HKCU:\Software\Classes\SublimeText.json\shell\open\command" -Force
+Set-ItemProperty -Path "HKCU:\Software\Classes\SublimeText.json\shell\open\command" -Name "(Default)" -Value $command
+
+$iconPath = "$sublimePath,0"
+New-Item -Path "HKCU:\Software\Classes\SublimeText.json\DefaultIcon" -Force
+Set-ItemProperty -Path "HKCU:\Software\Classes\SublimeText.json\DefaultIcon" -Name "(Default)" -Value $iconPath
+
+& "C:\Windows\System32\cmd.exe" /c "assoc $extension=SublimeText.json"
+& "C:\Windows\System32\cmd.exe" /c "ftype SublimeText.json=$command"
