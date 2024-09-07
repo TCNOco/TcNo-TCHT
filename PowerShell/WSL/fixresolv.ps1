@@ -54,11 +54,14 @@ $selectedDistro = Select-OSDistribution
 
 Write-Host "`n`nSetting WSL.conf to not generate resolv.conf..." -ForegroundColor Cyan
 Write-Host "This will replace all text within /etc/wsl.conf. Last settings backup: /etc/wsl.conf.bak"
-Invoke-WSLCommand -distroName $selectedDistro -command "sudo touch /etc/wsl.conf &&  sudo cp /etc/wsl.conf /etc/wsl.conf.bak && echo -e `"[network]\ngenerateResolvConf = false`" | sudo tee /etc/wsl.conf"
-
-Write-Host "`n`nRestarting WSL..." -ForegroundColor Cyan
-wsl --shutdown
+Invoke-WSLCommand -DistroName $selectedDistro -Command "sudo touch /etc/wsl.conf && sudo cp /etc/wsl.conf /etc/wsl.conf.bak"
+Invoke-WSLCommand -DistroName $selectedDistro -Command "echo -e `"[network]\ngenerateResolvConf = false`" | sudo tee /etc/wsl.conf"
 
 Write-Host "`n`nSetting known DNS servers..." -ForegroundColor Cyan
 Write-Host "This will replace all text within /etc/resolv.conf. Last settings backup: /etc/resolv.conf.bak"
-Invoke-WSLCommand -distroName $selectedDistro -command "sudo touch /etc/resolv.conf && sudo cp /etc/resolv.conf /etc/resolv.conf.bak && echo -e `"nameserver 8.8.8.8\nnameserver 1.1.1.1`" | sudo tee /etc/resolv.conf"
+Invoke-WSLCommand -DistroName $selectedDistro -Command "sudo touch /etc/resolv.conf && sudo cp /etc/resolv.conf /etc/resolv.conf.bak"
+Invoke-WSLCommand -DistroName $selectedDistro -Command "echo -e `"nameserver 8.8.8.8\nnameserver 1.1.1.1`" | sudo tee /etc/resolv.conf"
+
+Write-Host "`n`nRestarting WSL..." -ForegroundColor Cyan
+Stop-WSLDistribution -DistroName $selectedDistro
+

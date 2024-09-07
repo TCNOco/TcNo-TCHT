@@ -97,3 +97,29 @@ function Invoke-WSLCommand {
         throw "No WSL distribution selected. Please run the script again to select a distribution."
     }
 }
+
+<#
+.Synopsis
+   Shuts down a specific WSL distribution.
+
+.Parameter distroName
+   This is a required argument - The distribution where the WSL command will be run.
+
+.Example
+   Invoke-WSLCommand -DistroName "Ubuntu-Preview"
+#>
+function Stop-WSLDistribution {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$DistroName
+    )
+
+    if ($DistroName) {
+        Write-Host "Stopping: $DistroName`n"
+        wsl -t $DistroName
+    }
+    else {
+        Write-Host -ForegroundColor Red "No WSL distribution selected. Please run the script again to select a distribution."
+        throw "No WSL distribution selected. Please run the script again to select a distribution."
+    }
+}
