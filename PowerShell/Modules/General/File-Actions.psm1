@@ -22,6 +22,23 @@
 # This script has lots of useful commands for file/directory actions
 # ----------------------------------------
 
+function Show-Animation {
+    param (
+        [string]$Text = "Deleting files",
+        [int]$Duration = 3000
+    )
+    $spinner = @("|", "/", "-", "\")
+    $endTime = (Get-Date).AddMilliseconds($Duration)
+    while ((Get-Date) -lt $endTime) {
+        foreach ($frame in $spinner) {
+            if ((Get-Date) -ge $endTime) { break }
+            $host.ui.Write("$Text $frame`r")
+            Start-Sleep -Milliseconds 200
+        }
+    }
+    $host.ui.Write("Deleting files...`r")
+}
+
 <#
 .SYNOPSIS
     Recursively deletes a folder and its contents.
@@ -52,24 +69,9 @@ function Remove-FolderRecursive {
     param (
         [Parameter(Mandatory = $true)]
         [string]$Path,
-        [bool]$IgnoreErrors = $true
+        [bool]$IgnoreErrors = $true,
+        [bool]$DryRun =  $false
     )
-
-    function Show-Animation {
-        param (
-            [int]$Duration = 3000
-        )
-        $spinner = @("|", "/", "-", "\")
-        $endTime = (Get-Date).AddMilliseconds($Duration)
-        while ((Get-Date) -lt $endTime) {
-            foreach ($frame in $spinner) {
-                if ((Get-Date) -ge $endTime) { break }
-                $host.ui.Write("Deleting files $frame`r")
-                Start-Sleep -Milliseconds 200
-            }
-        }
-        $host.ui.Write("Deleting files...`r")
-    }
 
     try {
         if (Test-Path $Path) {
@@ -79,7 +81,9 @@ function Remove-FolderRecursive {
             try {
                 Get-ChildItem -Path $Path -Recurse -Force -ErrorAction Stop | ForEach-Object {
                     try {
-                        Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Stop
+                        if (-not $DryRun) {
+                            Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Stop
+                        }
                         Write-Host "Deleted: $($_.FullName)"
                     } catch {
                         if ($IgnoreErrors) {
@@ -107,7 +111,9 @@ function Remove-FolderRecursive {
             }
 
             try {
-                Remove-Item -Path $Path -Recurse -Force -ErrorAction Stop
+                if (-not $DryRun) {
+                    Remove-Item -Path $Path -Recurse -Force -ErrorAction Stop
+                }
                 Write-Host "Folder '$Path' deleted successfully."
             } catch {
                 if ($IgnoreErrors) {
@@ -149,7 +155,8 @@ function Remove-Folders {
     param (
         [Parameter(Mandatory = $false)]
         [string[]]$Folders = $null,
-        [bool]$IgnoreErrors = $true
+        [bool]$IgnoreErrors = $true,
+        [bool]$DryRun =  $false
     )
 
     if (-not $Folders -or -not ($Folders -is [array])) {
@@ -161,7 +168,7 @@ function Remove-Folders {
         $expandedFolder = [Environment]::ExpandEnvironmentVariables($folder)
         Write-Host "Processing folder: $expandedFolder"
         
-        Remove-FolderRecursive -Path $expandedFolder -IgnoreErrors $IgnoreErrors
+        Remove-FolderRecursive -Path $expandedFolder -IgnoreErrors $IgnoreErrors -DryRun $DryRun
     }
 }
 
@@ -173,4 +180,60 @@ function Get-FreeSpace {
     $os = Get-WmiObject -Class Win32_OperatingSystem
     $drive = Get-WmiObject Win32_LogicalDisk -Filter "DeviceID='$($os.SystemDrive)'" | Select @{Name="FreeGB";Expression={[math]::Round($_.FreeSpace / 1GB, 2)}}
     return "$($drive.FreeGB) GB"
+}
+
+<#
+.SYNOPSIS
+    Returns string of the size of the requested $Folders array in GB.
+    
+.PARAMETER Folders
+    Array of folder strings. Can include environment variables.
+
+#>
+
+function Get-FolderSizeInGB {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string[]]$Folders
+    )
+    
+    $animationJob = Start-Job -ScriptBlock { Show-Animation -Text "Calculating size" }
+
+    function Measure-Size {
+        param (
+            [Parameter(Mandatory = $true)]
+            [string]$Path
+        )
+
+        $totalSize = 0
+        
+        if (Test-Path $Path) {
+            try {
+                $files = Get-ChildItem -Path $Path -Recurse -File -ErrorAction Stop
+                foreach ($file in $files) {
+                    $totalSize += $file.Length
+                }
+            } catch {
+                Write-Warning "Error calculating size for '$Path': $_"
+            }
+        } else {
+            Write-Warning "Path does not exist: $Path"
+        }
+
+        Stop-Job -Job $animationJob | Out-Null
+        Remove-Job -Job $animationJob
+        
+        return $totalSize
+    }
+
+    $totalBytes = 0
+    
+    foreach ($folder in $Folders) {
+        $expandedFolder = [Environment]::ExpandEnvironmentVariables($folder)
+        $folderSize = Measure-Size -Path $expandedFolder
+        $totalBytes += $folderSize
+    }
+
+    $totalGB = [math]::Round($totalBytes / 1GB, 2) # Convert bytes to GB and round to 2 decimal places
+    return "$totalGB GB"
 }

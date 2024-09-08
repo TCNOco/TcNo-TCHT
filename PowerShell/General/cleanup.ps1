@@ -59,7 +59,8 @@ function Confirm-Cleanup {
         [Parameter(Mandatory = $true)]
         [string[]]$Folders,
         [string]$Text,
-        [bool]$DefaultYes = $true
+        [bool]$DefaultYes = $true,
+        [bool]$DryRun = $false
     )
 
     Write-Host "Clear $Text? Locations include:"
@@ -68,8 +69,10 @@ function Confirm-Cleanup {
         Write-Host "- $expandedFolder"
     }
     
+    Write-Host "Total File Size: $(Get-FolderSizeInGB -Folders $Folders)" -ForegroundColor Cyan
+
     if ($(Confirm-Text -DefaultYes $DefaultYes)) {
-        Remove-Folders -Folders $Folders
+        Remove-Folders -Folders $Folders -DryRun $DryRun
     }
 }
 
@@ -99,8 +102,10 @@ function Confirm-Text {
     }
 }
 
+# You can find a lot of these that Windows Disk Cleanup uses in:
+# Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Temporary Files
 
-$Folders = @("C:\Windows\Temp", "C:\Temp", "C:\tmp", "C:\Windows\Prefetch", "$env:LocalAppData\Temp");
+$Folders = @("$env:WinDir\Temp", "$env:WinDir\Logs", "$env:WinDir\System32\LogFiles", "$env:WinDir\SystemTemp", "C:\Temp", "C:\tmp", "C:\Windows\Prefetch", "$env:LocalAppData\Temp");
 Confirm-Cleanup -Text "known common temp/cache" -Folders $Folders
 
 
@@ -118,6 +123,10 @@ if ($(Confirm-Text -DefaultYes $true)) {
     $Folders = @("$env:windir\SoftwareDistribution\Download");
     Remove-Folders -Folders $Folders
 }
+
+
+$Folders = @("$env:WinDir\Temp", "$env:LocalAppData\Temp", "$env:SystemDrive\ESD\Windows", "$env:SystemDrive\ESD\Download", "$env:SystemDrive\`$Windows.~WS", "$env:SystemDrive\`$Windows.~BT");
+Confirm-Cleanup -Text "Windows installation/update log files & Cache" -Folders $Folders -DryRun $true
 
 
 $endTime = Get-Date
