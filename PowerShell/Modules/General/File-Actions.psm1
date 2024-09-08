@@ -55,36 +55,79 @@ function Remove-FolderRecursive {
         [bool]$IgnoreErrors = $true
     )
 
+    function Show-Animation {
+        param (
+            [int]$Duration = 3000
+        )
+        $spinner = @("|", "/", "-", "\")
+        $endTime = (Get-Date).AddMilliseconds($Duration)
+        while ((Get-Date) -lt $endTime) {
+            foreach ($frame in $spinner) {
+                if ((Get-Date) -ge $endTime) { break }
+                $host.ui.Write("Deleting files $frame`r")
+                Start-Sleep -Milliseconds 200
+            }
+        }
+        $host.ui.Write("Deleting files...`r")
+    }
+
     try {
         if (Test-Path $Path) {
-            Get-ChildItem -Path $Path -Recurse -Force | ForEach-Object {
-                try {
-                    Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Stop
-                    Write-Host "Deleted: $($_.FullName)"
-                } catch {
-                    if ($IgnoreErrors) {
-                        # Write-Warning "An error occurred while deleting '$($_.FullName)', but it was ignored: $_"
-                        # This literally increases time tenfold.
-                    } else {
-                        throw $_
+            # Start the animation in the background
+            $animationJob = Start-Job -ScriptBlock { Show-Animation }
+
+            try {
+                Get-ChildItem -Path $Path -Recurse -Force -ErrorAction Stop | ForEach-Object {
+                    try {
+                        Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Stop
+                        Write-Host "Deleted: $($_.FullName)"
+                    } catch {
+                        if ($IgnoreErrors) {
+                            # Commented out to reduce time overhead
+                            # Write-Warning "An error occurred while deleting '$($_.FullName)', but it was ignored: $_"
+                        } else {
+                            throw $_
+                        }
                     }
                 }
+            } catch {
+                if ($IgnoreErrors) {
+                    # Commented out to reduce time overhead
+                    # Write-Warning "An error occurred while accessing items in '$Path', but it was ignored: $_"
+                } else {
+                    throw $_
+                }
+            } finally {
+                # Stop the animation
+                Stop-Job -Job $animationJob | Out-Null
+                Remove-Job -Job $animationJob
+                Write-Host "Deleting files... Done.`r"
             }
 
-            Remove-Item -Path $Path -Recurse -Force -ErrorAction Stop
-            Write-Host "Folder '$Path' deleted successfully."
+            try {
+                Remove-Item -Path $Path -Recurse -Force -ErrorAction Stop
+                Write-Host "Folder '$Path' deleted successfully."
+            } catch {
+                if ($IgnoreErrors) {
+                    # Commented out to reduce time overhead
+                    # Write-Warning "An error occurred while deleting the root folder '$Path', but it was ignored: $_"
+                } else {
+                    throw $_
+                }
+            }
         } else {
             Write-Host "Folder '$Path' does not exist."
         }
     } catch {
         if ($IgnoreErrors) {
-            # Write-Warning "An error occurred, but it was ignored: $_"
-            # This literally increases time tenfold.
+            Write-Warning "An error occurred, but it was ignored: $_"
         } else {
             throw $_
         }
     }
 }
+
+
 
 
 <#
