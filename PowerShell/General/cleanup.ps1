@@ -43,13 +43,14 @@ Write-Host "NOTE: " -ForegroundColor Cyan -NoNewline
 Write-Host "When options include one capital letter, eg: (Y/n), the capital letter is the default option." -ForegroundColor Yellow
 Write-Host "Hitting Enter with nothing typed for (Y/n) will choose Yes. (y/N) will choose No.`n" -ForegroundColor Yellow
 
+$startTime = Get-Date
+Write-Host "Start Time: $startTime" -ForegroundColor Cyan
+Write-Host "Getting free space..." -ForegroundColor Cyan
+
 iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 Import-FunctionIfNotExists -Command Get-FreeSpace -ScriptUri "File-Actions.tc.ht"
 
-$startTime = Get-Date
-Write-Host "Start Time: $startTime" -ForegroundColor Cyan
-Write-Host "Getting free space..." -ForegroundColor Cyan
 $startingFreeSpace = Get-FreeSpace  
 Write-Host  "Free space before cleanup: $startingFreeSpace`n" -ForegroundColor Cyan
 
@@ -66,29 +67,36 @@ function Confirm-Cleanup {
         $expandedFolder = [Environment]::ExpandEnvironmentVariables($folder)
         Write-Host "- $expandedFolder"
     }
-        
-    if ($DefaultYes) {
-        do {
-            $continue = Read-Host "Continue? (Y/n)"
-        } while ($continue -notin "Y", "y", "1", "0", "N", "n", "")
+    
+    if ($(Confirm-Text -DefaultYes $DefaultYes)) {
+        Remove-Folders -Folders $Folders
+    }
+}
 
+function Confirm-Text {
+    param (
+        [bool]$DefaultYes = $true
+    )
+
+    do {
+        $continue = Read-Host "Continue? (Y/n)"
+    } while ($continue -notin "Y", "y", "1", "0", "N", "n", "")
+    
+    if ($DefaultYes) {
         if ($continue -in "Y", "y", "" ) {
-            Remove-Folders -Folders $Folders
+            return $true
         } else {
             Write-Host "Skippping."
+            return $false
         }
     } else {
-        do {
-            $continue = Read-Host "Continue? (y/N)"
-        } while ($continue -notin "Y", "y", "1", "0", "N", "n", "")
-        
         if ($continue -in "Y", "y" ) {
-            Remove-Folders -Folders $Folders
+            return $true
         } else {
             Write-Host "Skippping."
+            return $false
         }
     }
-    
 }
 
 
@@ -96,6 +104,20 @@ $Folders = @("C:\Windows\Temp", "C:\Temp", "C:\tmp", "C:\Windows\Prefetch", "$en
 Confirm-Cleanup -Text "known common temp/cache" -Folders $Folders
 
 
+Write-Host "`nClear Windows Update cache?"
+    
+if ($(Confirm-Text -DefaultYes $true)) {
+    $WUServ = Get-Service wuauserv
+    
+    if ($WUServ.Status -eq "Running") {
+        Write-Host "Stopping Windows Update..." -ForegroundColor Cyan
+        $WUServ | Stop-Service -Force
+    }
+
+    Write-Host "Cleaning Windows Update Cache..." -ForegroundColor Cyan
+    $Folders = @("$env:windir\SoftwareDistribution\Download");
+    Remove-Folders -Folders $Folders
+}
 
 
 $endTime = Get-Date

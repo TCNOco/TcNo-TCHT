@@ -85,6 +85,7 @@ function Remove-FolderRecursive {
                         if ($IgnoreErrors) {
                             # Commented out to reduce time overhead
                             # Write-Warning "An error occurred while deleting '$($_.FullName)', but it was ignored: $_"
+                            continue
                         } else {
                             throw $_
                         }
@@ -94,6 +95,7 @@ function Remove-FolderRecursive {
                 if ($IgnoreErrors) {
                     # Commented out to reduce time overhead
                     # Write-Warning "An error occurred while accessing items in '$Path', but it was ignored: $_"
+                    continue
                 } else {
                     throw $_
                 }
@@ -111,6 +113,7 @@ function Remove-FolderRecursive {
                 if ($IgnoreErrors) {
                     # Commented out to reduce time overhead
                     # Write-Warning "An error occurred while deleting the root folder '$Path', but it was ignored: $_"
+                    continue
                 } else {
                     throw $_
                 }
