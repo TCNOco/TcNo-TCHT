@@ -22,22 +22,60 @@
 # This script has lots of useful commands for file/directory actions
 # ----------------------------------------
 
-function Show-Animation {
-    param (
-        [string]$Text = "Deleting files",
-        [int]$Duration = 3000
-    )
-    $spinner = @("|", "/", "-", "\")
-    $endTime = (Get-Date).AddMilliseconds($Duration)
-    while ((Get-Date) -lt $endTime) {
-        foreach ($frame in $spinner) {
-            if ((Get-Date) -ge $endTime) { break }
-            $host.ui.Write("$Text $frame`r")
-            Start-Sleep -Milliseconds 200
-        }
+$script:SPINNER = @(
+    "$([char]10251)",
+    "$([char]10265)",
+    "$([char]10297)",
+    "$([char]10296)",
+    "$([char]10300)",
+    "$([char]10292)",
+    "$([char]10278)",
+    "$([char]10279)",
+    "$([char]10247)",
+    "$([char]10255)"
+)
+
+Function Write-Spinner() {
+    $script:SPINNER | Foreach-Object {
+        Write-Host "`b$_" -NoNewline
+        Start-Sleep -m 50
     }
-    $host.ui.Write("Deleting files...`r")
 }
+Function Write-Spinner() {
+    $script:SPINNER | Foreach-Object {
+        Write-Host "`b$_" -NoNewline
+        Start-Sleep -m 50
+    }
+}
+
+Function Use-Spinner() {
+    param  (
+        $Function = $null,
+        [string]$Text = "",
+        $ArgumentList
+    )
+    Try {    
+        $Job = Start-Job -ScriptBlock $Function -ArgumentList $ArgumentList
+    
+        Do {
+            Write-Host "`r$Text  " -NoNewLine
+            Write-Spinner
+        } Until ($(Get-Job -ID $Job.ID).State -eq "Completed")
+        Write-Host "`r$(" " * ($Text.Length+2))`r" -NoNewLine
+    }
+    Catch {
+        Write-Error $_
+    }
+    Finally {
+        $Output = Receive-Job $Job
+        foreach ($item in $output){
+            write-host $item
+        }
+
+        Remove-Job -Job $Job
+    }
+}
+
 
 <#
 .SYNOPSIS
@@ -75,26 +113,26 @@ function Remove-FolderRecursive {
 
     try {
         if (Test-Path $Path) {
-            # Start the animation in the background
-            $animationJob = Start-Job -ScriptBlock { Show-Animation }
-
             try {
-                Get-ChildItem -Path $Path -Recurse -Force -ErrorAction Stop | ForEach-Object {
-                    try {
-                        if (-not $DryRun) {
-                            Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Stop
-                        }
-                        Write-Host "Deleted: $($_.FullName)"
-                    } catch {
-                        if ($IgnoreErrors) {
-                            # Commented out to reduce time overhead
-                            # Write-Warning "An error occurred while deleting '$($_.FullName)', but it was ignored: $_"
-                            continue
-                        } else {
-                            throw $_
+                $MyJob = {
+                    Get-ChildItem -Path $Path -Recurse -Force -ErrorAction Stop | ForEach-Object {
+                        try {
+                            if (-not $DryRun) {
+                                Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Stop
+                            }
+                            Write-Host "Deleted: $($_.FullName)"
+                        } catch {
+                            if ($IgnoreErrors) {
+                                # Commented out to reduce time overhead
+                                # Write-Warning "An error occurred while deleting '$($_.FullName)', but it was ignored: $_"
+                                continue
+                            } else {
+                                throw $_
+                            }
                         }
                     }
                 }
+                Use-Spinner -Text "Deleting files... " -Function $MyJob
             } catch {
                 if ($IgnoreErrors) {
                     # Commented out to reduce time overhead
@@ -103,11 +141,6 @@ function Remove-FolderRecursive {
                 } else {
                     throw $_
                 }
-            } finally {
-                # Stop the animation
-                Stop-Job -Job $animationJob | Out-Null
-                Remove-Job -Job $animationJob
-                Write-Host "Deleting files... Done.`r"
             }
 
             try {
@@ -182,6 +215,8 @@ function Get-FreeSpace {
     return "$($drive.FreeGB) GB"
 }
 
+
+
 <#
 .SYNOPSIS
     Returns string of the size of the requested $Folders array in GB.
@@ -194,44 +229,56 @@ function Get-FreeSpace {
 function Get-FolderSizeInGB {
     param (
         [Parameter(Mandatory = $true)]
-        [string[]]$Folders
+        [string[]]$Folders,
+        [bool]$IgnoreErrors = $true
     )
-    
-    $animationJob = Start-Job -ScriptBlock { Show-Animation -Text "Calculating size" }
 
-    function Measure-Size {
-        param (
-            [Parameter(Mandatory = $true)]
-            [string]$Path
-        )
-
-        $totalSize = 0
-        
-        if (Test-Path $Path) {
-            try {
-                $files = Get-ChildItem -Path $Path -Recurse -File -ErrorAction Stop
-                foreach ($file in $files) {
-                    $totalSize += $file.Length
-                }
-            } catch {
-                Write-Warning "Error calculating size for '$Path': $_"
-            }
-        } else {
-            Write-Warning "Path does not exist: $Path"
-        }
-
-        Stop-Job -Job $animationJob | Out-Null
-        Remove-Job -Job $animationJob
-        
-        return $totalSize
-    }
 
     $totalBytes = 0
-    
     foreach ($folder in $Folders) {
-        $expandedFolder = [Environment]::ExpandEnvironmentVariables($folder)
-        $folderSize = Measure-Size -Path $expandedFolder
-        $totalBytes += $folderSize
+        $MyJob = {
+            param ([string]$folder, [bool]$IgnoreErrors)
+
+            function Measure-Size {
+                param (
+                    [Parameter(Mandatory = $true)]
+                    [string]$Path,
+                    [bool]$IgnoreErrors =  $true
+                )
+            
+                $totalSize = 0
+                
+                if (Test-Path $Path) {
+                    try {
+                        $files = Get-ChildItem -Path $Path -Recurse -File -ErrorAction Stop
+                        foreach ($file in $files) {
+                            try {
+                                $totalSize += $file.Length
+                            } catch {
+                                if  (-not $IgnoreErrors) {
+                                    Write-Warning "Error accessing file '$($file.FullName)': $_"
+                                }
+                            }
+                        }
+                    } catch {
+                        if  (-not $IgnoreErrors) {
+                            Write-Warning "Error calculating size for folder '$Path': $_"
+                        }
+                    }
+                } else {
+                    if  (-not $IgnoreErrors) {
+                        Write-Warning "Path does not exist: $Path"
+                    }
+                }
+            
+                return $totalSize
+            }
+
+            $expandedFolder = [Environment]::ExpandEnvironmentVariables($folder)
+            $folderSize = Measure-Size -Path $expandedFolder -IgnoreErrors $IgnoreErrors
+            $totalBytes += $folderSize
+        }
+        Use-Spinner -Text "Calculating size... " -Function $MyJob -ArgumentList @($folder, $IgnoreErrors)
     }
 
     $totalGB = [math]::Round($totalBytes / 1GB, 2) # Convert bytes to GB and round to 2 decimal places

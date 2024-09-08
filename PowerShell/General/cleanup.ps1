@@ -24,6 +24,13 @@
 # input as they may contain things like logins and more.
 # ----------------------------------------
 
+Write-Host  "NOT READY"
+Write-Host  "DO NOT USE"
+#exit
+exit
+return
+
+
 Write-Host "---------------------------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "Welcome to TroubleChute's Cache & Temp Cleanup Tool!" -ForegroundColor Cyan
 Write-Host "This script:" -ForegroundColor Cyan
@@ -49,7 +56,8 @@ Write-Host "Getting free space..." -ForegroundColor Cyan
 
 iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
-Import-FunctionIfNotExists -Command Get-FreeSpace -ScriptUri "File-Actions.tc.ht"
+# Import-FunctionIfNotExists -Command Get-FreeSpace -ScriptUri "File-Actions.tc.ht"
+Import-Module C:\Users\tcno\Documents\GitHub\TcNo-TCHT\PowerShell\Modules\General\File-Actions.psm1 -Force
 
 $startingFreeSpace = Get-FreeSpace  
 Write-Host  "Free space before cleanup: $startingFreeSpace`n" -ForegroundColor Cyan
@@ -121,7 +129,7 @@ if ($(Confirm-Text -DefaultYes $true)) {
 
     Write-Host "Cleaning Windows Update Cache..." -ForegroundColor Cyan
     $Folders = @("$env:windir\SoftwareDistribution\Download");
-    Remove-Folders -Folders $Folders
+    Remove-Folders -Folders $Folders -DryRun $true
 }
 
 
