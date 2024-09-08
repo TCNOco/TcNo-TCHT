@@ -57,6 +57,20 @@ function Remove-FolderRecursive {
 
     try {
         if (Test-Path $Path) {
+            Get-ChildItem -Path $Path -Recurse -Force | ForEach-Object {
+                try {
+                    Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction Stop
+                    Write-Host "Deleted: $($_.FullName)"
+                } catch {
+                    if ($IgnoreErrors) {
+                        # Write-Warning "An error occurred while deleting '$($_.FullName)', but it was ignored: $_"
+                        # This literally increases time tenfold.
+                    } else {
+                        throw $_
+                    }
+                }
+            }
+
             Remove-Item -Path $Path -Recurse -Force -ErrorAction Stop
             Write-Host "Folder '$Path' deleted successfully."
         } else {
@@ -64,12 +78,14 @@ function Remove-FolderRecursive {
         }
     } catch {
         if ($IgnoreErrors) {
-            Write-Warning "An error occurred, but it was ignored: $_"
+            # Write-Warning "An error occurred, but it was ignored: $_"
+            # This literally increases time tenfold.
         } else {
             throw $_
         }
     }
 }
+
 
 <#
 .SYNOPSIS

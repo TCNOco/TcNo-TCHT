@@ -32,7 +32,12 @@ Write-Host "- Prompt you when deleting more important Cache/Temp folders" -Foreg
 Write-Host "[Version 2024-09-08]" -ForegroundColor Cyan
 Write-Host "`nThis script is provided AS-IS without warranty of any kind. See https://tc.ht/privacy & https://tc.ht/terms."
 Write-Host "Consider supporting these install scripts: https://tc.ht/support" -ForegroundColor Green
-Write-Host "---------------------------------------------------------------------------`n`n" -ForegroundColor Cyan
+Write-Host "---------------------------------------------------------------------------`n" -ForegroundColor Cyan
+
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but not all temp/cache folders can be cleared properly. Press Enter to continue..." -ForegroundColor Red
+    Read-Host
+}
 
 Write-Host "NOTE: " -ForegroundColor Cyan -NoNewline
 Write-Host "When options include one capital letter, eg: (Y/n), the capital letter is the default option." -ForegroundColor Yellow
@@ -42,7 +47,11 @@ iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 Import-FunctionIfNotExists -Command Get-FreeSpace -ScriptUri "File-Actions.tc.ht"
 
-Write-Host  "Space before cleanup: $(Get-FreeSpace)`n`n"
+$startTime = Get-Date
+Write-Host "Start Time: $startTime" -ForegroundColor Cyan
+Write-Host "Getting free space..." -ForegroundColor Cyan
+$startingFreeSpace = Get-FreeSpace  
+Write-Host  "Free space before cleanup: $startingFreeSpace`n" -ForegroundColor Cyan
 
 function Confirm-Cleanup {
     param (
@@ -88,3 +97,10 @@ Confirm-Cleanup -Text "known common temp/cache" -Folders $Folders
 
 
 
+
+$endTime = Get-Date
+Write-Host "End Time: $endTime" -ForegroundColor Cyan
+$duration = $endTime - $startTime
+Write-Host "Duration: $($duration.TotalSeconds) seconds" -ForegroundColor Cyan
+Write-Host  "Free space before cleanup: $startingFreeSpace" -ForegroundColor Cyan
+Write-Host  "Free space after cleanup: $(Get-FreeSpace)`n" -ForegroundColor Cyan
