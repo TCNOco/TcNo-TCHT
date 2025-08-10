@@ -30,11 +30,6 @@ Write-Host "--------------------------------------------------------------------
 
 Set-Variable ProgressPreference SilentlyContinue # Remove annoying yellow progress bars when doing Invoke-WebRequest for this session
 
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
-    Read-Host
-}
-
 # Allow importing remote functions
 iex (irm Import-RemoteFunction.tc.ht)
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
