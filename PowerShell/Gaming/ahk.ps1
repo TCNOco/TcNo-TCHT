@@ -42,15 +42,39 @@ $tempPath = [System.IO.Path]::GetTempPath()
 try {
     Write-Host "Fetching latest release info from GitHub..." -ForegroundColor Yellow
     $release = Invoke-RestMethod -Uri $apiUrl -Headers @{ 'User-Agent' = 'TcNo-TCHT-Script' }
+    $tagName = $release.tag_name
+    
     $asset = $release.assets | Where-Object { $_.name -eq 'Autohotkey.Finder.exe' } | Select-Object -First 1
     if (-not $asset) {
         Write-Host "Could not find Autohotkey.Finder.exe in the latest release assets." -ForegroundColor Red
         exit 1
     }
-    $downloadUrl = $asset.browser_download_url
-    $outFile = Join-Path $tempPath 'Autohotkey.Finder.exe'
-    Write-Host "Downloading $($asset.name) to $outFile..." -ForegroundColor Yellow
-    Invoke-WebRequest -Uri $downloadUrl -OutFile $outFile -UseBasicParsing
+    
+    # Create filename with tag_name appended
+    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($asset.name)
+    $extension = [System.IO.Path]::GetExtension($asset.name)
+    $versionedName = "$baseName-$tagName$extension"
+    $outFile = Join-Path $tempPath $versionedName
+    
+    # Check if file already exists and is valid
+    $needsDownload = $true
+    if (Test-Path $outFile) {
+        $fileInfo = Get-Item $outFile
+        if ($fileInfo.Length -gt 0) {
+            Write-Host "Found existing version $tagName at $outFile. Skipping download." -ForegroundColor Green
+            $needsDownload = $false
+        } else {
+            Write-Host "Existing file is invalid (zero size). Will re-download." -ForegroundColor Yellow
+        }
+    }
+    
+    if ($needsDownload) {
+        $downloadUrl = $asset.browser_download_url
+        Write-Host "Downloading $($asset.name) (version $tagName) to $outFile..." -ForegroundColor Yellow
+        Invoke-WebRequest -Uri $downloadUrl -OutFile $outFile -UseBasicParsing
+        Write-Host "Download complete." -ForegroundColor Green
+    }
+    
     Write-Host "Running Autohotkey.Finder.exe in this window...`n`n`n" -ForegroundColor Green
     Clear-ConsoleScreen
     & $outFile
