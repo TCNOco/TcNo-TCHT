@@ -122,7 +122,11 @@ if (-not $isSystem) {
 Write-Step 'Restoring Windows Update service startup types'
 Set-Service -Name 'wuauserv' -StartupType Automatic
 Set-Service -Name 'UsoSvc' -StartupType Automatic
-Set-Service -Name 'uhssvc' -StartupType AutomaticDelayedStart
+Write-StepDetail 'Configuring uhssvc for delayed automatic startup'
+$uhsSvcConfig = Start-Process -FilePath 'sc.exe' -ArgumentList @('config', 'uhssvc', 'start=', 'delayed-auto') -NoNewWindow -Wait -PassThru
+if ($uhsSvcConfig.ExitCode -ne 0) {
+    Write-Warning "Unable to configure 'uhssvc' for delayed automatic startup."
+}
 
 # Restore renamed services (Happens with https://github.com/tsgrgo/windows-update-disabler)
 Write-Step 'Restoring renamed Windows Update DLLs if needed'
@@ -146,19 +150,39 @@ foreach ($name in @('WaaSMedicSvc', 'wuaueng')) {
 
 # Update registry
 Write-Step 'Restoring Windows Update registry settings'
-Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\WaaSMedicSvc' -Name Start -Type DWord -Value 3
-
+$waasMedicPsPath = 'HKLM:\SYSTEM\CurrentControlSet\Services\WaaSMedicSvc'
+$waasMedicNativePath = 'HKLM\SYSTEM\CurrentControlSet\Services\WaaSMedicSvc'
 $failureActionsHex = '840300000000000000000000030000001400000001000000c0d4010001000000e09304000000000000000000'
 [byte[]]$failureActionsBytes = for ($i = 0; $i -lt $failureActionsHex.Length; $i += 2) {
     [Convert]::ToByte($failureActionsHex.Substring($i, 2), 16)
 }
 
-New-ItemProperty `
-    -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\WaaSMedicSvc' `
-    -Name 'FailureActions' `
-    -PropertyType Binary `
-    -Value $failureActionsBytes `
-    -Force | Out-Null
+try {
+    Set-ItemProperty -Path $waasMedicPsPath -Name Start -Type DWord -Value 3 -ErrorAction Stop
+    New-ItemProperty `
+        -Path $waasMedicPsPath `
+        -Name 'FailureActions' `
+        -PropertyType Binary `
+        -Value $failureActionsBytes `
+        -Force `
+        -ErrorAction Stop | Out-Null
+}
+catch [System.Security.SecurityException] {
+    Write-Warning "Direct access to 'WaaSMedicSvc' registry settings was blocked. Trying reg.exe fallback."
+
+    $waasMedicStartResult = Start-Process -FilePath 'reg.exe' -ArgumentList @('add', $waasMedicNativePath, '/v', 'Start', '/t', 'REG_DWORD', '/d', '3', '/f') -NoNewWindow -Wait -PassThru
+    $waasMedicFailureResult = Start-Process -FilePath 'reg.exe' -ArgumentList @('add', $waasMedicNativePath, '/v', 'FailureActions', '/t', 'REG_BINARY', '/d', $failureActionsHex, '/f') -NoNewWindow -Wait -PassThru
+
+    if ($waasMedicStartResult.ExitCode -eq 0 -and $waasMedicFailureResult.ExitCode -eq 0) {
+        Write-StepSuccess "Restored 'WaaSMedicSvc' registry settings via reg.exe"
+    }
+    else {
+        Write-Warning "'WaaSMedicSvc' is protected on this system. Some registry settings could not be restored without TrustedInstaller-level access."
+    }
+}
+catch {
+    Write-Warning "Failed to restore 'WaaSMedicSvc' registry settings: $($_.Exception.Message)"
+}
 
 Remove-ItemProperty `
     -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' `
