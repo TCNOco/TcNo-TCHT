@@ -76,6 +76,8 @@ Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $isSystem = $currentIdentity.User.Value -eq 'S-1-5-18'
 if (-not $isSystem) {
+    Write-Host "This script will elevate to System to have more permissions."
+    Write-Host "First it must download a copy of PsExec from Microsoft Sysinternals, then it will relaunch."
     # Set up install directory
     Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
     $TCHT = Get-TCHTPath
