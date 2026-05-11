@@ -450,3 +450,11 @@ Write-Host '==============================================='
 Write-Host '-- Reset All Windows Update Settings to Stock -'
 Write-Host '==============================================='
 Write-StepSuccess 'Finished. Please reboot your computer.'
+Write-Host 'Press any key to close this window...' -ForegroundColor Yellow
+
+try {
+    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+}
+catch {
+    Read-Host 'Press Enter to close this window'
+}
