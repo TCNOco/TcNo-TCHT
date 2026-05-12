@@ -65,7 +65,9 @@ function Write-StepSuccess {
     Write-Host "[OK] $Message" -ForegroundColor Green
 }
 
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if (-not $isAdmin) {
     Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
     Read-Host
 }
@@ -75,7 +77,9 @@ Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 
 $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $isSystem = $currentIdentity.User.Value -eq 'S-1-5-18'
-if (-not $isSystem) {
+$systemRelaunchAttempted = $env:TCHT_FIXUPDATES_SYSTEM_ATTEMPTED -eq '1'
+
+if (-not $isSystem -and $isAdmin -and -not $systemRelaunchAttempted) {
     Write-Host "This script will elevate to System to have more permissions."
     Write-Host "First it must download a copy of PsExec from Microsoft Sysinternals, then it will relaunch."
     # Set up install directory
@@ -111,11 +115,20 @@ if (-not $isSystem) {
         'powershell.exe'
         '-NoProfile'
         '-ExecutionPolicy', 'Bypass'
-        '-Command', "iex (irm 'https://fixupdates.tc.ht')"
+        '-Command', "`$env:TCHT_FIXUPDATES_SYSTEM_ATTEMPTED='1'; iex (irm 'https://fixupdates.tc.ht')"
     ) -Verb RunAs
     return
 }
-# This script should now be running as system.
+
+if (-not $isSystem -and $isAdmin -and $systemRelaunchAttempted) {
+    Write-Warning "SYSTEM relaunch was already attempted once. Continuing with administrator rights."
+}
+elseif ($isSystem) {
+    Write-StepSuccess 'Running as NT AUTHORITY\SYSTEM'
+}
+elseif (-not $isAdmin) {
+    Write-Warning 'Continuing without administrator rights. Some repair steps may fail.'
+}
 
 
 # Configure services
