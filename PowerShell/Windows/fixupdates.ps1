@@ -20,8 +20,8 @@
 #
 # ----------------------------------------
 # This script:
-# 1. Downloads PSExec to update
-# 2. Runs the fixer script as System (higher than Admin) using PSExec
+# 1. Elevates to Administrator by default
+# 2. Optionally runs the fixer as System (higher than Admin) using PSExec
 # 3. Undo changes possibly made by https://github.com/tsgrgo/windows-update-disabler
 # 4. Undo changes possibly made by Privacy.sexy
 # 5. Run the Chris Titus Tech Windows Update - Reset script from: https://github.com/ChrisTitusTech/winutil/blob/main/docs/content/dev/features/Fixes/Update.md
@@ -66,67 +66,112 @@ function Write-StepSuccess {
 }
 
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+$adminRelaunchAttempted = $env:TCHT_FIXUPDATES_ADMIN_ATTEMPTED -eq '1'
 
-if (-not $isAdmin) {
-    Write-Host "This script needs to be run as an administrator.`nProcess can try to continue, but will likely fail. Press Enter to continue..." -ForegroundColor Red
-    Read-Host
+if (-not $isAdmin -and -not $adminRelaunchAttempted) {
+    Write-Step 'Requesting administrator access' -Color Yellow
+    Write-Host 'Windows may show a permission prompt next.' -ForegroundColor Gray
+
+    $adminCommand = '$env:TCHT_FIXUPDATES_ADMIN_ATTEMPTED=''1''; Invoke-Expression (Invoke-RestMethod ''https://fixupdates.tc.ht'')'
+
+    try {
+        Start-Process -FilePath 'powershell.exe' -Verb RunAs -ArgumentList @(
+            '-NoProfile'
+            '-ExecutionPolicy', 'Bypass'
+            '-Command', $adminCommand
+        )
+        return
+    }
+    catch {
+        Write-Warning 'Administrator approval was cancelled or could not be started. Continuing without administrator rights.'
+    }
+}
+elseif (-not $isAdmin -and $adminRelaunchAttempted) {
+    Write-Warning 'Administrator relaunch was already attempted once. Continuing without administrator rights.'
 }
 
-iex (irm Import-RemoteFunction.tc.ht) # Get RemoteFunction importer
+Invoke-Expression (Invoke-RestMethod 'https://Import-RemoteFunction.tc.ht') # Get RemoteFunction importer
 Import-RemoteFunction("Get-GeneralFuncs.tc.ht")
 
 $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $isSystem = $currentIdentity.User.Value -eq 'S-1-5-18'
 $systemRelaunchAttempted = $env:TCHT_FIXUPDATES_SYSTEM_ATTEMPTED -eq '1'
 
-if (-not $isSystem -and $isAdmin -and -not $systemRelaunchAttempted) {
-    Write-Host "This script will elevate to System to have more permissions."
-    Write-Host "First it must download a copy of PsExec from Microsoft Sysinternals, then it will relaunch."
-    # Set up install directory
-    Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
-    $TCHT = Get-TCHTPath
-
-    if (!(Test-Path -Path "$TCHT\PsExec")) {
-        New-Item -ItemType Directory -Path "$TCHT\PsExec" | Out-Null
-    }
-
-    # Then CD into $TCHT\
-    Set-Location "$TCHT\PsExec"
-
-    Write-Step "Downloading the latest PsExec"
-    Invoke-WebRequest -Uri "https://download.sysinternals.com/files/PSTools.zip" -OutFile "PSTools.zip"
-
-    Write-Step "Extracting PsExec"
-    Expand-Archive -Path "PSTools.zip" -DestinationPath ./ -Force
-    Remove-Item -Path "PSTools.zip"
-
-    $psExec = Join-Path "$TCHT\PsExec" "PsExec64.exe"
-    if (-not (Test-Path $psExec)) {
-        $psExec = Join-Path "$TCHT\PsExec" "PsExec.exe"
-    }
-    if (-not (Test-Path $psExec)) {
-        throw "PsExec was not found after extraction."
-    }
-    Write-Step "Relaunching this script as NT AUTHORITY\SYSTEM" -Color Yellow
-    Start-Process -FilePath $psExec -ArgumentList @(
-        '-accepteula'
-        '-i'
-        '-s'
-        'powershell.exe'
-        '-NoProfile'
-        '-ExecutionPolicy', 'Bypass'
-        '-Command', "`$env:TCHT_FIXUPDATES_SYSTEM_ATTEMPTED='1'; iex (irm 'https://fixupdates.tc.ht')"
-    ) -Verb RunAs
-    return
-}
-
-if (-not $isSystem -and $isAdmin -and $systemRelaunchAttempted) {
-    Write-Warning "SYSTEM relaunch was already attempted once. Continuing with administrator rights."
-}
-elseif ($isSystem) {
+if ($isSystem) {
     Write-StepSuccess 'Running as NT AUTHORITY\SYSTEM'
 }
-elseif (-not $isAdmin) {
+elseif ($isAdmin -and $systemRelaunchAttempted) {
+    Write-Warning 'Higher permissions were already attempted once. Continuing in administrator mode.'
+}
+elseif ($isAdmin) {
+    Write-Host ''
+    Write-Step 'Administrator mode is ready'
+    Write-Host 'Most people should just press Enter and continue.' -ForegroundColor Gray
+    Write-Host 'If this fixer has not worked well for you before, you can press Y to try a deeper repair with higher permissions.' -ForegroundColor Gray
+    $trySystem = Read-Host 'Press Enter to continue, or type Y for higher permissions'
+
+    if ($trySystem -match '^(?i)y(?:es)?$') {
+        try {
+            Import-FunctionIfNotExists -Command Get-TCHTPath -ScriptUri "Get-TCHTPath.tc.ht"
+            $TCHT = Get-TCHTPath
+            $psExecFolder = Join-Path $TCHT 'PsExec'
+
+            if (-not (Test-Path -Path $psExecFolder)) {
+                New-Item -ItemType Directory -Path $psExecFolder | Out-Null
+            }
+
+            $psExec = Join-Path $psExecFolder 'PsExec64.exe'
+            if (-not (Test-Path $psExec)) {
+                $psExec = Join-Path $psExecFolder 'PsExec.exe'
+            }
+
+            if (-not (Test-Path $psExec)) {
+                $oldLocation = Get-Location
+                try {
+                    Set-Location $psExecFolder
+                    Write-Step 'Downloading PsExec from Microsoft Sysinternals' -Color Yellow
+                    Invoke-WebRequest -Uri 'https://download.sysinternals.com/files/PSTools.zip' -OutFile 'PSTools.zip'
+
+                    Write-Step 'Extracting PsExec' -Color Yellow
+                    Expand-Archive -Path 'PSTools.zip' -DestinationPath '.' -Force
+                    Remove-Item -Path 'PSTools.zip'
+                }
+                finally {
+                    Set-Location $oldLocation
+                }
+
+                $psExec = Join-Path $psExecFolder 'PsExec64.exe'
+                if (-not (Test-Path $psExec)) {
+                    $psExec = Join-Path $psExecFolder 'PsExec.exe'
+                }
+            }
+
+            if (Test-Path $psExec) {
+                $systemCommand = '$env:TCHT_FIXUPDATES_ADMIN_ATTEMPTED=''1''; $env:TCHT_FIXUPDATES_SYSTEM_ATTEMPTED=''1''; Invoke-Expression (Invoke-RestMethod ''https://fixupdates.tc.ht'')'
+                Write-Step 'Trying higher permissions in this window' -Color Yellow
+                Write-StepDetail 'If this does not start, the script will continue in administrator mode.'
+                & $psExec -accepteula -nobanner -s powershell.exe -NoProfile -ExecutionPolicy Bypass -Command $systemCommand
+                $psExecExitCode = $LASTEXITCODE
+
+                if ($psExecExitCode -eq 0) {
+                    return
+                }
+
+                Write-Warning "The higher-permission relaunch did not start correctly (PsExec exit code: $psExecExitCode). Continuing in administrator mode."
+            }
+            else {
+                Write-Warning 'PsExec could not be found after extraction. Continuing in administrator mode.'
+            }
+        }
+        catch {
+            Write-Warning "Could not start the higher-permission relaunch. Continuing in administrator mode. Error: $($_.Exception.Message)"
+        }
+    }
+    else {
+        Write-Step 'Continuing in administrator mode'
+    }
+}
+else {
     Write-Warning 'Continuing without administrator rights. Some repair steps may fail.'
 }
 
